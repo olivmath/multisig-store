@@ -114,7 +114,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
       <div className="space-y-1">
         <p className="text-xs text-gray-500">Destination</p>
         <p className="font-mono text-sm">
-          {tx.destination.slice(0, 10)}...{tx.destination.slice(-8)}
+          {tx.destination ? `${tx.destination.slice(0, 10)}...${tx.destination.slice(-8)}` : 'Invalid address'}
         </p>
       </div>
 

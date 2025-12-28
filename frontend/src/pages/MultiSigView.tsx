@@ -18,8 +18,8 @@ export function MultiSigView() {
   const { owners, required, txCount } = useMultiSig(multiSigAddress)
   const { data: balance } = useBalance({ address: multiSigAddress })
 
-  // Listen for real-time events
-  useMultiSigEvents(multiSigAddress)
+  // Listen for real-time events - DISABLED temporarily due to RPC rate limit
+  // useMultiSigEvents(multiSigAddress)
 
   if (!isConnected) {
     return (
