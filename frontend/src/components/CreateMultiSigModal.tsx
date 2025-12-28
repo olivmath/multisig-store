@@ -13,14 +13,14 @@ export function CreateMultiSigModal({ isOpen, onClose }: CreateMultiSigModalProp
   const [owners, setOwners] = useState<string[]>([''])
   const [required, setRequired] = useState(1)
   const [errors, setErrors] = useState<Record<number, string>>({})
-  const { createMultiSig, isCreating, isSuccess } = useMultiSigFactory()
+  const { createMultiSig, isCreating, isSuccess, refetchUserMultiSigs } = useMultiSigFactory()
 
   if (!isOpen) return null
 
   if (isSuccess) {
     setTimeout(() => {
+      refetchUserMultiSigs()
       onClose()
-      window.location.reload()
     }, 2000)
   }
 

@@ -60,8 +60,14 @@ export function Dashboard() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {userMultiSigs.map((address) => (
-              <WalletCard key={address} address={address} />
+            {userMultiSigs.map((address, index) => (
+              <div
+                key={address}
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <WalletCard address={address} />
+              </div>
             ))}
           </div>
         )}

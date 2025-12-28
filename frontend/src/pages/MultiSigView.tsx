@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useAccount, useBalance } from 'wagmi'
 import { formatEther } from 'viem'
 import { useMultiSig } from '@/hooks/useMultiSig'
+import { useMultiSigEvents } from '@/hooks/useEventListener'
 import { Card } from '@/components/ui/Card'
 import { SubmitTransactionForm } from '@/components/SubmitTransactionForm'
 import { TransactionTimeline } from '@/components/TransactionTimeline'
@@ -13,6 +14,9 @@ export function MultiSigView() {
 
   const { owners, required, txCount } = useMultiSig(multiSigAddress)
   const { data: balance } = useBalance({ address: multiSigAddress })
+
+  // Listen for real-time events
+  useMultiSigEvents(multiSigAddress)
 
   if (!isConnected) {
     return (
