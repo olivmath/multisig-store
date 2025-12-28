@@ -13,9 +13,8 @@ interface TransactionCardProps {
 interface Transaction {
   destination: `0x${string}`
   value: bigint
-  data: `0x${string}`
   executed: boolean
-  confirmations: number
+  data: `0x${string}`
 }
 
 export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps) {
@@ -23,12 +22,14 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
   const { required, confirmTransaction, executeTransaction } = useMultiSig(multiSigAddress)
 
   // Read transaction data
-  const { data: tx } = useReadContract({
+  const { data: txData } = useReadContract({
     address: multiSigAddress,
     abi: multiSigABI,
     functionName: 'transactions',
     args: [txId],
-  }) as { data: Transaction | undefined }
+  })
+
+  const tx = txData as Transaction | undefined
 
   // Read if transaction is confirmed (has enough confirmations)
   const { data: isConfirmed } = useReadContract({
@@ -119,9 +120,9 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
       {/* Confirmations Progress */}
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <p className="text-xs text-gray-500">Confirmations</p>
+          <p className="text-xs text-gray-500">Status</p>
           <p className="text-xs text-gray-400">
-            {tx.confirmations} of {required} required
+            {isConfirmed ? `${required} of ${required}` : `Pending (need ${required})`}
           </p>
         </div>
         <div className="w-full bg-gray-700 rounded-full h-2">
@@ -131,7 +132,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
               tx.executed ? 'bg-green-500' : isConfirmed ? 'bg-blue-500' : 'bg-yellow-500'
             )}
             style={{
-              width: `${Math.min((tx.confirmations / required) * 100, 100)}%`,
+              width: isConfirmed ? '100%' : '50%',
             }}
           />
         </div>
