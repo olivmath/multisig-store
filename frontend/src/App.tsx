@@ -1,5 +1,7 @@
+import { Routes, Route, Link } from 'react-router-dom'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { Dashboard } from './pages/Dashboard'
+import { MultiSigView } from './pages/MultiSigView'
 import { Button } from './components/ui/Button'
 
 function App() {
@@ -12,7 +14,9 @@ function App() {
       {/* Header */}
       <header className="border-b border-gray-800">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold">MultiSig Wallet</h1>
+          <Link to="/" className="text-xl font-bold hover:text-gray-300 transition-colors">
+            MultiSig Wallet
+          </Link>
 
           {isConnected ? (
             <div className="flex items-center gap-4">
@@ -40,7 +44,10 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <Dashboard />
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/multisig/:address" element={<MultiSigView />} />
+      </Routes>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAccount } from 'wagmi'
 import { useMultiSigFactory } from '@/hooks/useMultiSigFactory'
 import { Card } from '@/components/ui/Card'
@@ -73,21 +74,23 @@ function WalletCard({ address }: { address: `0x${string}` }) {
   const { owners, required } = useMultiSig(address)
 
   return (
-    <Card className="hover:border-blue-600/50 cursor-pointer">
-      <div className="space-y-3">
-        <div>
-          <p className="text-xs text-gray-500 mb-1">MultiSig Address</p>
-          <p className="font-mono text-sm">
-            {address.slice(0, 6)}...{address.slice(-4)}
-          </p>
-        </div>
+    <Link to={`/multisig/${address}`}>
+      <Card className="hover:border-blue-600/50 cursor-pointer transition-all hover:scale-[1.02]">
+        <div className="space-y-3">
+          <div>
+            <p className="text-xs text-gray-500 mb-1">MultiSig Address</p>
+            <p className="font-mono text-sm">
+              {address.slice(0, 6)}...{address.slice(-4)}
+            </p>
+          </div>
 
-        <div className="pt-3 border-t border-gray-800 flex justify-between text-sm">
-          <span className="text-gray-400">{owners.length} owners</span>
-          <span className="text-blue-400">{required}/{owners.length} required</span>
+          <div className="pt-3 border-t border-gray-800 flex justify-between text-sm">
+            <span className="text-gray-400">{owners.length} owners</span>
+            <span className="text-blue-400">{required}/{owners.length} required</span>
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </Link>
   )
 }
 
