@@ -1,11 +1,14 @@
+import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { useMultiSigFactory } from '@/hooks/useMultiSigFactory'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { CreateMultiSigModal } from '@/components/CreateMultiSigModal'
 
 export function Dashboard() {
   const { isConnected } = useAccount()
   const { userMultiSigs } = useMultiSigFactory()
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   if (!isConnected) {
     return (
@@ -29,8 +32,14 @@ export function Dashboard() {
               {userMultiSigs.length} wallet{userMultiSigs.length !== 1 ? 's' : ''}
             </p>
           </div>
-          <Button>+ Create New Wallet</Button>
+          <Button onClick={() => setIsCreateModalOpen(true)}>+ Create New Wallet</Button>
         </div>
+
+        {/* Create Modal */}
+        <CreateMultiSigModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+        />
 
         {/* Wallets Grid */}
         {userMultiSigs.length === 0 ? (
@@ -43,7 +52,9 @@ export function Dashboard() {
                 <h3 className="text-lg font-medium text-white mb-2">No MultiSig Wallets Yet</h3>
                 <p className="text-sm">Create your first multisig wallet to get started</p>
               </div>
-              <Button className="mt-4">Create Your First Wallet</Button>
+              <Button className="mt-4" onClick={() => setIsCreateModalOpen(true)}>
+                Create Your First Wallet
+              </Button>
             </div>
           </Card>
         ) : (
