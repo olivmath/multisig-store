@@ -1,4 +1,6 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { Dashboard } from './pages/Dashboard'
+import { Button } from './components/ui/Button'
 
 function App() {
   const { address, isConnected } = useAccount()
@@ -6,43 +8,39 @@ function App() {
   const { disconnect } = useDisconnect()
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
-      <div className="max-w-2xl w-full space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-2">MultiSig Wallet</h1>
-          <p className="text-gray-500">Secure multi-signature ethereum wallets</p>
-        </div>
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <header className="border-b border-gray-800">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold">MultiSig Wallet</h1>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-md p-6 space-y-4">
           {isConnected ? (
-            <>
-              <div>
-                <p className="text-sm text-gray-500 mb-2">Connected Address:</p>
-                <p className="font-mono text-white">{address}</p>
-              </div>
-              <button
-                onClick={() => disconnect()}
-                className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-400 font-mono">
+                {address?.slice(0, 6)}...{address?.slice(-4)}
+              </span>
+              <Button variant="ghost" size="sm" onClick={() => disconnect()}>
                 Disconnect
-              </button>
-            </>
+              </Button>
+            </div>
           ) : (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-500">Connect your wallet to continue</p>
+            <div className="flex gap-2">
               {connectors.map((connector) => (
-                <button
+                <Button
                   key={connector.id}
+                  size="sm"
                   onClick={() => connect({ connector })}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
-                  Connect {connector.name}
-                </button>
+                  Connect Wallet
+                </Button>
               ))}
             </div>
           )}
         </div>
-      </div>
+      </header>
+
+      {/* Main Content */}
+      <Dashboard />
     </div>
   )
 }
