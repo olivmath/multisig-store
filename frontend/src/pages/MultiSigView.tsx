@@ -86,19 +86,9 @@ export function MultiSigView() {
               <p className="text-3xl font-bold">
                 {required}/{owners.length}
               </p>
-              <div className="pt-2">
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full bg-blue-600"
-                    style={{
-                      width: `${(required / owners.length) * 100}%`,
-                    }}
-                  />
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  {required === 1 ? '1 signature needed' : `${required} signatures needed`}
-                </p>
-              </div>
+              <p className="text-sm text-gray-400 pt-2">
+                {required === 1 ? '1 signature needed' : `${required} signatures needed`}
+              </p>
             </div>
           </Card>
 

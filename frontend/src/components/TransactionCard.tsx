@@ -22,7 +22,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
   const { required, confirmTransaction, executeTransaction } = useMultiSig(multiSigAddress)
 
   // Read transaction data
-  const { data: txData } = useReadContract({
+  const { data: txData, isLoading: txLoading } = useReadContract({
     address: multiSigAddress,
     abi: multiSigABI,
     functionName: 'transactions',
@@ -50,7 +50,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     },
   })
 
-  if (!tx) {
+  if (txLoading || !tx || !required) {
     return (
       <div className="bg-gray-800/50 rounded-md p-4 animate-pulse">
         <div className="h-4 bg-gray-700 rounded w-1/3 mb-2"></div>
@@ -79,7 +79,8 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     executeTransaction(txId)
   }
 
-  const isETHTransfer = tx.data === '0x' || tx.data === '0x0'
+  // Check if it's an ETH transfer (no data or empty data)
+  const isETHTransfer = !tx.data || tx.data === '0x' || tx.data === '0x0' || tx.data.length <= 2
 
   return (
     <div className="bg-gray-800/50 rounded-md p-6 space-y-4 border border-gray-700 hover:border-gray-600 transition-colors">
