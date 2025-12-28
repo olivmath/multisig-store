@@ -1,16 +1,19 @@
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAccount, useBalance } from 'wagmi'
 import { formatEther } from 'viem'
 import { useMultiSig } from '@/hooks/useMultiSig'
 import { useMultiSigEvents } from '@/hooks/useEventListener'
 import { Card } from '@/components/ui/Card'
-import { SubmitTransactionForm } from '@/components/SubmitTransactionForm'
+import { Button } from '@/components/ui/Button'
+import { SubmitTransactionModal } from '@/components/SubmitTransactionModal'
 import { TransactionTimeline } from '@/components/TransactionTimeline'
 
 export function MultiSigView() {
   const { address } = useParams<{ address: `0x${string}` }>()
   const { isConnected } = useAccount()
   const multiSigAddress = address as `0x${string}`
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false)
 
   const { owners, required, txCount } = useMultiSig(multiSigAddress)
   const { data: balance } = useBalance({ address: multiSigAddress })
@@ -53,61 +56,82 @@ export function MultiSigView() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card 1: Owners */}
           <Card>
-            <div className="space-y-1">
-              <p className="text-xs text-gray-500">Balance</p>
-              <p className="text-2xl font-bold">
-                {balance ? `${parseFloat(formatEther(balance.value)).toFixed(4)} ETH` : '0 ETH'}
-              </p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
+            <div className="space-y-3">
               <p className="text-xs text-gray-500">Owners</p>
-              <p className="text-2xl font-bold">{owners.length}</p>
+              <p className="text-3xl font-bold">{owners.length}</p>
+              <div className="space-y-2 pt-2">
+                {owners.slice(0, 3).map((owner, index) => (
+                  <div key={owner} className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-400 text-xs font-medium">
+                      {index + 1}
+                    </div>
+                    <p className="font-mono text-xs text-gray-400">
+                      {owner.slice(0, 6)}...{owner.slice(-4)}
+                    </p>
+                  </div>
+                ))}
+                {owners.length > 3 && (
+                  <p className="text-xs text-gray-500 pl-8">+{owners.length - 3} more</p>
+                )}
+              </div>
             </div>
           </Card>
 
+          {/* Card 2: Required Confirmations */}
           <Card>
-            <div className="space-y-1">
+            <div className="space-y-3">
               <p className="text-xs text-gray-500">Required Confirmations</p>
-              <p className="text-2xl font-bold">
+              <p className="text-3xl font-bold">
                 {required}/{owners.length}
               </p>
+              <div className="pt-2">
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div
+                    className="h-2 rounded-full bg-blue-600"
+                    style={{
+                      width: `${(required / owners.length) * 100}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  {required === 1 ? '1 signature needed' : `${required} signatures needed`}
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Card 3: Balance */}
+          <Card>
+            <div className="space-y-3">
+              <p className="text-xs text-gray-500">Balance</p>
+              <p className="text-3xl font-bold">
+                {balance ? parseFloat(formatEther(balance.value)).toFixed(4) : '0.0000'}
+              </p>
+              <p className="text-sm text-gray-400">ETH</p>
             </div>
           </Card>
         </div>
 
-        {/* Owners List */}
-        <Card>
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold">Owners</h2>
-            <div className="space-y-2">
-              {owners.map((owner, index) => (
-                <div
-                  key={owner}
-                  className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-md"
-                >
-                  <div className="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-400 text-sm font-medium">
-                    {index + 1}
-                  </div>
-                  <p className="font-mono text-sm flex-1">{owner}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-
-        {/* Submit Transaction */}
-        <SubmitTransactionForm multiSigAddress={multiSigAddress} />
+        {/* Submit Transaction Modal */}
+        <SubmitTransactionModal
+          multiSigAddress={multiSigAddress}
+          isOpen={isSubmitModalOpen}
+          onClose={() => setIsSubmitModalOpen(false)}
+        />
 
         {/* Transactions Timeline */}
         <Card>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Transactions</h2>
-              <span className="text-sm text-gray-400">{txCount} total</span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-400">{txCount} total</span>
+                <Button onClick={() => setIsSubmitModalOpen(true)} size="sm">
+                  + New Transaction
+                </Button>
+              </div>
             </div>
             <TransactionTimeline multiSigAddress={multiSigAddress} txCount={txCount} />
           </div>
