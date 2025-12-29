@@ -11,12 +11,11 @@ interface CreateWalletModalProps {
   isOpen: boolean;
   onClose: () => void;
   connectedAddress: string;
-  onCreate: (wallet: { name: string; owners: string[]; required: number }) => void;
+  onCreate: (wallet: { owners: string[]; required: number }) => void;
 }
 
 const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: CreateWalletModalProps) => {
   const { toast } = useToast();
-  const [name, setName] = useState("");
   const [owners, setOwners] = useState<string[]>([connectedAddress]);
   const [newOwner, setNewOwner] = useState("");
   const [required, setRequired] = useState(1);
@@ -83,15 +82,6 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: Crea
   };
 
   const handleCreate = async () => {
-    if (!name.trim()) {
-      toast({
-        title: "Wallet Name Required",
-        description: "Please enter a name for your wallet.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (owners.length === 0) {
       toast({
         title: "No Owners",
@@ -112,11 +102,10 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: Crea
 
     setIsCreating(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
-    onCreate({ name: name.trim(), owners, required });
+    onCreate({ owners, required });
     setIsCreating(false);
     onClose();
     // Reset form
-    setName("");
     setOwners([connectedAddress]);
     setRequired(1);
   };
@@ -134,17 +123,6 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: Crea
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Wallet Name */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Wallet Name</Label>
-            <Input
-              id="name"
-              placeholder="e.g. Treasury Team"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="bg-background"
-            />
-          </div>
 
           {/* Owners */}
           <div className="space-y-3">
@@ -238,7 +216,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: Crea
             variant="gold" 
             className="flex-1"
             onClick={handleCreate}
-            disabled={!name || owners.length === 0 || required <= 0 || required > owners.length || isCreating}
+            disabled={owners.length === 0 || required <= 0 || required > owners.length || isCreating}
           >
             {isCreating ? (
               <>
