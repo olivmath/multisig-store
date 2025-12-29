@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { ArrowRight, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useReadContract } from "wagmi";
-import { sepolia } from "wagmi/chains";
 import Logo from "@/components/Logo";
 import StatsCard from "@/components/StatsCard";
 import ConnectWalletModal from "@/components/ConnectWalletModal";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import heroBg from "@/assets/hero-bg.jpg";
-import { multiSigFactoryABI } from "@/lib/contracts/multiSigFactoryABI";
-import { CONTRACTS } from "@/lib/contracts/addresses";
+import { useGlobalStats } from "@/hooks/useGlobalStats";
 
 const Index = () => {
   const { toast } = useToast();
@@ -27,17 +24,7 @@ const Index = () => {
   };
 
   // Read real stats from blockchain
-  const { data: multiSigCount } = useReadContract({
-    address: CONTRACTS[sepolia.id].MultiSigFactory,
-    abi: multiSigFactoryABI,
-    functionName: 'getMultiSigCount',
-  });
-
-  const stats = {
-    activeWallets: multiSigCount ? Number(multiSigCount) : 0,
-    uniqueOwners: multiSigCount ? Number(multiSigCount) * 3 : 0,
-    totalTransactions: multiSigCount ? Number(multiSigCount) * 5 : 0,
-  };
+  const stats = useGlobalStats();
 
   return (
     <div className="min-h-screen bg-background">

@@ -15,6 +15,8 @@ export function useMultiSigFactory() {
     args: userAddress ? [userAddress] : undefined,
     query: {
       enabled: !!userAddress,
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
     },
   })
 

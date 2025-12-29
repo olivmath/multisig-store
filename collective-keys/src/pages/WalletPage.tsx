@@ -6,6 +6,7 @@ import { formatUnits, formatEther, parseEther, parseUnits } from "viem";
 import DashboardHeader from "@/components/DashboardHeader";
 import Identicon from "@/components/Identicon";
 import TransactionModal from "@/components/TransactionModal";
+import { TransactionCard } from "@/components/TransactionCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useMultiSig } from "@/hooks/useMultiSig";
+import { useMultiSigFactory } from "@/hooks/useMultiSigFactory";
+import { usePendingWallets } from "@/hooks/usePendingWallets";
 import { tokenABI } from "@/lib/contracts/tokenABI";
 
 const WalletPage = () => {
@@ -30,6 +33,8 @@ const WalletPage = () => {
   const walletAddress = id as `0x${string}` | undefined;
   const { owners, required, txCount, submitTransaction } = useMultiSig(walletAddress);
   const { data: walletBalance } = useBalance({ address: walletAddress });
+  const { userMultiSigs } = useMultiSigFactory();
+  const pendingWallets = usePendingWallets(userMultiSigs);
 
   // Token selection state
   const [selectedToken, setSelectedToken] = useState<"eth" | "custom">("eth");
@@ -217,7 +222,7 @@ const WalletPage = () => {
         address={connectedAddress}
         balance={userBalance ? formatEther(userBalance.value) : "0"}
         network="sepolia"
-        pendingWallets={[]}
+        pendingWallets={pendingWallets}
         onLogout={handleLogout}
       />
 
@@ -400,20 +405,32 @@ const WalletPage = () => {
         </div>
 
         {/* Transactions Section */}
-        <div className="rounded-2xl border border-border bg-card p-8">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Coins className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="font-display text-xl font-semibold mb-2">Transaction History</h3>
-            <p className="text-muted-foreground mb-4">
-              Total transactions: <span className="text-primary font-semibold">{txCount}</span>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Transaction history and management will be available soon.
-            </p>
+        {txCount > 0 ? (
+          <div className="space-y-4">
+            {Array.from({ length: txCount }, (_, i) => BigInt(i)).reverse().map((txId) => (
+              <TransactionCard
+                key={txId.toString()}
+                multiSigAddress={walletAddress}
+                txId={txId}
+              />
+            ))}
           </div>
-        </div>
+        ) : (
+          <div className="rounded-2xl border border-border bg-card p-8">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Coins className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="font-display text-xl font-semibold mb-2">No Transactions Yet</h3>
+              <p className="text-muted-foreground mb-4">
+                This wallet hasn't created any transactions yet.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Click "New Transaction" above to create your first transaction.
+              </p>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Transaction Modal */}

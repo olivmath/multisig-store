@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMultiSigFactory } from "@/hooks/useMultiSigFactory";
 import { useMultiSig } from "@/hooks/useMultiSig";
+import { usePendingWallets } from "@/hooks/usePendingWallets";
 import { formatEther } from "viem";
 import { useState } from "react";
 
@@ -37,6 +38,7 @@ const Dashboard = () => {
   const { data: balance } = useBalance({ address: connectedAddress });
 
   const { userMultiSigs, createMultiSig, isCreating, isSuccess, refetchUserMultiSigs } = useMultiSigFactory();
+  const pendingWallets = usePendingWallets(userMultiSigs);
 
   useEffect(() => {
     if (!isConnected) {
@@ -49,6 +51,13 @@ const Dashboard = () => {
       refetchUserMultiSigs();
     }
   }, [isSuccess, refetchUserMultiSigs]);
+
+  // Refetch wallets when connected address changes
+  useEffect(() => {
+    if (connectedAddress) {
+      refetchUserMultiSigs();
+    }
+  }, [connectedAddress, refetchUserMultiSigs]);
 
   const handleLogout = () => {
     disconnect();
@@ -85,7 +94,7 @@ const Dashboard = () => {
         address={connectedAddress}
         balance={balance ? formatEther(balance.value) : "0"}
         network="sepolia"
-        pendingWallets={[]}
+        pendingWallets={pendingWallets}
         onLogout={handleLogout}
       />
 
