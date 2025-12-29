@@ -42,21 +42,12 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
           const destinationHex = '0x' + tx.data.slice(34, 74)
           const amountHex = '0x' + tx.data.slice(74, 138)
 
-          console.log('Decoding ERC20 transfer:', {
-            fullData: tx.data,
-            dataLength: tx.data.length,
-            destinationHex,
-            amountHex,
-            tokenContract: tx.destination,
-          })
-
           return {
             destination: destinationHex as `0x${string}`,
             amount: BigInt(amountHex),
             tokenContract: tx.destination,
           }
-        } catch (error) {
-          console.error('Failed to decode ERC20:', error)
+        } catch {
           return null
         }
       })()
