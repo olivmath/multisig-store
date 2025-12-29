@@ -2,9 +2,8 @@
 pragma solidity ^0.8.4;
 
 import {MultiSig} from "./MultiSig.sol";
-import {MultiSigFacade} from "./MultiSigFacade.sol";
 
-contract MultiSigFactory is MultiSigFacade {
+contract MultiSigFactory {
     event MultiSigCreated(
         address indexed multiSig,
         address indexed creator,
@@ -41,14 +40,13 @@ contract MultiSigFactory is MultiSigFacade {
     ) external payable returns (address multisig) {
         require(msg.value >= creationFee, "Insufficient fee");
 
-        MultiSig newMultiSig = new MultiSig(owners, required);
-        multisig = address(newMultiSig);
+        MultiSig ms = new MultiSig(owners, required);
+        multisig = address(ms);
 
         deployedMultiSigs.push(multisig);
         creatorMultiSigs[msg.sender].push(multisig);
 
-        uint256 len = owners.length;
-        for (uint256 i; i < len; ++i) {
+        for (uint256 i; i < owners.length; ++i) {
             ownerMultiSigs[owners[i]].push(multisig);
         }
 
@@ -60,15 +58,8 @@ contract MultiSigFactory is MultiSigFacade {
         require(ok, "Fee transfer failed");
     }
 
-    /*//////////////////////////////////////////////////////////////
-                            VIEW FUNCTIONS
-    //////////////////////////////////////////////////////////////*/
     function getDeployedMultiSigs() external view returns (address[] memory) {
         return deployedMultiSigs;
-    }
-
-    function getMultiSigCount() external view returns (uint256) {
-        return deployedMultiSigs.length;
     }
 
     function getCreatorMultiSigs(address creator) external view returns (address[] memory) {

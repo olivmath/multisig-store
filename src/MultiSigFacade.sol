@@ -4,63 +4,70 @@ pragma solidity ^0.8.4;
 import {MultiSig} from "./MultiSig.sol";
 
 contract MultiSigFacade {
-    function submitTransaction(
+    /*//////////////////////////////////////////////////////////////
+                            WRITE
+    //////////////////////////////////////////////////////////////*/
+
+    function submitETH(address multisig, address to, uint256 amount)
+        external
+        returns (uint256)
+    {
+        return MultiSig(payable(multisig)).submitETH(to, amount);
+    }
+
+    function submitERC20(address multisig, address token, address to, uint256 amount)
+        external
+        returns (uint256)
+    {
+        return MultiSig(payable(multisig)).submitERC20(token, to, amount);
+    }
+
+    function submitCustom(
         address multisig,
-        address destination,
+        address to,
         uint256 value,
         bytes calldata data
     ) external returns (uint256) {
-        return MultiSig(payable(multisig)).submitTransaction(destination, value, data);
+        return MultiSig(payable(multisig)).submitCustom(to, value, data);
     }
 
-    function confirmTransaction(address multisig, uint256 txId) external {
+    function confirm(address multisig, uint256 txId) external {
         MultiSig(payable(multisig)).confirmTransaction(txId);
     }
 
-    function executeTransaction(address multisig, uint256 txId) external {
+    function execute(address multisig, uint256 txId) external {
         MultiSig(payable(multisig)).executeTransaction(txId);
     }
 
     /*//////////////////////////////////////////////////////////////
-                            READ HELPERS
+                            READ
     //////////////////////////////////////////////////////////////*/
+
     function getTransaction(address multisig, uint256 txId)
         external
         view
         returns (MultiSig.Transaction memory)
     {
-        return MultiSig(payable(multisig)).getTransaction(txId);
+        return MultiSig(payable(multisig)).transactions(txId);
+    }
+
+    function getConfirmers(address multisig, uint256 txId)
+        external
+        view
+        returns (address[] memory)
+    {
+        return MultiSig(payable(multisig)).getConfirmers(txId);
     }
 
     function getTxCount(address multisig) external view returns (uint256) {
         return MultiSig(payable(multisig)).txCount();
     }
 
-    function getConfirmationCount(address multisig, uint256 txId)
-        external
-        view
-        returns (uint256)
-    {
-        return MultiSig(payable(multisig)).confirmationCount(txId);
-    }
-
-    function isConfirmed(address multisig, uint256 txId) external view returns (bool) {
-        return MultiSig(payable(multisig)).isConfirmed(txId);
-    }
-
-    function isConfirmedBy(address multisig, uint256 txId, address owner)
-        external
-        view
-        returns (bool)
-    {
-        return MultiSig(payable(multisig)).isConfirmedBy(txId, owner);
+    function getRequired(address multisig) external view returns (uint256) {
+        return MultiSig(payable(multisig)).required();
     }
 
     function getOwners(address multisig) external view returns (address[] memory) {
         return MultiSig(payable(multisig)).getOwners();
-    }
-
-    function getRequired(address multisig) external view returns (uint256) {
-        return MultiSig(payable(multisig)).required();
     }
 }
