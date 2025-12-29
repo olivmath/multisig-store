@@ -2,8 +2,11 @@
 pragma solidity ^0.8.4;
 
 import {MultiSig} from "./MultiSig.sol";
+import {MultiSigFacade} from "./MultiSigFacade.sol";
 
-contract MultiSigFactory {
+
+
+contract MultiSigFactory is MultiSigFacade {
     event MultiSigCreated(
         address indexed multiSig,
         address indexed creator,

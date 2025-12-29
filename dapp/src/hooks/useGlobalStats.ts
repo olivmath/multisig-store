@@ -8,13 +8,6 @@ import { useMemo } from 'react'
 export function useGlobalStats() {
   const factoryAddress = CONTRACTS[sepolia.id].MultiSigFactory
 
-  // Get active wallets count
-  const { data: multiSigCount } = useReadContract({
-    address: factoryAddress,
-    abi: multiSigFactoryABI,
-    functionName: 'getMultiSigCount',
-  })
-
   // Get all deployed multisigs
   const { data: allMultiSigs } = useReadContract({
     address: factoryAddress,
@@ -23,7 +16,7 @@ export function useGlobalStats() {
   })
 
   const multiSigAddresses = (allMultiSigs as `0x${string}`[]) || []
-  const activeWallets = multiSigCount ? Number(multiSigCount) : 0
+  const activeWallets = multiSigAddresses.length
 
   // Build contracts array for multicall
   const contracts = useMemo(() => {

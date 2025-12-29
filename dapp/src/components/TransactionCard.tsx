@@ -4,7 +4,7 @@ import { useMultiSig } from '@/hooks/useMultiSig'
 import { multiSigABI } from '@/lib/contracts/multiSigABI'
 import { tokenABI } from '@/lib/contracts/tokenABI'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, Clock } from 'lucide-react'
+import { CheckCircle2, ArrowUpRight, Coins, Code } from 'lucide-react'
 import { decodeTransaction } from '@/lib/utils/decodeTransaction'
 import { useEffect } from 'react'
 
@@ -34,10 +34,20 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     args: [txId],
   })
 
-  const tx = txData as Transaction | undefined
+  // Convert array response to object
+  const tx: Transaction | undefined = txData
+    ? {
+        txType: Number((txData as any)[0]),
+        token: (txData as any)[1] as `0x${string}`,
+        to: (txData as any)[2] as `0x${string}`,
+        amount: (txData as any)[3] as bigint,
+        executed: (txData as any)[4] as boolean,
+        data: (txData as any)[5] as `0x${string}`,
+      }
+    : undefined
 
   // Read token info if it's an ERC20 transaction (txType === 1)
-  const isERC20 = tx && tx.txType === 1
+  const isERC20 = tx && Number(tx.txType) === 1
 
   const { data: tokenSymbol } = useReadContract({
     address: tx?.token,
@@ -55,6 +65,14 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     query: {
       enabled: isERC20,
     },
+  })
+
+  // Read confirmation count for this transaction
+  const { data: confirmationCount, refetch: refetchConfCount } = useReadContract({
+    address: multiSigAddress,
+    abi: multiSigABI,
+    functionName: 'confirmationCount',
+    args: [txId],
   })
 
   // Read if user has confirmed this transaction
@@ -81,9 +99,10 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
       setTimeout(() => {
         refetchTx()
         refetchConfirmation()
+        refetchConfCount()
       }, 2000)
     }
-  }, [isConfirmSuccess, refetchTx, refetchConfirmation])
+  }, [isConfirmSuccess, refetchTx, refetchConfirmation, refetchConfCount])
 
   if (txLoading || !tx || !required) {
     return (
@@ -126,10 +145,14 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
             </span>
           </div>
           <div className="flex items-center gap-2">
-            {tx.executed ? (
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-            ) : (
-              <Clock className="w-4 h-4 text-yellow-600" />
+            {txInfo.type === 'eth' && (
+              <ArrowUpRight className="w-4 h-4 text-primary" />
+            )}
+            {txInfo.type === 'erc20' && (
+              <Coins className="w-4 h-4 text-primary" />
+            )}
+            {txInfo.type === 'custom' && (
+              <Code className="w-4 h-4 text-primary" />
             )}
             <p className="text-sm text-muted-foreground">
               {txInfo.type === 'eth' && 'Send ETH'}
@@ -158,13 +181,18 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         </div>
       </div>
 
-      {/* Token Contract (for ERC20) */}
-      {txInfo.type === 'erc20' && (
+      {/* Token Contract (for ERC20) or Spacer */}
+      {txInfo.type === 'erc20' ? (
         <div className="space-y-1 py-3 border-t border-border/50">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Token Contract</p>
           <p className="font-mono text-sm">
             {txInfo.tokenContract.slice(0, 10)}...{txInfo.tokenContract.slice(-8)}
           </p>
+        </div>
+      ) : (
+        <div className="py-3 border-t border-border/50 opacity-0 pointer-events-none">
+          <p className="text-xs uppercase tracking-wide">Spacer</p>
+          <p className="text-sm">Placeholder</p>
         </div>
       )}
 
@@ -195,9 +223,9 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
       {/* Confirmations Progress */}
       <div className="space-y-2 pb-2">
         <div className="flex justify-between items-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">Status</p>
-          <p className="text-xs text-muted-foreground">
-            Need {required} confirmations
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Confirmations</p>
+          <p className="text-sm font-semibold">
+            {confirmationCount ? Number(confirmationCount) : 0}/{required}
           </p>
         </div>
         <div className="progress-gold">
@@ -206,7 +234,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
               tx.executed ? 'bg-green-500' : 'bg-yellow-500'
             }`}
             style={{
-              width: tx.executed ? '100%' : '50%',
+              width: tx.executed ? '100%' : `${((confirmationCount ? Number(confirmationCount) : 0) / required) * 100}%`,
             }}
           />
         </div>

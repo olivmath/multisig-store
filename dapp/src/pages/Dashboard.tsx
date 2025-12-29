@@ -130,9 +130,6 @@ const Dashboard = () => {
             </div>
             <h2 className="font-display text-2xl font-semibold mb-3">No wallets found</h2>
             <p className="text-muted-foreground mb-6">Create your first multisig wallet to get started</p>
-            <Button variant="gold" onClick={() => setIsCreateModalOpen(true)} disabled={isCreating}>
-              {isCreating ? "Creating..." : "Create First Wallet"}
-            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
