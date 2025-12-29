@@ -1,0 +1,306 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* MultiSigStore Design System - Black & Gold Fintech Aesthetic */
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 5%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
+
+    --primary: 45 93% 47%;
+    --primary-foreground: 0 0% 5%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 5%;
+
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 45 93% 47%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 45 93% 47%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 5%;
+    --sidebar-primary: 45 93% 47%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 5%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 45 93% 47%;
+
+    --chart-1: 45 93% 47%;
+    --chart-2: 45 80% 55%;
+    --chart-3: 45 70% 60%;
+    --chart-4: 0 0% 30%;
+    --chart-5: 0 0% 50%;
+
+    /* Custom tokens */
+    --gold: 45 93% 47%;
+    --gold-light: 45 93% 55%;
+    --gold-dark: 45 93% 40%;
+    --gold-glow: 45 93% 47%;
+    
+    --surface-dark: 0 0% 5%;
+    --surface-dark-elevated: 0 0% 10%;
+    --surface-dark-muted: 0 0% 15%;
+    
+    --gradient-gold: linear-gradient(135deg, hsl(45 93% 47%), hsl(45 80% 55%));
+    --gradient-dark: linear-gradient(180deg, hsl(0 0% 5%), hsl(0 0% 8%));
+    --gradient-gold-radial: radial-gradient(ellipse at top, hsl(45 93% 47% / 0.15), transparent 50%);
+    
+    --shadow-gold: 0 4px 20px hsl(45 93% 47% / 0.25);
+    --shadow-gold-sm: 0 2px 10px hsl(45 93% 47% / 0.15);
+    --shadow-dark: 0 4px 30px hsl(0 0% 0% / 0.3);
+
+    --font-sans: 'Roboto', sans-serif;
+  }
+
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 45 93% 50%;
+    --primary-foreground: 0 0% 5%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 45 93% 50%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 45 93% 50%;
+
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 45 93% 50%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 45 93% 50%;
+
+    --chart-1: 45 93% 55%;
+    --chart-2: 45 80% 60%;
+    --chart-3: 45 70% 65%;
+    --chart-4: 0 0% 40%;
+    --chart-5: 0 0% 60%;
+
+    --gold: 45 93% 50%;
+    --gold-light: 45 93% 60%;
+    --gold-dark: 45 93% 42%;
+    --gold-glow: 45 93% 50%;
+    
+    --surface-dark: 0 0% 5%;
+    --surface-dark-elevated: 0 0% 10%;
+    --surface-dark-muted: 0 0% 15%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  /* Gold gradient text */
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;    background-image: var(--gradient-gold);
+  }
+
+  /* Gold button glow effect */
+  .btn-gold {
+    @apply relative overflow-hidden transition-all duration-300;
+    background: var(--gradient-gold);
+  }
+
+  .btn-gold::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(135deg, hsl(45 93% 55%), hsl(45 80% 60%));
+  }
+
+  .btn-gold:hover::before {
+    @apply opacity-100;
+  }
+
+  .btn-gold:hover {
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-1px);
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply border-primary/30;
+    box-shadow: var(--shadow-gold-sm);
+    transform: translateY(-2px);
+  }
+
+  /* Gold border glow */
+  .border-gold-glow {
+    @apply border border-primary/20;
+    box-shadow: inset 0 1px 0 hsl(var(--gold) / 0.1);
+  }
+
+  /* Gradient overlay for dark sections */
+  .gradient-dark-overlay {
+    background: var(--gradient-dark);
+  }
+
+  .gradient-gold-overlay::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: var(--gradient-gold-radial);
+  }
+
+  /* Identicon circle */
+  .identicon-circle {
+    @apply rounded-full p-0.5;
+    background: var(--gradient-gold);
+  }
+
+  /* Status badge */
+  .status-pending {
+    @apply bg-primary/10 text-primary border border-primary/20;
+  }
+
+  .status-confirmed {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  /* Micro-animations */
+  .animate-pulse-gold {
+    animation: pulse-gold 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-gold {
+    0%, 100% {
+      box-shadow: 0 0 0 0 hsl(var(--gold) / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px hsl(var(--gold) / 0);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--gold) / 0) 0%,
+      hsl(var(--gold) / 0.3) 50%,
+      hsl(var(--gold) / 0) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Progress bar with gold gradient */
+  .progress-gold {
+    @apply h-2 rounded-full overflow-hidden;
+    background: hsl(var(--muted));
+  }
+
+  .progress-gold-fill {
+    @apply h-full rounded-full transition-all duration-500;
+    background: var(--gradient-gold);
+  }
+
+  /* Notification badge */
+  .notification-badge {
+    @apply absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold;
+    background: var(--gradient-gold);
+    color: hsl(var(--surface-dark));
+  }
+
+  /* Floating label animation */
+  .float-label {
+    @apply transition-all duration-200;
+  }
+
+  /* Glass effect for modals */
+  .glass-dark {
+    @apply backdrop-blur-xl;
+    background: hsl(var(--surface-dark) / 0.95);
+  }
+}
+
+@layer utilities {
+
+
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
+
+  .bg-surface-dark {
+    background-color: hsl(var(--surface-dark));
+  }
+
+  .bg-surface-dark-elevated {
+    background-color: hsl(var(--surface-dark-elevated));
+  }
+
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+
+  .shadow-gold-sm {
+    box-shadow: var(--shadow-gold-sm);
+  }
+}
