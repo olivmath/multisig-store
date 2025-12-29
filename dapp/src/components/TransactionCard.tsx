@@ -1,10 +1,12 @@
-import { useAccount, useReadContract } from 'wagmi'
-import { formatEther, formatUnits } from 'viem'
+import { useAccount, useReadContract, useWaitForTransactionReceipt } from 'wagmi'
+import { formatEther } from 'viem'
 import { useMultiSig } from '@/hooks/useMultiSig'
 import { multiSigABI } from '@/lib/contracts/multiSigABI'
 import { tokenABI } from '@/lib/contracts/tokenABI'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, Clock } from 'lucide-react'
+import { decodeTransaction, decodeERC20Transfer } from '@/lib/utils/decodeTransaction'
+import { useEffect } from 'react'
 
 interface TransactionCardProps {
   multiSigAddress: `0x${string}`
@@ -20,10 +22,10 @@ interface Transaction {
 
 export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps) {
   const { address: userAddress } = useAccount()
-  const { required, confirmTransaction } = useMultiSig(multiSigAddress)
+  const { required, confirmTransaction, confirmTxHash } = useMultiSig(multiSigAddress)
 
   // Read transaction data
-  const { data: txData, isLoading: txLoading } = useReadContract({
+  const { data: txData, isLoading: txLoading, refetch: refetchTx } = useReadContract({
     address: multiSigAddress,
     abi: multiSigABI,
     functionName: 'transactions',
@@ -32,26 +34,8 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
 
   const tx = txData as Transaction | undefined
 
-  // Try to decode ERC20 transfer if transaction has data
-  const decodedERC20 = tx?.data?.startsWith('0xa9059cbb') && tx.data.length === 138
-    ? (() => {
-        try {
-          // Extract destination address from the calldata
-          // Structure: 0xa9059cbb (8 chars) + padded address (64 chars) + amount (64 chars)
-          // Address is in the last 40 chars of the first parameter
-          const destinationHex = '0x' + tx.data.slice(34, 74)
-          const amountHex = '0x' + tx.data.slice(74, 138)
-
-          return {
-            destination: destinationHex as `0x${string}`,
-            amount: BigInt(amountHex),
-            tokenContract: tx.destination,
-          }
-        } catch {
-          return null
-        }
-      })()
-    : null
+  // Decode ERC20 transfer using utility function
+  const decodedERC20 = tx ? decodeERC20Transfer(tx.data, tx.destination) : null
 
   // Read token info if it's an ERC20 transaction
   const { data: tokenSymbol } = useReadContract({
@@ -73,7 +57,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
   })
 
   // Read if user has confirmed this transaction
-  const { data: hasUserConfirmed } = useReadContract({
+  const { data: hasUserConfirmed, refetch: refetchConfirmation } = useReadContract({
     address: multiSigAddress,
     abi: multiSigABI,
     functionName: 'confirmations',
@@ -82,6 +66,23 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
       enabled: !!userAddress,
     },
   })
+
+  // Wait for confirmation transaction to complete and refetch data
+  const { isLoading: isConfirmPending, isSuccess: isConfirmSuccess } = useWaitForTransactionReceipt({
+    hash: confirmTxHash,
+  })
+
+  // Auto-refetch when confirmation completes
+  useEffect(() => {
+    if (isConfirmSuccess) {
+      console.log('[TransactionCard] Confirmation complete, refetching data...')
+      // Refetch transaction data after 2 seconds to allow blockchain state to update
+      setTimeout(() => {
+        refetchTx()
+        refetchConfirmation()
+      }, 2000)
+    }
+  }, [isConfirmSuccess, refetchTx, refetchConfirmation])
 
   if (txLoading || !tx || !required) {
     return (
@@ -106,47 +107,11 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     confirmTransaction(txId)
   }
 
-  // Decode transaction data
-  const decodeTransaction = () => {
-    // Check if it's ERC20 transfer
-    if (decodedERC20) {
-      const decimals = (tokenDecimals as number) || 18
-      const symbol = (tokenSymbol as string) || 'TOKENS'
-
-      return {
-        type: 'erc20' as const,
-        tokenContract: decodedERC20.tokenContract,
-        destination: decodedERC20.destination,
-        value: decodedERC20.amount,
-        displayValue: formatUnits(decodedERC20.amount, decimals),
-        symbol: symbol,
-      }
-    }
-
-    // Check if has data (bytes)
-    const hasData = tx.data && tx.data !== '0x' && tx.data.length > 2
-
-    if (!hasData) {
-      // Simple ETH transfer
-      return {
-        type: 'eth' as const,
-        destination: tx.destination,
-        value: tx.value || BigInt(0),
-        displayValue: tx.value ? formatEther(tx.value) : '0',
-        symbol: 'ETH',
-      }
-    }
-
-    // Custom contract interaction
-    return {
-      type: 'custom' as const,
-      destination: tx.destination,
-      calldata: tx.data,
-      value: tx.value || BigInt(0),
-    }
-  }
-
-  const txInfo = decodeTransaction()
+  // Use utility function to decode transaction
+  const txInfo = decodeTransaction(tx, {
+    symbol: tokenSymbol as string,
+    decimals: tokenDecimals as number,
+  })
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 space-y-4 hover:border-primary/50 transition-colors">
@@ -255,8 +220,14 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
       {!tx.executed && (
         <div className="flex gap-3 pt-2 border-t border-border/50">
           {!hasUserConfirmed ? (
-            <Button variant="outline" size="sm" onClick={handleConfirm} className="flex-1">
-              Confirm Transaction
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleConfirm}
+              disabled={isConfirmPending}
+              className="flex-1"
+            >
+              {isConfirmPending ? 'Confirming...' : 'Confirm Transaction'}
             </Button>
           ) : (
             <div className="flex-1 text-center text-sm text-green-600 py-2 font-medium">

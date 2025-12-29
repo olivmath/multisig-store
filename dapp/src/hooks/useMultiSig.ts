@@ -46,7 +46,7 @@ export function useMultiSig(multiSigAddress: `0x${string}` | undefined) {
   }
 
   // Write: Confirm transaction
-  const { writeContract: confirm } = useWriteContract()
+  const { writeContract: confirm, data: confirmTxHash } = useWriteContract()
 
   const confirmTransaction = (txId: bigint) => {
     if (!multiSigAddress) return
@@ -77,6 +77,7 @@ export function useMultiSig(multiSigAddress: `0x${string}` | undefined) {
     txCount: txCount ? Number(txCount) : 0,
     submitTransaction,
     confirmTransaction,
+    confirmTxHash,
     executeTransaction,
   }
 }
