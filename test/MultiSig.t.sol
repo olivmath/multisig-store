@@ -13,7 +13,13 @@ contract MultiSigTest is Test {
     address public notOwner;
 
     event Deposit(address indexed sender, uint256 value);
-    event SubmitTransaction(uint256 indexed txId, address indexed destination, uint256 value, bytes data);
+    event SubmitTransaction(
+        uint256 indexed txId,
+        MultiSig.TxType txType,
+        address indexed token,
+        address indexed to,
+        uint256 amount
+    );
     event ConfirmTransaction(address indexed owner, uint256 indexed txId);
     event ExecuteTransaction(uint256 indexed txId);
 
@@ -81,17 +87,19 @@ contract MultiSigTest is Test {
 
     function test_submitTransaction() public {
         vm.prank(owner1);
-        vm.expectEmit(true, true, false, true);
-        emit SubmitTransaction(0, owner2, 1 ether, "");
+        vm.expectEmit(true, true, true, true);
+        emit SubmitTransaction(0, MultiSig.TxType.ETH, address(0), owner2, 1 ether);
 
-        uint256 txId = multiSig.submitTransaction(owner2, 1 ether, "");
+        uint256 txId = multiSig.submitETH(owner2, 1 ether);
 
         assertEq(txId, 0);
         assertEq(multiSig.txCount(), 1);
 
-        (address dest, uint256 value, bool executed, bytes memory data) = multiSig.transactions(0);
-        assertEq(dest, owner2);
-        assertEq(value, 1 ether);
+        (MultiSig.TxType txType, address token, address to, uint256 amount, bool executed, bytes memory data) = multiSig.transactions(0);
+        assertEq(uint256(txType), uint256(MultiSig.TxType.ETH));
+        assertEq(token, address(0));
+        assertEq(to, owner2);
+        assertEq(amount, 1 ether);
         assertFalse(executed);
         assertEq(data, "");
         assertTrue(multiSig.confirmations(0, owner1));
@@ -100,12 +108,12 @@ contract MultiSigTest is Test {
     function test_submitTransaction_revertsIfNotOwner() public {
         vm.prank(notOwner);
         vm.expectRevert(MultiSig.NotAuthorized.selector);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
     }
 
     function test_confirmTransaction() public {
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         vm.prank(owner2);
         vm.expectEmit(true, true, false, false);
@@ -117,7 +125,7 @@ contract MultiSigTest is Test {
 
     function test_confirmTransaction_revertsIfNotOwner() public {
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         vm.prank(notOwner);
         vm.expectRevert(MultiSig.NotAuthorized.selector);
@@ -132,7 +140,7 @@ contract MultiSigTest is Test {
 
     function test_confirmTransaction_revertsIfAlreadyConfirmed() public {
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         vm.prank(owner1);
         vm.expectRevert(MultiSig.AlreadyConfirmed.selector);
@@ -141,7 +149,7 @@ contract MultiSigTest is Test {
 
     function test_executeTransaction() public {
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         uint256 balanceBefore = owner2.balance;
 
@@ -153,13 +161,13 @@ contract MultiSigTest is Test {
 
         assertEq(owner2.balance, balanceBefore + 1 ether);
 
-        (,, bool executed,) = multiSig.transactions(0);
+        (,,,, bool executed,) = multiSig.transactions(0);
         assertTrue(executed);
     }
 
     function test_executeTransaction_revertsIfNotOwner() public {
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         vm.prank(owner2);
         multiSig.confirmTransaction(0);
@@ -177,7 +185,7 @@ contract MultiSigTest is Test {
 
     function test_executeTransaction_revertsIfNotConfirmed() public {
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         vm.prank(owner1);
         vm.expectRevert(MultiSig.TransactionNotConfirmed.selector);
@@ -186,7 +194,7 @@ contract MultiSigTest is Test {
 
     function test_executeTransaction_revertsIfAlreadyExecuted() public {
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         vm.prank(owner2);
         multiSig.confirmTransaction(0);
@@ -201,7 +209,7 @@ contract MultiSigTest is Test {
         bytes memory data = abi.encodeWithSignature("setValue(uint256)", 42);
 
         vm.prank(owner1);
-        multiSig.submitTransaction(address(target), 0, data);
+        multiSig.submitCustom(address(target), 0, data);
 
         vm.prank(owner2);
         multiSig.confirmTransaction(0);
@@ -211,7 +219,7 @@ contract MultiSigTest is Test {
 
     function test_isConfirmed() public {
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         assertFalse(multiSig.isConfirmed(0));
 
@@ -221,7 +229,7 @@ contract MultiSigTest is Test {
         assertTrue(multiSig.isConfirmed(0));
 
         vm.prank(owner1);
-        multiSig.submitTransaction(owner2, 1 ether, "");
+        multiSig.submitETH(owner2, 1 ether);
 
         assertFalse(multiSig.isConfirmed(1));
 

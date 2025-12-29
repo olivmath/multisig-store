@@ -41,12 +41,14 @@ contract MultiSigFuzzTest is Test {
         vm.assume(value <= 100 ether);
 
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(destination, value, data);
+        uint256 txId = multiSig.submitCustom(destination, value, data);
 
-        (address dest, uint256 val, bool executed, bytes memory txData) = multiSig.transactions(txId);
+        (MultiSig.TxType txType, address token, address to, uint256 amount, bool executed, bytes memory txData) = multiSig.transactions(txId);
 
-        assertEq(dest, destination);
-        assertEq(val, value);
+        assertEq(uint256(txType), uint256(MultiSig.TxType.CUSTOM));
+        assertEq(token, address(0));
+        assertEq(to, destination);
+        assertEq(amount, value);
         assertFalse(executed);
         assertEq(txData, data);
         assertTrue(multiSig.confirmations(txId, owners[0]));
@@ -58,7 +60,7 @@ contract MultiSigFuzzTest is Test {
 
         for (uint256 i = 0; i < txCount; i++) {
             vm.prank(owners[0]);
-            multiSig.submitTransaction(makeAddr(vm.toString(i)), 1 ether, "");
+            multiSig.submitETH(makeAddr(vm.toString(i)), 1 ether);
         }
 
         vm.prank(owners[1]);
@@ -76,14 +78,14 @@ contract MultiSigFuzzTest is Test {
         uint256 balanceBefore = destination.balance;
 
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(destination, value, "");
+        uint256 txId = multiSig.submitETH(destination, value);
 
         vm.prank(owners[1]);
         multiSig.confirmTransaction(txId);
 
         assertEq(destination.balance, balanceBefore + value);
 
-        (,, bool executed,) = multiSig.transactions(txId);
+        (,,,, bool executed,) = multiSig.transactions(txId);
         assertTrue(executed);
     }
 
@@ -92,14 +94,14 @@ contract MultiSigFuzzTest is Test {
 
         for (uint256 i = 0; i < count; i++) {
             vm.prank(owners[0]);
-            multiSig.submitTransaction(address(uint160(i + 1)), 1 ether, "");
+            multiSig.submitETH(address(uint160(i + 1)), 1 ether);
         }
 
         assertEq(multiSig.txCount(), count);
 
         for (uint256 i = 0; i < count; i++) {
-            (address dest,,,) = multiSig.transactions(i);
-            assertEq(dest, address(uint160(i + 1)));
+            (,, address to,,,) = multiSig.transactions(i);
+            assertEq(to, address(uint160(i + 1)));
         }
     }
 
@@ -110,7 +112,7 @@ contract MultiSigFuzzTest is Test {
         vm.deal(address(testMultiSig), 100 ether);
 
         vm.prank(owners[0]);
-        uint256 txId = testMultiSig.submitTransaction(makeAddr("dest"), 1 ether, "");
+        uint256 txId = testMultiSig.submitETH(makeAddr("dest"), 1 ether);
 
         for (uint256 i = 1; i < required; i++) {
             vm.prank(owners[i]);
@@ -135,7 +137,7 @@ contract MultiSigFuzzTest is Test {
         vm.assume(confirmCount < 2);
 
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(makeAddr("dest"), 1 ether, "");
+        uint256 txId = multiSig.submitETH(makeAddr("dest"), 1 ether);
 
         if (confirmCount == 0) {
             vm.prank(owners[0]);
@@ -151,12 +153,12 @@ contract MultiSigFuzzTest is Test {
         address destination = address(new MockReceiver());
 
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(destination, value, data);
+        uint256 txId = multiSig.submitCustom(destination, value, data);
 
         vm.prank(owners[1]);
         multiSig.confirmTransaction(txId);
 
-        (,, bool executed,) = multiSig.transactions(txId);
+        (,,,, bool executed,) = multiSig.transactions(txId);
         assertTrue(executed);
     }
 }

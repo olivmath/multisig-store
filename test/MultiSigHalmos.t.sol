@@ -24,13 +24,13 @@ contract MultiSigHalmosTest is SymTest, Test {
 
         for (uint256 i = 0; i < initialTxCount; i++) {
             vm.prank(owners[0]);
-            multiSig.submitTransaction(address(0x999), 1 ether, "");
+            multiSig.submitETH(address(0x999), 1 ether);
         }
 
         uint256 txCountBefore = multiSig.txCount();
 
         vm.prank(owners[0]);
-        multiSig.submitTransaction(address(0x999), 1 ether, "");
+        multiSig.submitETH(address(0x999), 1 ether);
 
         uint256 txCountAfter = multiSig.txCount();
 
@@ -40,7 +40,7 @@ contract MultiSigHalmosTest is SymTest, Test {
 
     function check_executedTransactionCannotBeReExecuted() public {
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(address(0x999), 1 ether, "");
+        uint256 txId = multiSig.submitETH(address(0x999), 1 ether);
 
         vm.prank(owners[1]);
         multiSig.confirmTransaction(txId);
@@ -48,7 +48,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.prank(owners[0]);
         multiSig.executeTransaction(txId);
 
-        (,, bool executedBefore,) = multiSig.transactions(txId);
+        (,,,, bool executedBefore,) = multiSig.transactions(txId);
         assert(executedBefore);
 
         vm.prank(owners[0]);
@@ -63,7 +63,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.assume(ownerIndex < owners.length);
 
         vm.prank(owners[0]);
-        multiSig.submitTransaction(address(0x999), 1 ether, "");
+        multiSig.submitETH(address(0x999), 1 ether);
 
         vm.assume(txId < multiSig.txCount());
 
@@ -83,7 +83,7 @@ contract MultiSigHalmosTest is SymTest, Test {
 
     function check_requiredConfirmationsToExecute() public {
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(address(0x999), 1 ether, "");
+        uint256 txId = multiSig.submitETH(address(0x999), 1 ether);
 
         bool canExecuteWithOne = multiSig.isConfirmed(txId);
         assert(canExecuteWithOne);
@@ -99,7 +99,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.assume(caller != owners[0] && caller != owners[1] && caller != owners[2]);
 
         vm.prank(caller);
-        try multiSig.submitTransaction(address(0x999), 1 ether, "") {
+        try multiSig.submitETH(address(0x999), 1 ether) {
             assert(false);
         } catch {
             assert(true);
@@ -110,7 +110,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.assume(caller != owners[0] && caller != owners[1] && caller != owners[2]);
 
         vm.prank(owners[0]);
-        multiSig.submitTransaction(address(0x999), 1 ether, "");
+        multiSig.submitETH(address(0x999), 1 ether);
 
         vm.assume(txId < multiSig.txCount());
 
@@ -126,7 +126,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.assume(caller != owners[0] && caller != owners[1] && caller != owners[2]);
 
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(address(0x999), 1 ether, "");
+        uint256 txId = multiSig.submitETH(address(0x999), 1 ether);
 
         vm.prank(owners[1]);
         multiSig.confirmTransaction(txId);
@@ -143,7 +143,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.assume(ownerIndex < owners.length);
 
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(address(0x999), 1 ether, "");
+        uint256 txId = multiSig.submitETH(address(0x999), 1 ether);
 
         if (ownerIndex == 0) {
             vm.prank(owners[ownerIndex]);
@@ -167,7 +167,7 @@ contract MultiSigHalmosTest is SymTest, Test {
 
     function check_transactionRequiresEnoughConfirmations() public {
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(address(0x999), 1 ether, "");
+        uint256 txId = multiSig.submitETH(address(0x999), 1 ether);
 
         uint256 required = multiSig.required();
         assert(required == 2);
@@ -178,7 +178,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.prank(owners[0]);
         multiSig.executeTransaction(txId);
 
-        (,, bool executed,) = multiSig.transactions(txId);
+        (,,,, bool executed,) = multiSig.transactions(txId);
         assert(executed);
     }
 
@@ -193,7 +193,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         assert(balanceAfterDeposit == initialBalance + 5 ether);
 
         vm.prank(owners[0]);
-        uint256 txId = multiSig.submitTransaction(address(0x999), 1 ether, "");
+        uint256 txId = multiSig.submitETH(address(0x999), 1 ether);
 
         vm.prank(owners[1]);
         multiSig.confirmTransaction(txId);
@@ -211,7 +211,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         address[] memory ownersBefore = multiSig.getOwners();
 
         vm.prank(owners[0]);
-        multiSig.submitTransaction(address(0x999), 1 ether, "");
+        multiSig.submitETH(address(0x999), 1 ether);
 
         address[] memory ownersAfter = multiSig.getOwners();
 
@@ -225,7 +225,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         uint256 requiredBefore = multiSig.required();
 
         vm.prank(owners[0]);
-        multiSig.submitTransaction(address(0x999), 1 ether, "");
+        multiSig.submitETH(address(0x999), 1 ether);
 
         uint256 requiredAfter = multiSig.required();
 

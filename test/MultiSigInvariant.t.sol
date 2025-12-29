@@ -30,7 +30,7 @@ contract MultiSigInvariantTest is StdInvariant, Test {
 
     function invariant_executedTransactionsStayExecuted() public view {
         for (uint256 i = 0; i < multiSig.txCount(); i++) {
-            (,, bool executed,) = multiSig.transactions(i);
+            (,,,, bool executed,) = multiSig.transactions(i);
             if (executed) {
                 assertTrue(handler.wasExecuted(i));
             }
@@ -47,7 +47,7 @@ contract MultiSigInvariantTest is StdInvariant, Test {
 
     function invariant_cannotExecuteWithoutEnoughConfirmations() public view {
         for (uint256 i = 0; i < multiSig.txCount(); i++) {
-            (,, bool executed,) = multiSig.transactions(i);
+            (,,,, bool executed,) = multiSig.transactions(i);
             if (executed) {
                 assertTrue(multiSig.isConfirmed(i));
             }
@@ -89,7 +89,7 @@ contract InvariantHandler is Test {
         }
 
         vm.prank(owners[ownerIndex]);
-        try multiSig.submitTransaction(destination, value, "") returns (uint256 txId) {
+        try multiSig.submitETH(destination, value) returns (uint256 txId) {
             submitCalls++;
             if (multiSig.txCount() > maxTxCount) {
                 maxTxCount = multiSig.txCount();
@@ -106,7 +106,7 @@ contract InvariantHandler is Test {
         vm.prank(owners[ownerIndex]);
         try multiSig.confirmTransaction(txId) {
             confirmCalls++;
-            (,, bool executed,) = multiSig.transactions(txId);
+            (,,,, bool executed,) = multiSig.transactions(txId);
             if (executed) {
                 wasExecuted[txId] = true;
             }

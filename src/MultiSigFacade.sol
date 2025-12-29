@@ -46,9 +46,25 @@ contract MultiSigFacade {
     function getTransaction(address multisig, uint256 txId)
         external
         view
-        returns (MultiSig.Transaction memory)
+        returns (MultiSig.Transaction memory transaction)
     {
-        return MultiSig(payable(multisig)).transactions(txId);
+        (
+            MultiSig.TxType txType,
+            address token,
+            address to,
+            uint256 amount,
+            bool executed,
+            bytes memory data
+        ) = MultiSig(payable(multisig)).transactions(txId);
+
+        transaction = MultiSig.Transaction({
+            txType: txType,
+            token: token,
+            to: to,
+            amount: amount,
+            executed: executed,
+            data: data
+        });
     }
 
     function getConfirmers(address multisig, uint256 txId)

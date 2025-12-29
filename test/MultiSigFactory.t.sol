@@ -52,7 +52,7 @@ contract MultiSigFactoryTest is Test {
         vm.prank(creator);
         address multiSig1 = factory.createMultiSig{value: CREATION_FEE}(owners, 2);
 
-        assertEq(factory.getMultiSigCount(), 1);
+        assertEq(factory.getDeployedMultiSigs().length, 1);
         assertEq(factory.deployedMultiSigs(0), multiSig1);
 
         address[] memory creatorMultiSigs = factory.getCreatorMultiSigs(creator);
@@ -66,7 +66,7 @@ contract MultiSigFactoryTest is Test {
         address multiSig2 = factory.createMultiSig{value: CREATION_FEE}(owners, 3);
         vm.stopPrank();
 
-        assertEq(factory.getMultiSigCount(), 2);
+        assertEq(factory.getDeployedMultiSigs().length, 2);
 
         address[] memory allMultiSigs = factory.getDeployedMultiSigs();
         assertEq(allMultiSigs.length, 2);
@@ -87,7 +87,7 @@ contract MultiSigFactoryTest is Test {
         vm.prank(creator2);
         address multiSig2 = factory.createMultiSig{value: CREATION_FEE}(owners, 2);
 
-        assertEq(factory.getMultiSigCount(), 2);
+        assertEq(factory.getDeployedMultiSigs().length, 2);
 
         address[] memory creator1MultiSigs = factory.getCreatorMultiSigs(creator);
         assertEq(creator1MultiSigs.length, 1);
@@ -106,12 +106,12 @@ contract MultiSigFactoryTest is Test {
         vm.deal(multiSigAddr, 10 ether);
 
         vm.prank(owners[0]);
-        multiSig.submitTransaction(makeAddr("destination"), 1 ether, "");
+        multiSig.submitETH(makeAddr("destination"), 1 ether);
 
         vm.prank(owners[1]);
         multiSig.confirmTransaction(0);
 
-        (,, bool executed,) = multiSig.transactions(0);
+        (,,,, bool executed,) = multiSig.transactions(0);
         assertTrue(executed);
     }
 
@@ -170,7 +170,7 @@ contract MultiSigFactoryTest is Test {
             factory.createMultiSig{value: CREATION_FEE}(owners, 2);
         }
 
-        assertEq(factory.getMultiSigCount(), count);
+        assertEq(factory.getDeployedMultiSigs().length, count);
         assertEq(factory.getCreatorMultiSigs(creator).length, count);
     }
 }
