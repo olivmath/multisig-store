@@ -143,16 +143,13 @@ contract MultiSigTest is Test {
         vm.prank(owner1);
         multiSig.submitTransaction(owner2, 1 ether, "");
 
-        vm.prank(owner2);
-        multiSig.confirmTransaction(0);
-
         uint256 balanceBefore = owner2.balance;
 
-        vm.prank(owner1);
+        vm.prank(owner2);
         vm.expectEmit(true, false, false, false);
         emit ExecuteTransaction(0);
 
-        multiSig.executeTransaction(0);
+        multiSig.confirmTransaction(0);
 
         assertEq(owner2.balance, balanceBefore + 1 ether);
 
@@ -195,9 +192,6 @@ contract MultiSigTest is Test {
         multiSig.confirmTransaction(0);
 
         vm.prank(owner1);
-        multiSig.executeTransaction(0);
-
-        vm.prank(owner1);
         vm.expectRevert(MultiSig.TransactionAlreadyExecuted.selector);
         multiSig.executeTransaction(0);
     }
@@ -211,9 +205,6 @@ contract MultiSigTest is Test {
 
         vm.prank(owner2);
         multiSig.confirmTransaction(0);
-
-        vm.prank(owner1);
-        multiSig.executeTransaction(0);
 
         assertEq(target.value(), 42);
     }

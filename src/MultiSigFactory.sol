@@ -2,8 +2,9 @@
 pragma solidity ^0.8.4;
 
 import {MultiSig} from "./MultiSig.sol";
+import {MultiSigFacade} from "./MultiSigFacade.sol";
 
-contract MultiSigFactory {
+contract MultiSigFactory is MultiSigFacade {
     event MultiSigCreated(
         address indexed multiSig,
         address indexed creator,
@@ -68,5 +69,13 @@ contract MultiSigFactory {
 
     function getMultiSigCount() external view returns (uint256) {
         return deployedMultiSigs.length;
+    }
+
+    function getCreatorMultiSigs(address creator) external view returns (address[] memory) {
+        return creatorMultiSigs[creator];
+    }
+
+    function getOwnerMultiSigs(address _owner) external view returns (address[] memory) {
+        return ownerMultiSigs[_owner];
     }
 }

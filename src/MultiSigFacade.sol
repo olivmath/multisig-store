@@ -10,15 +10,15 @@ contract MultiSigFacade {
         uint256 value,
         bytes calldata data
     ) external returns (uint256) {
-        return MultiSig(multisig).submitTransaction(destination, value, data);
+        return MultiSig(payable(multisig)).submitTransaction(destination, value, data);
     }
 
     function confirmTransaction(address multisig, uint256 txId) external {
-        MultiSig(multisig).confirmTransaction(txId);
+        MultiSig(payable(multisig)).confirmTransaction(txId);
     }
 
     function executeTransaction(address multisig, uint256 txId) external {
-        MultiSig(multisig).executeTransaction(txId);
+        MultiSig(payable(multisig)).executeTransaction(txId);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -29,11 +29,11 @@ contract MultiSigFacade {
         view
         returns (MultiSig.Transaction memory)
     {
-        return MultiSig(multisig).getTransaction(txId);
+        return MultiSig(payable(multisig)).getTransaction(txId);
     }
 
     function getTxCount(address multisig) external view returns (uint256) {
-        return MultiSig(multisig).txCount();
+        return MultiSig(payable(multisig)).txCount();
     }
 
     function getConfirmationCount(address multisig, uint256 txId)
@@ -41,11 +41,11 @@ contract MultiSigFacade {
         view
         returns (uint256)
     {
-        return MultiSig(multisig).confirmationCount(txId);
+        return MultiSig(payable(multisig)).confirmationCount(txId);
     }
 
     function isConfirmed(address multisig, uint256 txId) external view returns (bool) {
-        return MultiSig(multisig).isConfirmed(txId);
+        return MultiSig(payable(multisig)).isConfirmed(txId);
     }
 
     function isConfirmedBy(address multisig, uint256 txId, address owner)
@@ -53,14 +53,14 @@ contract MultiSigFacade {
         view
         returns (bool)
     {
-        return MultiSig(multisig).isConfirmedBy(txId, owner);
+        return MultiSig(payable(multisig)).isConfirmedBy(txId, owner);
     }
 
     function getOwners(address multisig) external view returns (address[] memory) {
-        return MultiSig(multisig).getOwners();
+        return MultiSig(payable(multisig)).getOwners();
     }
 
     function getRequired(address multisig) external view returns (uint256) {
-        return MultiSig(multisig).required();
+        return MultiSig(payable(multisig)).required();
     }
 }

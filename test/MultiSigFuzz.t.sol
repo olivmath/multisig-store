@@ -73,16 +73,13 @@ contract MultiSigFuzzTest is Test {
         vm.assume(value > 0 && value <= 10 ether);
         vm.assume(destination.code.length == 0);
 
+        uint256 balanceBefore = destination.balance;
+
         vm.prank(owners[0]);
         uint256 txId = multiSig.submitTransaction(destination, value, "");
 
         vm.prank(owners[1]);
         multiSig.confirmTransaction(txId);
-
-        uint256 balanceBefore = destination.balance;
-
-        vm.prank(owners[0]);
-        multiSig.executeTransaction(txId);
 
         assertEq(destination.balance, balanceBefore + value);
 
@@ -158,9 +155,6 @@ contract MultiSigFuzzTest is Test {
 
         vm.prank(owners[1]);
         multiSig.confirmTransaction(txId);
-
-        vm.prank(owners[0]);
-        multiSig.executeTransaction(txId);
 
         (,, bool executed,) = multiSig.transactions(txId);
         assertTrue(executed);

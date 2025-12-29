@@ -11,7 +11,7 @@ contract DeployLocalScript is Script {
         vm.startBroadcast();
 
         // Deploy Factory
-        MultiSigFactory factory = new MultiSigFactory();
+        MultiSigFactory factory = new MultiSigFactory(0);
         console2.log("===========================================");
         console2.log("MultiSigFactory deployed at:", address(factory));
         console2.log("===========================================");
@@ -22,7 +22,7 @@ contract DeployLocalScript is Script {
         owners[1] = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8; // Anvil account 1
         owners[2] = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC; // Anvil account 2
 
-        address multiSigAddress = factory.createMultiSig(owners, 2);
+        address multiSigAddress = factory.createMultiSig{value: 0}(owners, 2);
         console2.log("Example MultiSig created at:", multiSigAddress);
 
         // Fund the MultiSig with some ETH

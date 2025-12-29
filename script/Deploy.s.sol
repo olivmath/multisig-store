@@ -8,7 +8,7 @@ contract DeployScript is Script {
     function run() external returns (MultiSigFactory) {
         vm.startBroadcast();
 
-        MultiSigFactory factory = new MultiSigFactory();
+        MultiSigFactory factory = new MultiSigFactory(0);
 
         console2.log("MultiSigFactory deployed at:", address(factory));
 

@@ -409,7 +409,7 @@ const WalletPage = () => {
 
         {/* Transactions Section */}
         {txCount > 0 ? (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {Array.from({ length: txCount }, (_, i) => BigInt(i)).reverse().map((txId) => (
               <TransactionCard
                 key={txId.toString()}

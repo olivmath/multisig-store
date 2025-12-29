@@ -16,7 +16,7 @@ contract MultiSigFactoryTest is Test {
     );
 
     function setUp() public {
-        factory = new MultiSigFactory();
+        factory = new MultiSigFactory(CREATION_FEE);
         creator = makeAddr("creator");
         vm.deal(creator, 100 ether);
 
@@ -111,9 +111,6 @@ contract MultiSigFactoryTest is Test {
         vm.prank(owners[1]);
         multiSig.confirmTransaction(0);
 
-        vm.prank(owners[0]);
-        multiSig.executeTransaction(0);
-
         (,, bool executed,) = multiSig.transactions(0);
         assertTrue(executed);
     }
@@ -129,7 +126,7 @@ contract MultiSigFactoryTest is Test {
 
     function test_createMultiSig_revertIfInsufficientFee() public {
         vm.prank(creator);
-        vm.expectRevert("Insufficient creation fee");
+        vm.expectRevert("Insufficient fee");
         factory.createMultiSig{value: CREATION_FEE - 1 wei}(owners, 2);
     }
 

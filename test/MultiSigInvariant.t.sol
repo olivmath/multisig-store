@@ -106,6 +106,10 @@ contract InvariantHandler is Test {
         vm.prank(owners[ownerIndex]);
         try multiSig.confirmTransaction(txId) {
             confirmCalls++;
+            (,, bool executed,) = multiSig.transactions(txId);
+            if (executed) {
+                wasExecuted[txId] = true;
+            }
         } catch {}
     }
 
