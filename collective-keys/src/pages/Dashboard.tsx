@@ -5,6 +5,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 import WalletCard from "@/components/WalletCard";
 import CreateWalletModal from "@/components/CreateWalletModal";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface WalletData {
   id: string;
@@ -23,6 +24,7 @@ interface PendingWallet {
 }
 
 const Dashboard = () => {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [connectedAddress, setConnectedAddress] = useState<string>("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -110,7 +112,12 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("connectedAddress");
-    navigate("/");
+    toast({
+      title: "Disconnected",
+      description: "You have been successfully disconnected.",
+      variant: "default",
+    });
+    setTimeout(() => navigate("/"), 500);
   };
 
   const handleCreateWallet = (wallet: { name: string; owners: string[]; required: number }) => {
@@ -125,7 +132,14 @@ const Dashboard = () => {
     const updatedWallets = [...wallets, newWallet];
     setWallets(updatedWallets);
     localStorage.setItem("wallets", JSON.stringify(updatedWallets));
-    navigate(`/wallet/${newWallet.id}`);
+
+    toast({
+      title: "Wallet Created!",
+      description: `${wallet.name} has been created successfully with ${wallet.owners.length} owners.`,
+      variant: "default",
+    });
+
+    setTimeout(() => navigate(`/wallet/${newWallet.id}`), 500);
   };
 
   return (

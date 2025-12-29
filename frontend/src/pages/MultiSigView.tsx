@@ -59,22 +59,24 @@ export function MultiSigView() {
           {/* Card 1: Owners */}
           <Card>
             <div className="space-y-3">
-              <p className="text-xs text-gray-500">Owners</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Owners</p>
               <p className="text-3xl font-bold">{owners.length}</p>
-              <div className="space-y-2 pt-2">
-                {owners.slice(0, 3).map((owner, index) => (
-                  <div key={owner} className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-400 text-xs font-medium">
-                      {index + 1}
+              <div className="space-y-2 pt-2 border-t border-gray-800">
+                <div className="pt-2 space-y-2">
+                  {owners.slice(0, 3).map((owner, index) => (
+                    <div key={owner} className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-400 text-xs font-medium">
+                        {index + 1}
+                      </div>
+                      <p className="font-mono text-xs text-gray-400">
+                        {owner.slice(0, 6)}...{owner.slice(-4)}
+                      </p>
                     </div>
-                    <p className="font-mono text-xs text-gray-400">
-                      {owner.slice(0, 6)}...{owner.slice(-4)}
-                    </p>
-                  </div>
-                ))}
-                {owners.length > 3 && (
-                  <p className="text-xs text-gray-500 pl-8">+{owners.length - 3} more</p>
-                )}
+                  ))}
+                  {owners.length > 3 && (
+                    <p className="text-xs text-gray-500 pl-8">+{owners.length - 3} more</p>
+                  )}
+                </div>
               </div>
             </div>
           </Card>
@@ -82,24 +84,28 @@ export function MultiSigView() {
           {/* Card 2: Required Confirmations */}
           <Card>
             <div className="space-y-3">
-              <p className="text-xs text-gray-500">Required Confirmations</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Required Confirmations</p>
               <p className="text-3xl font-bold">
                 {required}/{owners.length}
               </p>
-              <p className="text-sm text-gray-400 pt-2">
-                {required === 1 ? '1 signature needed' : `${required} signatures needed`}
-              </p>
+              <div className="pt-2 border-t border-gray-800">
+                <p className="text-sm text-gray-400 pt-2">
+                  {required === 1 ? '1 signature needed' : `${required} signatures needed`}
+                </p>
+              </div>
             </div>
           </Card>
 
           {/* Card 3: Balance */}
           <Card>
             <div className="space-y-3">
-              <p className="text-xs text-gray-500">Balance</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Balance</p>
               <p className="text-3xl font-bold">
                 {balance ? parseFloat(formatEther(balance.value)).toFixed(4) : '0.0000'}
               </p>
-              <p className="text-sm text-gray-400">ETH</p>
+              <div className="pt-2 border-t border-gray-800">
+                <p className="text-sm text-gray-400 pt-2">ETH</p>
+              </div>
             </div>
           </Card>
         </div>

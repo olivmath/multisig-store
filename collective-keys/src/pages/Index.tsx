@@ -1,19 +1,26 @@
 import { useState } from "react";
-import { Wallet, Users, ArrowRight, Shield, Lock, Key } from "lucide-react";
+import { ArrowRight, Shield, Key } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 import StatsCard from "@/components/StatsCard";
 import ConnectWalletModal from "@/components/ConnectWalletModal";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const Index = () => {
+  const { toast } = useToast();
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleConnect = (address: string) => {
     localStorage.setItem("connectedAddress", address);
-    navigate("/dashboard");
+    toast({
+      title: "Wallet Connected!",
+      description: `Successfully connected to ${address.slice(0, 6)}...${address.slice(-4)}`,
+      variant: "default",
+    });
+    setTimeout(() => navigate("/dashboard"), 500);
   };
 
   // Mock stats data
@@ -61,14 +68,13 @@ const Index = () => {
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight mb-6 animate-fade-up">
               MultiSig<span className="text-primary">Store</span>
               <span className="block text-3xl md:text-4xl lg:text-5xl mt-4 text-muted-foreground font-sans font-normal">
-                Collective Security on Blockchain
+                Secure Multi-Signature Digital Wallets
               </span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-              Create secure multisig wallets for teams with collective approvals and high technology. 
-              Protect your shared assets with the security of multiple signatures.
+              Buy your secure multisig digital wallets. <br/> Protect your shared assets with multiple signatures.
             </p>
 
             {/* CTA */}
@@ -79,20 +85,14 @@ const Index = () => {
               <StatsCard
                 title="Active Wallets"
                 value={stats.activeWallets.toLocaleString()}
-                icon={Wallet}
-                description="Multisig wallets in use"
               />
               <StatsCard
                 title="Unique Owners"
                 value={stats.uniqueOwners.toLocaleString()}
-                icon={Users}
-                description="Connected participants"
               />
               <StatsCard
                 title="Total Transactions"
                 value={stats.totalTransactions.toLocaleString()}
-                icon={Lock}
-                description="Transactions processed"
               />
             </div>
           </div>

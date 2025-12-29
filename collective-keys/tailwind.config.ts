@@ -74,9 +74,9 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["DM Sans", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
-        serif: ["DM Serif Display", "ui-serif", "Georgia", "serif"],
-        display: ["DM Serif Display", "ui-serif", "Georgia", "serif"],
+        sans: ["Roboto", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["Roboto", "ui-serif", "Georgia", "serif"],
+        display: ["Roboto", "ui-serif", "Georgia", "serif"],
       },
       keyframes: {
         "accordion-down": {

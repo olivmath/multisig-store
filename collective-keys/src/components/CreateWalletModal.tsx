@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import Identicon from "./Identicon";
 
 interface CreateWalletModalProps {
@@ -14,6 +15,7 @@ interface CreateWalletModalProps {
 }
 
 const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: CreateWalletModalProps) => {
+  const { toast } = useToast();
   const [name, setName] = useState("");
   const [owners, setOwners] = useState<string[]>([connectedAddress]);
   const [newOwner, setNewOwner] = useState("");
@@ -21,26 +23,96 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: Crea
   const [isCreating, setIsCreating] = useState(false);
 
   const addOwner = () => {
-    if (newOwner && newOwner.startsWith("0x") && newOwner.length === 42 && !owners.includes(newOwner)) {
-      setOwners([...owners, newOwner]);
-      setNewOwner("");
+    const trimmedOwner = newOwner.trim();
+
+    if (!trimmedOwner) {
+      toast({
+        title: "Empty Address",
+        description: "Please enter an owner address.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    if (!trimmedOwner.startsWith("0x") || trimmedOwner.length !== 42 || !/^0x[a-fA-F0-9]{40}$/.test(trimmedOwner)) {
+      toast({
+        title: "Invalid Address",
+        description: "Please enter a valid Ethereum address (0x followed by 40 hexadecimal characters).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (owners.includes(trimmedOwner)) {
+      toast({
+        title: "Duplicate Owner",
+        description: "This address is already added as an owner.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setOwners([...owners, trimmedOwner]);
+    setNewOwner("");
+    toast({
+      title: "Owner Added!",
+      description: "New owner has been added successfully.",
+      variant: "default",
+    });
   };
 
   const removeOwner = (index: number) => {
-    if (owners[index] === connectedAddress) return;
+    if (owners[index] === connectedAddress) {
+      toast({
+        title: "Cannot Remove",
+        description: "You cannot remove yourself as an owner.",
+        variant: "destructive",
+      });
+      return;
+    }
     const newOwners = owners.filter((_, i) => i !== index);
     setOwners(newOwners);
     if (required > newOwners.length) {
       setRequired(newOwners.length);
     }
+    toast({
+      title: "Owner Removed",
+      description: "Owner has been removed from the wallet.",
+      variant: "default",
+    });
   };
 
   const handleCreate = async () => {
-    if (!name || owners.length === 0 || required <= 0 || required > owners.length) return;
+    if (!name.trim()) {
+      toast({
+        title: "Wallet Name Required",
+        description: "Please enter a name for your wallet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (owners.length === 0) {
+      toast({
+        title: "No Owners",
+        description: "At least one owner is required.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (required <= 0 || required > owners.length) {
+      toast({
+        title: "Invalid Required Signatures",
+        description: `Required signatures must be between 1 and ${owners.length}.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsCreating(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
-    onCreate({ name, owners, required });
+    onCreate({ name: name.trim(), owners, required });
     setIsCreating(false);
     onClose();
     // Reset form
@@ -108,6 +180,12 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: Crea
                 value={newOwner}
                 onChange={(e) => setNewOwner(e.target.value)}
                 className="bg-background font-mono text-sm"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addOwner();
+                  }
+                }}
               />
               <Button variant="gold-outline" size="icon" onClick={addOwner}>
                 <Plus className="w-4 h-4" />

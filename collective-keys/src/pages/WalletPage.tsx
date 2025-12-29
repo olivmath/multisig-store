@@ -151,7 +151,12 @@ const WalletPage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("connectedAddress");
-    navigate("/");
+    toast({
+      title: "Disconnected",
+      description: "You have been successfully disconnected.",
+      variant: "default",
+    });
+    setTimeout(() => navigate("/"), 500);
   };
 
   const handleCreateTransaction = (tx: { type: string; destination: string; value: string; token?: string; data?: string }) => {
@@ -170,29 +175,53 @@ const WalletPage = () => {
     const updatedTxs = [newTx, ...transactions];
     setTransactions(updatedTxs);
     localStorage.setItem(`wallet_${id}_transactions`, JSON.stringify(updatedTxs));
-    
+
     // Update pending wallets
     updatePendingWallets(updatedTxs);
+
+    // Show success toast
+    toast({
+      title: "Transaction Created!",
+      description: `New ${tx.type} transaction submitted for approval.`,
+      variant: "default",
+    });
   };
 
   const handleConfirmTransaction = (txId: string) => {
     const updatedTxs = transactions.map(tx => {
       if (tx.id === txId) {
         const newConfirmations = tx.confirmations + 1;
+        const isNowConfirmed = newConfirmations >= tx.required;
         return {
           ...tx,
           confirmations: newConfirmations,
-          status: newConfirmations >= tx.required ? "confirmed" as const : "pending" as const,
-          txHash: newConfirmations >= tx.required ? `0x${Math.random().toString(16).slice(2)}` : undefined
+          status: isNowConfirmed ? "confirmed" as const : "pending" as const,
+          txHash: isNowConfirmed ? `0x${Math.random().toString(16).slice(2)}` : undefined
         };
       }
       return tx;
     });
     setTransactions(updatedTxs);
     localStorage.setItem(`wallet_${id}_transactions`, JSON.stringify(updatedTxs));
-    
+
     // Update pending wallets
     updatePendingWallets(updatedTxs);
+
+    // Show success toast
+    const updatedTx = updatedTxs.find(t => t.id === txId);
+    if (updatedTx?.status === "confirmed") {
+      toast({
+        title: "Transaction Executed!",
+        description: "The transaction has been confirmed and executed successfully.",
+        variant: "default",
+      });
+    } else {
+      toast({
+        title: "Confirmation Added!",
+        description: `Transaction now has ${updatedTx?.confirmations}/${updatedTx?.required} confirmations.`,
+        variant: "default",
+      });
+    }
   };
 
   const updatePendingWallets = (currentTxs: Transaction[]) => {
@@ -225,27 +254,33 @@ const WalletPage = () => {
   };
 
   const handleSaveCustomToken = () => {
-    const isValidAddress = customTokenAddress && customTokenAddress.startsWith("0x") && customTokenAddress.length === 42;
+    const trimmedAddress = customTokenAddress.trim();
+    const isValidAddress =
+      trimmedAddress &&
+      trimmedAddress.startsWith("0x") &&
+      trimmedAddress.length === 42 &&
+      /^0x[a-fA-F0-9]{40}$/.test(trimmedAddress);
 
     if (isValidAddress) {
       const newCustomToken: CustomToken = {
-        address: customTokenAddress,
+        address: trimmedAddress,
         balance: (Math.random() * 10000).toFixed(2)
       };
       setCustomToken(newCustomToken);
       localStorage.setItem(`wallet_${id}_custom_token`, JSON.stringify(newCustomToken));
       setIsAddingCustomToken(false);
       setSelectedToken("custom");
+      setCustomTokenAddress("");
       toast({
         title: "Token Saved!",
         description: "Custom token has been successfully added.",
-        variant: "default", 
+        variant: "default",
       });
     } else {
       toast({
         title: "Invalid Address",
-        description: "Please enter a valid Ethereum token address (e.g., 0x... with 40 hex characters).",
-        variant: "destructive", 
+        description: "Please enter a valid Ethereum token address (0x followed by 40 hexadecimal characters).",
+        variant: "destructive",
       });
     }
   };
@@ -321,14 +356,14 @@ const WalletPage = () => {
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {/* Owners Card */}
-          <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-xl bg-primary/10">
                 <Users className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="font-display font-semibold">Owners</h3>
+              <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Owners</h3>
             </div>
-            <div className="space-y-3">
+            <div className="flex-1 flex flex-col justify-center space-y-3 pt-2 border-t border-border/50">
               {wallet.owners.map((owner, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <Identicon address={owner} size={32} />
@@ -344,20 +379,20 @@ const WalletPage = () => {
           </div>
 
           {/* Required Card */}
-          <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-xl bg-primary/10">
                 <Shield className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="font-display font-semibold">Required</h3>
+              <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Required</h3>
             </div>
-            <div className="text-center py-4">
+            <div className="flex-1 flex flex-col justify-center text-center py-4 border-t border-border/50">
               <p className="text-5xl font-display font-bold text-primary mb-2">
                 {wallet.required}<span className="text-2xl text-muted-foreground">/{wallet.owners.length}</span>
               </p>
-              <p className="text-sm text-muted-foreground">Approvals needed</p>
-              <div className="mt-4 progress-gold">
-                <div 
+              <p className="text-sm text-muted-foreground mb-4">Approvals needed</p>
+              <div className="mt-auto progress-gold">
+                <div
                   className="progress-gold-fill"
                   style={{ width: `${(wallet.required / wallet.owners.length) * 100}%` }}
                 />
@@ -366,13 +401,13 @@ const WalletPage = () => {
           </div>
 
           {/* Balance Card */}
-          <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-primary/10">
                   <Coins className="w-5 h-5 text-primary" />
                 </div>
-                <h3 className="font-display font-semibold">Balance</h3>
+                <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Balance</h3>
               </div>
               <Select value={selectedToken} onValueChange={handleTokenChange}>
                 <SelectTrigger className="w-28 h-8">
@@ -386,7 +421,7 @@ const WalletPage = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="text-center py-4">
+            <div className="flex-1 flex flex-col justify-center text-center py-4 border-t border-border/50">
               {isAddingCustomToken ? (
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground mb-2">Enter token contract address</p>
@@ -395,17 +430,40 @@ const WalletPage = () => {
                     value={customTokenAddress}
                     onChange={(e) => setCustomTokenAddress(e.target.value)}
                     className="font-mono text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSaveCustomToken();
+                      }
+                    }}
                   />
-                  <Button 
-                    variant="gold" 
-                    size="sm" 
-                    onClick={handleSaveCustomToken}
-                    disabled={!customTokenAddress || customTokenAddress.length !== 42 || !customTokenAddress.startsWith("0x")}
-                    className="w-full gap-2"
-                  >
-                    <Check className="w-4 h-4" />
-                    Save Token
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsAddingCustomToken(false);
+                        setCustomTokenAddress("");
+                        setSelectedToken("eth");
+                      }}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="gold"
+                      size="sm"
+                      onClick={handleSaveCustomToken}
+                      className="flex-1 gap-2"
+                    >
+                      <Check className="w-4 h-4" />
+                      Save
+                    </Button>
+                  </div>
+                  {customTokenAddress && customTokenAddress.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      {customTokenAddress.trim().length}/42 characters
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
