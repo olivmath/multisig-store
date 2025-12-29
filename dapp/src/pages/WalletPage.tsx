@@ -32,7 +32,7 @@ const WalletPage = () => {
   const { data: userBalance } = useBalance({ address: connectedAddress });
 
   const walletAddress = id as `0x${string}` | undefined;
-  const { owners, required, txCount, submitTransaction } = useMultiSig(walletAddress);
+  const { owners, required, txCount, submitETH, submitERC20, submitCustomTransaction } = useMultiSig(walletAddress);
   const { data: walletBalance } = useBalance({ address: walletAddress });
   const { userMultiSigs } = useMultiSigFactory();
   const pendingWallets = usePendingWallets(userMultiSigs);
@@ -158,47 +158,42 @@ const WalletPage = () => {
   const handleCreateTransaction = (tx: { type: string; destination: string; value: string; token?: string; data?: string }) => {
     try {
       const destination = tx.destination as `0x${string}`;
-      let value: bigint;
-      let data: `0x${string}` = '0x';
 
       if (tx.type === "ether") {
-        // Simple ETH transfer
-        value = parseEther(tx.value);
-      } else if (tx.type === "erc20" && tx.token) {
-        // ERC20 transfer - encode transfer function call
-        const tokenAddress = tx.token as `0x${string}`;
-        const amount = parseUnits(tx.value, 18); // Assuming 18 decimals, ideally should fetch from token contract
+        // Simple ETH transfer using submitETH
+        const amount = parseEther(tx.value);
+        submitETH(destination, amount);
 
-        // Encode transfer(address to, uint256 amount)
-        // Function selector: 0xa9059cbb
-        const encodedAmount = amount.toString(16).padStart(64, '0');
-        const encodedDestination = destination.slice(2).padStart(64, '0');
-        data = `0xa9059cbb${encodedDestination}${encodedAmount}` as `0x${string}`;
-        value = BigInt(0);
-        // Change destination to token contract for ERC20 transfers
-        submitTransaction(tokenAddress, value, data);
+        toast({
+          title: "Transaction Submitted!",
+          description: "ETH transfer transaction has been submitted. Please confirm in your wallet.",
+          variant: "default",
+        });
+      } else if (tx.type === "erc20" && tx.token) {
+        // ERC20 transfer using submitERC20
+        const tokenAddress = tx.token as `0x${string}`;
+        const amount = parseUnits(tx.value, 18); // Assuming 18 decimals
+        submitERC20(tokenAddress, destination, amount);
 
         toast({
           title: "Transaction Submitted!",
           description: "ERC20 transfer transaction has been submitted. Please confirm in your wallet.",
           variant: "default",
         });
-        return;
       } else if (tx.type === "custom") {
-        // Custom transaction with data
-        value = tx.value ? parseEther(tx.value) : BigInt(0);
-        data = (tx.data || '0x') as `0x${string}`;
+        // Custom transaction using submitCustomTransaction
+        const value = tx.value ? parseEther(tx.value) : BigInt(0);
+        const data = (tx.data || '0x') as `0x${string}`;
+        submitCustomTransaction(destination, value, data);
+
+        toast({
+          title: "Transaction Submitted!",
+          description: "Custom transaction has been submitted. Please confirm in your wallet.",
+          variant: "default",
+        });
       } else {
         throw new Error("Invalid transaction type");
       }
-
-      submitTransaction(destination, value, data);
-
-      toast({
-        title: "Transaction Submitted!",
-        description: "Transaction has been submitted. Please confirm in your wallet.",
-        variant: "default",
-      });
     } catch (error) {
       console.error("Error creating transaction:", error);
       toast({

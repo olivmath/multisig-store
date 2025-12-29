@@ -5,7 +5,7 @@ import { multiSigABI } from '@/lib/contracts/multiSigABI'
 import { tokenABI } from '@/lib/contracts/tokenABI'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, Clock } from 'lucide-react'
-import { decodeTransaction, decodeERC20Transfer } from '@/lib/utils/decodeTransaction'
+import { decodeTransaction } from '@/lib/utils/decodeTransaction'
 import { useEffect } from 'react'
 
 interface TransactionCardProps {
@@ -14,8 +14,10 @@ interface TransactionCardProps {
 }
 
 interface Transaction {
-  destination: `0x${string}`
-  value: bigint
+  txType: number
+  token: `0x${string}`
+  to: `0x${string}`
+  amount: bigint
   executed: boolean
   data: `0x${string}`
 }
@@ -34,25 +36,24 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
 
   const tx = txData as Transaction | undefined
 
-  // Decode ERC20 transfer using utility function
-  const decodedERC20 = tx ? decodeERC20Transfer(tx.data, tx.destination) : null
+  // Read token info if it's an ERC20 transaction (txType === 1)
+  const isERC20 = tx && tx.txType === 1
 
-  // Read token info if it's an ERC20 transaction
   const { data: tokenSymbol } = useReadContract({
-    address: decodedERC20?.tokenContract,
+    address: tx?.token,
     abi: tokenABI,
     functionName: 'symbol',
     query: {
-      enabled: !!decodedERC20,
+      enabled: isERC20,
     },
   })
 
   const { data: tokenDecimals } = useReadContract({
-    address: decodedERC20?.tokenContract,
+    address: tx?.token,
     abi: tokenABI,
     functionName: 'decimals',
     query: {
-      enabled: !!decodedERC20,
+      enabled: isERC20,
     },
   })
 
@@ -149,9 +150,9 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
               {txInfo.displayValue} {txInfo.symbol}
             </p>
           )}
-          {txInfo.type === 'custom' && tx.value > 0 && (
+          {txInfo.type === 'custom' && tx.amount > 0 && (
             <p className="text-2xl font-display font-bold text-primary">
-              {formatEther(tx.value)} ETH
+              {formatEther(tx.amount)} ETH
             </p>
           )}
         </div>

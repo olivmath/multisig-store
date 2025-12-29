@@ -179,7 +179,7 @@ contract MultiSigTest is Test {
 
     function test_executeTransaction_revertsIfInvalidTxId() public {
         vm.prank(owner1);
-        vm.expectRevert(MultiSig.InvalidTransactionId.selector);
+        vm.expectRevert(MultiSig.TransactionNotConfirmed.selector);
         multiSig.executeTransaction(0);
     }
 
