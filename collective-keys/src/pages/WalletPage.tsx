@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Users, Shield, Coins, ArrowUpRight, Check } from "lucide-react";
+import { Users, Shield, Coins, ArrowUpRight, Plus, Check, X } from "lucide-react";
+import { useAccount, useDisconnect, useBalance, useReadContract } from "wagmi";
+import { formatUnits, formatEther, parseEther, parseUnits } from "viem";
 import DashboardHeader from "@/components/DashboardHeader";
 import Identicon from "@/components/Identicon";
-import TransactionList, { Transaction } from "@/components/TransactionList";
 import TransactionModal from "@/components/TransactionModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,242 +16,83 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-
-interface WalletData {
-  id: string;
-  address: string;
-  name: string;
-  owners: string[];
-  required: number;
-  balance: string;
-}
-
-interface CustomToken {
-  address: string;
-  balance: string;
-}
-
-interface PendingWallet {
-  id: string;
-  name: string;
-  address: string;
-  pendingCount: number;
-}
+import { useMultiSig } from "@/hooks/useMultiSig";
+import { tokenABI } from "@/lib/contracts/tokenABI";
 
 const WalletPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [connectedAddress, setConnectedAddress] = useState<string>("");
-  const [wallet, setWallet] = useState<WalletData | null>(null);
-  const [allWallets, setAllWallets] = useState<WalletData[]>([]);
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [selectedToken, setSelectedToken] = useState("eth");
+  const { address: connectedAddress, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { data: userBalance } = useBalance({ address: connectedAddress });
+
+  const walletAddress = id as `0x${string}` | undefined;
+  const { owners, required, txCount, submitTransaction } = useMultiSig(walletAddress);
+  const { data: walletBalance } = useBalance({ address: walletAddress });
+
+  // Token selection state
+  const [selectedToken, setSelectedToken] = useState<"eth" | "custom">("eth");
   const [customTokenAddress, setCustomTokenAddress] = useState("");
-  const [customToken, setCustomToken] = useState<CustomToken | null>(null);
-  const [isAddingCustomToken, setIsAddingCustomToken] = useState(false);
-  const [pendingWallets, setPendingWallets] = useState<PendingWallet[]>([]);
+  const [savedCustomToken, setSavedCustomToken] = useState<`0x${string}` | null>(null);
+  const [isAddingToken, setIsAddingToken] = useState(false);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+
+  // Load saved custom token from localStorage
+  useEffect(() => {
+    if (walletAddress) {
+      const saved = localStorage.getItem(`wallet_${walletAddress}_custom_token`);
+      if (saved) {
+        setSavedCustomToken(saved as `0x${string}`);
+      }
+    }
+  }, [walletAddress]);
+
+  // Get custom token balance
+  const { data: customTokenBalance } = useReadContract({
+    address: savedCustomToken || undefined,
+    abi: tokenABI,
+    functionName: 'balanceOf',
+    args: walletAddress ? [walletAddress] : undefined,
+    query: {
+      enabled: !!savedCustomToken && !!walletAddress && selectedToken === "custom",
+    },
+  });
+
+  // Get custom token decimals
+  const { data: customTokenDecimals } = useReadContract({
+    address: savedCustomToken || undefined,
+    abi: tokenABI,
+    functionName: 'decimals',
+    query: {
+      enabled: !!savedCustomToken && selectedToken === "custom",
+    },
+  });
+
+  // Get custom token symbol
+  const { data: customTokenSymbol } = useReadContract({
+    address: savedCustomToken || undefined,
+    abi: tokenABI,
+    functionName: 'symbol',
+    query: {
+      enabled: !!savedCustomToken && selectedToken === "custom",
+    },
+  });
 
   useEffect(() => {
-    const address = localStorage.getItem("connectedAddress");
-    if (!address) {
+    if (!isConnected) {
       navigate("/");
-      return;
     }
-    setConnectedAddress(address);
-
-    // Load all wallets from localStorage
-    const savedWallets = localStorage.getItem("wallets");
-    if (savedWallets) {
-      const wallets: WalletData[] = JSON.parse(savedWallets);
-      setAllWallets(wallets);
-      const foundWallet = wallets.find(w => w.id === id);
-      if (foundWallet) {
-        setWallet(foundWallet);
-      } else {
-        navigate("/dashboard");
-        return;
-      }
-
-      // Calculate pending transactions per wallet for notifications
-      const pending: PendingWallet[] = [];
-      wallets.forEach(w => {
-        if (w.owners.includes(address)) {
-          const savedTxs = localStorage.getItem(`wallet_${w.id}_transactions`);
-          let pendingCount = 0;
-          
-          if (savedTxs) {
-            const txs = JSON.parse(savedTxs);
-            pendingCount = txs.filter((tx: any) => tx.status === "pending").length;
-          } else {
-            if (w.id === "1") pendingCount = 2;
-            if (w.id === "2") pendingCount = 1;
-          }
-          
-          if (pendingCount > 0) {
-            pending.push({
-              id: w.id,
-              name: w.name,
-              address: w.address,
-              pendingCount
-            });
-          }
-        }
-      });
-      setPendingWallets(pending);
-    } else {
-      navigate("/dashboard");
-      return;
-    }
-
-    // Load custom token if saved
-    const savedCustomToken = localStorage.getItem(`wallet_${id}_custom_token`);
-    if (savedCustomToken) {
-      setCustomToken(JSON.parse(savedCustomToken));
-    }
-
-    // Load transactions
-    const savedTxs = localStorage.getItem(`wallet_${id}_transactions`);
-    if (savedTxs) {
-      const parsedTxs = JSON.parse(savedTxs);
-      setTransactions(parsedTxs.map((tx: any) => ({
-        ...tx,
-        createdAt: new Date(tx.createdAt)
-      })));
-    } else {
-      // Initialize with mock transactions
-      const mockTxs: Transaction[] = [
-        {
-          id: "tx1",
-          type: "ether",
-          destination: "0xabcdef1234567890abcdef1234567890abcdef12",
-          value: "0.5",
-          confirmations: 1,
-          required: 2,
-          status: "pending",
-          createdAt: new Date(Date.now() - 3600000)
-        },
-        {
-          id: "tx2",
-          type: "erc20",
-          destination: "0x567890abcdef1234567890abcdef123456789012",
-          value: "1000",
-          token: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-          confirmations: 2,
-          required: 2,
-          status: "confirmed",
-          txHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-          createdAt: new Date(Date.now() - 86400000)
-        }
-      ];
-      setTransactions(mockTxs);
-      localStorage.setItem(`wallet_${id}_transactions`, JSON.stringify(mockTxs));
-    }
-  }, [id, navigate]);
+  }, [isConnected, navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("connectedAddress");
+    disconnect();
     toast({
       title: "Disconnected",
       description: "You have been successfully disconnected.",
       variant: "default",
     });
     setTimeout(() => navigate("/"), 500);
-  };
-
-  const handleCreateTransaction = (tx: { type: string; destination: string; value: string; token?: string; data?: string }) => {
-    const newTx: Transaction = {
-      id: Date.now().toString(),
-      type: tx.type as "ether" | "erc20" | "custom",
-      destination: tx.destination,
-      value: tx.value,
-      token: tx.token,
-      data: tx.data,
-      confirmations: 1,
-      required: wallet?.required || 2,
-      status: "pending",
-      createdAt: new Date()
-    };
-    const updatedTxs = [newTx, ...transactions];
-    setTransactions(updatedTxs);
-    localStorage.setItem(`wallet_${id}_transactions`, JSON.stringify(updatedTxs));
-
-    // Update pending wallets
-    updatePendingWallets(updatedTxs);
-
-    // Show success toast
-    toast({
-      title: "Transaction Created!",
-      description: `New ${tx.type} transaction submitted for approval.`,
-      variant: "default",
-    });
-  };
-
-  const handleConfirmTransaction = (txId: string) => {
-    const updatedTxs = transactions.map(tx => {
-      if (tx.id === txId) {
-        const newConfirmations = tx.confirmations + 1;
-        const isNowConfirmed = newConfirmations >= tx.required;
-        return {
-          ...tx,
-          confirmations: newConfirmations,
-          status: isNowConfirmed ? "confirmed" as const : "pending" as const,
-          txHash: isNowConfirmed ? `0x${Math.random().toString(16).slice(2)}` : undefined
-        };
-      }
-      return tx;
-    });
-    setTransactions(updatedTxs);
-    localStorage.setItem(`wallet_${id}_transactions`, JSON.stringify(updatedTxs));
-
-    // Update pending wallets
-    updatePendingWallets(updatedTxs);
-
-    // Show success toast
-    const updatedTx = updatedTxs.find(t => t.id === txId);
-    if (updatedTx?.status === "confirmed") {
-      toast({
-        title: "Transaction Executed!",
-        description: "The transaction has been confirmed and executed successfully.",
-        variant: "default",
-      });
-    } else {
-      toast({
-        title: "Confirmation Added!",
-        description: `Transaction now has ${updatedTx?.confirmations}/${updatedTx?.required} confirmations.`,
-        variant: "default",
-      });
-    }
-  };
-
-  const updatePendingWallets = (currentTxs: Transaction[]) => {
-    const pending: PendingWallet[] = [];
-    allWallets.forEach(w => {
-      if (w.owners.includes(connectedAddress)) {
-        let pendingCount = 0;
-        
-        if (w.id === id) {
-          pendingCount = currentTxs.filter(tx => tx.status === "pending").length;
-        } else {
-          const savedTxs = localStorage.getItem(`wallet_${w.id}_transactions`);
-          if (savedTxs) {
-            const txs = JSON.parse(savedTxs);
-            pendingCount = txs.filter((tx: any) => tx.status === "pending").length;
-          }
-        }
-        
-        if (pendingCount > 0) {
-          pending.push({
-            id: w.id,
-            name: w.name,
-            address: w.address,
-            pendingCount
-          });
-        }
-      }
-    });
-    setPendingWallets(pending);
   };
 
   const handleSaveCustomToken = () => {
@@ -261,15 +103,10 @@ const WalletPage = () => {
       trimmedAddress.length === 42 &&
       /^0x[a-fA-F0-9]{40}$/.test(trimmedAddress);
 
-    if (isValidAddress) {
-      const newCustomToken: CustomToken = {
-        address: trimmedAddress,
-        balance: (Math.random() * 10000).toFixed(2)
-      };
-      setCustomToken(newCustomToken);
-      localStorage.setItem(`wallet_${id}_custom_token`, JSON.stringify(newCustomToken));
-      setIsAddingCustomToken(false);
-      setSelectedToken("custom");
+    if (isValidAddress && walletAddress) {
+      setSavedCustomToken(trimmedAddress as `0x${string}`);
+      localStorage.setItem(`wallet_${walletAddress}_custom_token`, trimmedAddress);
+      setIsAddingToken(false);
       setCustomTokenAddress("");
       toast({
         title: "Token Saved!",
@@ -286,15 +123,87 @@ const WalletPage = () => {
   };
 
   const handleTokenChange = (value: string) => {
-    setSelectedToken(value);
-    if (value === "custom" && !customToken) {
-      setIsAddingCustomToken(true);
+    if (value === "custom") {
+      if (!savedCustomToken) {
+        setIsAddingToken(true);
+      }
+      setSelectedToken("custom");
     } else {
-      setIsAddingCustomToken(false);
+      setSelectedToken("eth");
+      setIsAddingToken(false);
     }
   };
 
-  if (!wallet) {
+  const getDisplayBalance = () => {
+    if (selectedToken === "eth") {
+      return walletBalance ? formatUnits(walletBalance.value, 18) : "0";
+    } else if (selectedToken === "custom" && customTokenBalance && customTokenDecimals) {
+      return formatUnits(customTokenBalance as bigint, customTokenDecimals as number);
+    }
+    return "0";
+  };
+
+  const getTokenSymbol = () => {
+    if (selectedToken === "eth") return "ETH";
+    if (selectedToken === "custom" && customTokenSymbol) return customTokenSymbol as string;
+    return "TOKEN";
+  };
+
+  const handleCreateTransaction = (tx: { type: string; destination: string; value: string; token?: string; data?: string }) => {
+    try {
+      const destination = tx.destination as `0x${string}`;
+      let value: bigint;
+      let data: `0x${string}` = '0x';
+
+      if (tx.type === "ether") {
+        // Simple ETH transfer
+        value = parseEther(tx.value);
+      } else if (tx.type === "erc20" && tx.token) {
+        // ERC20 transfer - encode transfer function call
+        const tokenAddress = tx.token as `0x${string}`;
+        const amount = parseUnits(tx.value, 18); // Assuming 18 decimals, ideally should fetch from token contract
+
+        // Encode transfer(address to, uint256 amount)
+        // Function selector: 0xa9059cbb
+        const encodedAmount = amount.toString(16).padStart(64, '0');
+        const encodedDestination = destination.slice(2).padStart(64, '0');
+        data = `0xa9059cbb${encodedDestination}${encodedAmount}` as `0x${string}`;
+        value = BigInt(0);
+        // Change destination to token contract for ERC20 transfers
+        submitTransaction(tokenAddress, value, data);
+
+        toast({
+          title: "Transaction Submitted!",
+          description: "ERC20 transfer transaction has been submitted. Please confirm in your wallet.",
+          variant: "default",
+        });
+        return;
+      } else if (tx.type === "custom") {
+        // Custom transaction with data
+        value = tx.value ? parseEther(tx.value) : BigInt(0);
+        data = (tx.data || '0x') as `0x${string}`;
+      } else {
+        throw new Error("Invalid transaction type");
+      }
+
+      submitTransaction(destination, value, data);
+
+      toast({
+        title: "Transaction Submitted!",
+        description: "Transaction has been submitted. Please confirm in your wallet.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error creating transaction:", error);
+      toast({
+        title: "Transaction Failed",
+        description: error instanceof Error ? error.message : "Failed to create transaction",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (!connectedAddress || !walletAddress) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -302,43 +211,13 @@ const WalletPage = () => {
     );
   }
 
-  const getDisplayBalance = () => {
-    switch (selectedToken) {
-      case "eth":
-        return wallet.balance;
-      case "usdt":
-        return "5,000.00";
-      case "usdc":
-        return "3,250.00";
-      case "custom":
-        return customToken?.balance || "0.00";
-      default:
-        return wallet.balance;
-    }
-  };
-
-  const getTokenSymbol = () => {
-    switch (selectedToken) {
-      case "eth":
-        return "ETH";
-      case "usdt":
-        return "USDT";
-      case "usdc":
-        return "USDC";
-      case "custom":
-        return "TOKEN";
-      default:
-        return "ETH";
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader
         address={connectedAddress}
-        balance="2.45"
-        network="mainnet"
-        pendingWallets={pendingWallets}
+        balance={userBalance ? formatEther(userBalance.value) : "0"}
+        network="sepolia"
+        pendingWallets={[]}
         onLogout={handleLogout}
       />
 
@@ -346,10 +225,12 @@ const WalletPage = () => {
         {/* Wallet Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="font-display text-3xl font-semibold">{wallet.name}</h1>
+            <h1 className="font-display text-3xl font-semibold">
+              Wallet {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+            </h1>
           </div>
           <p className="font-mono text-muted-foreground">
-            {wallet.address}
+            {walletAddress}
           </p>
         </div>
 
@@ -364,17 +245,21 @@ const WalletPage = () => {
               <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Owners</h3>
             </div>
             <div className="flex-1 flex flex-col justify-center space-y-3 pt-2 border-t border-border/50">
-              {wallet.owners.map((owner, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <Identicon address={owner} size={32} />
-                  <span className="font-mono text-sm truncate">
-                    {owner.slice(0, 10)}...{owner.slice(-8)}
-                  </span>
-                  {owner === connectedAddress && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full ml-auto">You</span>
-                  )}
-                </div>
-              ))}
+              {owners.length > 0 ? (
+                owners.map((owner, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <Identicon address={owner} size={32} />
+                    <span className="font-mono text-sm truncate">
+                      {owner.slice(0, 10)}...{owner.slice(-8)}
+                    </span>
+                    {owner === connectedAddress && (
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full ml-auto">You</span>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground text-center">Loading owners...</p>
+              )}
             </div>
           </div>
 
@@ -388,13 +273,13 @@ const WalletPage = () => {
             </div>
             <div className="flex-1 flex flex-col justify-center text-center py-4 border-t border-border/50">
               <p className="text-5xl font-display font-bold text-primary mb-2">
-                {wallet.required}<span className="text-2xl text-muted-foreground">/{wallet.owners.length}</span>
+                {required}<span className="text-2xl text-muted-foreground">/{owners.length}</span>
               </p>
               <p className="text-sm text-muted-foreground mb-4">Approvals needed</p>
               <div className="mt-auto progress-gold">
                 <div
                   className="progress-gold-fill"
-                  style={{ width: `${(wallet.required / wallet.owners.length) * 100}%` }}
+                  style={{ width: `${owners.length > 0 ? (required / owners.length) * 100 : 0}%` }}
                 />
               </div>
             </div>
@@ -409,21 +294,37 @@ const WalletPage = () => {
                 </div>
                 <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Balance</h3>
               </div>
-              <Select value={selectedToken} onValueChange={handleTokenChange}>
-                <SelectTrigger className="w-28 h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="eth">ETH</SelectItem>
-                  <SelectItem value="usdt">USDT</SelectItem>
-                  <SelectItem value="usdc">USDC</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                <Select value={selectedToken} onValueChange={handleTokenChange}>
+                  <SelectTrigger className="w-28 h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="eth">ETH</SelectItem>
+                    <SelectItem value="custom">Custom</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(walletAddress || '');
+                    toast({
+                      title: "Address Copied!",
+                      description: "Wallet address copied to clipboard. Send funds to this address.",
+                      variant: "default",
+                    });
+                  }}
+                  className="gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Funds
+                </Button>
+              </div>
             </div>
             <div className="flex-1 flex flex-col justify-center text-center py-4 border-t border-border/50">
-              {isAddingCustomToken ? (
-                <div className="space-y-3">
+              {isAddingToken ? (
+                <div className="space-y-3 px-4">
                   <p className="text-sm text-muted-foreground mb-2">Enter token contract address</p>
                   <Input
                     placeholder="0x..."
@@ -441,12 +342,13 @@ const WalletPage = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        setIsAddingCustomToken(false);
+                        setIsAddingToken(false);
                         setCustomTokenAddress("");
                         setSelectedToken("eth");
                       }}
-                      className="flex-1"
+                      className="flex-1 gap-2"
                     >
+                      <X className="w-4 h-4" />
                       Cancel
                     </Button>
                     <Button
@@ -473,9 +375,9 @@ const WalletPage = () => {
                   <span className="text-lg text-primary font-medium mt-1">
                     {getTokenSymbol()}
                   </span>
-                  {selectedToken === "custom" && customToken && (
+                  {selectedToken === "custom" && savedCustomToken && (
                     <p className="text-xs text-muted-foreground font-mono mt-2">
-                      {customToken.address.slice(0, 10)}...{customToken.address.slice(-8)}
+                      {savedCustomToken.slice(0, 10)}...{savedCustomToken.slice(-8)}
                     </p>
                   )}
                 </div>
@@ -484,11 +386,11 @@ const WalletPage = () => {
           </div>
         </div>
 
-        {/* Transaction Button */}
+        {/* Transaction Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-display text-2xl font-semibold">Transactions</h2>
-          <Button 
-            variant="gold" 
+          <Button
+            variant="gold"
             onClick={() => setIsTransactionModalOpen(true)}
             className="gap-2"
           >
@@ -497,11 +399,21 @@ const WalletPage = () => {
           </Button>
         </div>
 
-        {/* Transactions List */}
-        <TransactionList
-          transactions={transactions}
-          onConfirm={handleConfirmTransaction}
-        />
+        {/* Transactions Section */}
+        <div className="rounded-2xl border border-border bg-card p-8">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Coins className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="font-display text-xl font-semibold mb-2">Transaction History</h3>
+            <p className="text-muted-foreground mb-4">
+              Total transactions: <span className="text-primary font-semibold">{txCount}</span>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Transaction history and management will be available soon.
+            </p>
+          </div>
+        </div>
       </main>
 
       {/* Transaction Modal */}

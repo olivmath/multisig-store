@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useConnect, useAccount } from "wagmi";
 import { ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useEffect } from "react";
 
 interface ConnectWalletModalProps {
   isOpen: boolean;
@@ -9,40 +9,65 @@ interface ConnectWalletModalProps {
   onConnect: (address: string) => void;
 }
 
-const walletOptions = [
-  { 
-    id: "metamask", 
-    name: "MetaMask", 
-    icon: "🦊",
-    description: "Connect using browser extension"
-  },
-  { 
-    id: "walletconnect", 
-    name: "WalletConnect", 
-    icon: "🔗",
-    description: "Scan with mobile wallet"
-  },
-  { 
-    id: "coinbase", 
-    name: "Coinbase Wallet", 
-    icon: "💰",
-    description: "Connect using Coinbase"
-  },
-];
-
 const ConnectWalletModal = ({ isOpen, onClose, onConnect }: ConnectWalletModalProps) => {
-  const [connecting, setConnecting] = useState<string | null>(null);
+  const { connectors, connect, isPending } = useConnect();
+  const { address, isConnected } = useAccount();
 
-  const handleConnect = async (walletId: string) => {
-    setConnecting(walletId);
-    // Simulate connection delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    // Generate mock address
-    const mockAddress = `0x${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 34)}`;
-    onConnect(mockAddress);
-    setConnecting(null);
-    onClose();
+  useEffect(() => {
+    if (isConnected && address) {
+      onConnect(address);
+      onClose();
+    }
+  }, [isConnected, address, onConnect, onClose]);
+
+  const handleConnect = async (connectorId: string) => {
+    const connector = connectors.find(c => c.id === connectorId);
+    if (connector) {
+      connect({ connector });
+    }
   };
+
+  const getConnectorIcon = (id: string) => {
+    if (id.includes('metamask') || id === 'io.metamask') return "🦊";
+    if (id.includes('walletConnect')) return "🔗";
+    if (id.includes('coinbase')) return "💰";
+    return "🦊";
+  };
+
+  const getConnectorDescription = (name: string) => {
+    if (name.toLowerCase().includes('metamask')) return "Connect using browser extension";
+    if (name.toLowerCase().includes('walletconnect')) return "Scan with mobile wallet";
+    if (name.toLowerCase().includes('coinbase')) return "Connect using Coinbase";
+    return "Connect using browser extension";
+  };
+
+  // Filter and sort connectors: MetaMask first, then WalletConnect
+  const filteredConnectors = connectors
+    .filter((connector) => {
+      const id = connector.id.toLowerCase();
+
+      // Show WalletConnect
+      if (id.includes('walletconnect')) return true;
+
+      // Show MetaMask or treat first injected as MetaMask
+      if (id.includes('metamask') || id === 'io.metamask') return true;
+
+      // Show Injected only if no MetaMask is available
+      if (id === 'injected' && !connectors.some(c => c.id.includes('metamask'))) {
+        return true;
+      }
+
+      return false;
+    })
+    .sort((a, b) => {
+      // MetaMask/Injected first
+      const aIsMetaMask = a.id.includes('metamask') || a.id === 'io.metamask' || a.id === 'injected';
+      const bIsMetaMask = b.id.includes('metamask') || b.id === 'io.metamask' || b.id === 'injected';
+
+      if (aIsMetaMask && !bIsMetaMask) return -1;
+      if (!aIsMetaMask && bIsMetaMask) return 1;
+      return 0;
+    });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -52,21 +77,21 @@ const ConnectWalletModal = ({ isOpen, onClose, onConnect }: ConnectWalletModalPr
         </DialogHeader>
 
         <div className="space-y-3 py-4">
-          {walletOptions.map((wallet) => (
+          {filteredConnectors.map((connector) => (
             <button
-              key={wallet.id}
-              onClick={() => handleConnect(wallet.id)}
-              disabled={connecting !== null}
+              key={connector.id}
+              onClick={() => handleConnect(connector.id)}
+              disabled={isPending}
               className="w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-background hover:bg-secondary hover:border-primary/30 transition-all duration-200 group disabled:opacity-50"
             >
-              <span className="text-3xl">{wallet.icon}</span>
+              <span className="text-3xl">{getConnectorIcon(connector.id)}</span>
               <div className="flex-1 text-left">
                 <p className="font-semibold group-hover:text-primary transition-colors">
-                  {wallet.name}
+                  {connector.name === 'Injected' ? 'MetaMask' : connector.name}
                 </p>
-                <p className="text-sm text-muted-foreground">{wallet.description}</p>
+                <p className="text-sm text-muted-foreground">{getConnectorDescription(connector.name)}</p>
               </div>
-              {connecting === wallet.id ? (
+              {isPending ? (
                 <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               ) : (
                 <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />

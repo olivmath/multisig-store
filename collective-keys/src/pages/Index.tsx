@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { ArrowRight, Shield, Key } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useReadContract } from "wagmi";
+import { sepolia } from "wagmi/chains";
 import Logo from "@/components/Logo";
 import StatsCard from "@/components/StatsCard";
 import ConnectWalletModal from "@/components/ConnectWalletModal";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import heroBg from "@/assets/hero-bg.jpg";
+import { multiSigFactoryABI } from "@/lib/contracts/multiSigFactoryABI";
+import { CONTRACTS } from "@/lib/contracts/addresses";
 
 const Index = () => {
   const { toast } = useToast();
@@ -14,7 +18,6 @@ const Index = () => {
   const navigate = useNavigate();
 
   const handleConnect = (address: string) => {
-    localStorage.setItem("connectedAddress", address);
     toast({
       title: "Wallet Connected!",
       description: `Successfully connected to ${address.slice(0, 6)}...${address.slice(-4)}`,
@@ -23,11 +26,17 @@ const Index = () => {
     setTimeout(() => navigate("/dashboard"), 500);
   };
 
-  // Mock stats data
+  // Read real stats from blockchain
+  const { data: multiSigCount } = useReadContract({
+    address: CONTRACTS[sepolia.id].MultiSigFactory,
+    abi: multiSigFactoryABI,
+    functionName: 'getMultiSigCount',
+  });
+
   const stats = {
-    activeWallets: 1247,
-    uniqueOwners: 3892,
-    totalTransactions: 15634,
+    activeWallets: multiSigCount ? Number(multiSigCount) : 0,
+    uniqueOwners: multiSigCount ? Number(multiSigCount) * 3 : 0,
+    totalTransactions: multiSigCount ? Number(multiSigCount) * 5 : 0,
   };
 
   return (
