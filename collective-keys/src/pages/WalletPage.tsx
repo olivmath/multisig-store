@@ -7,6 +7,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 import Identicon from "@/components/Identicon";
 import TransactionModal from "@/components/TransactionModal";
 import { TransactionCard } from "@/components/TransactionCard";
+import { EventListener } from "@/components/EventListener";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -218,6 +219,8 @@ const WalletPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {walletAddress && <EventListener walletAddresses={[walletAddress]} />}
+
       <DashboardHeader
         address={connectedAddress}
         balance={userBalance ? formatEther(userBalance.value) : "0"}

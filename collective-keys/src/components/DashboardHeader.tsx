@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Bell, ChevronDown, LogOut, Wallet, ArrowRight } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Wallet, ArrowRight, CheckCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import Identicon from "./Identicon";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "./NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,11 +54,14 @@ const DashboardHeader = ({ address, balance, network, pendingWallets, onLogout }
 
         {/* Right Section */}
         <div className="flex items-center gap-4">
-          {/* Notifications */}
+          {/* Real-time Notifications */}
+          <NotificationBell />
+
+          {/* Pending Transactions */}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
-                <Bell className="w-5 h-5" />
+                <CheckCircle className="w-5 h-5" />
                 {totalPending > 0 && (
                   <span className="notification-badge">{totalPending}</span>
                 )}

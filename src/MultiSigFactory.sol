@@ -20,6 +20,7 @@ contract MultiSigFactory {
     //////////////////////////////////////////////////////////////*/
     address[] public deployedMultiSigs;
     mapping(address => address[]) public creatorMultiSigs;
+    mapping(address => address[]) public ownerMultiSigs;
     mapping(address => bool) public isMultiSig;
 
     address public owner;
@@ -47,7 +48,7 @@ contract MultiSigFactory {
         uint256 _required
     ) external payable returns (address multiSig) {
         require(msg.value >= creationFee, "Insufficient creation fee");
-        
+
         (bool success, ) = payable(owner).call{value: msg.value}("");
         require(success, "Fee transfer failed");
 
@@ -56,6 +57,12 @@ contract MultiSigFactory {
 
         deployedMultiSigs.push(multiSig);
         creatorMultiSigs[msg.sender].push(multiSig);
+
+        // Add the multisig to all owners' lists
+        for (uint256 i = 0; i < _owners.length; i++) {
+            ownerMultiSigs[_owners[i]].push(multiSig);
+        }
+
         isMultiSig[multiSig] = true;
 
         emit MultiSigCreated(
@@ -80,6 +87,14 @@ contract MultiSigFactory {
         returns (address[] memory)
     {
         return creatorMultiSigs[creator];
+    }
+
+    function getOwnerMultiSigs(address _owner)
+        external
+        view
+        returns (address[] memory)
+    {
+        return ownerMultiSigs[_owner];
     }
 
     function getMultiSigCount() external view returns (uint256) {

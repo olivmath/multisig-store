@@ -103,9 +103,18 @@ contract MultiSig {
 
         confirmations[txId][msg.sender] = true;
         emit ConfirmTransaction(msg.sender, txId);
+
+        // Auto-execute if threshold is reached
+        if (isConfirmed(txId) && !transactions[txId].executed) {
+            _executeTransaction(txId);
+        }
     }
 
     function executeTransaction(uint256 txId) external onlyOwner {
+        _executeTransaction(txId);
+    }
+
+    function _executeTransaction(uint256 txId) internal {
         if (txId >= txCount) revert InvalidTransactionId();
 
         Transaction storage txn = transactions[txId];

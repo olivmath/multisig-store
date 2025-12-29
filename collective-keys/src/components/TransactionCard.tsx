@@ -1,9 +1,10 @@
 import { useAccount, useReadContract } from 'wagmi'
-import { formatEther } from 'viem'
+import { formatEther, formatUnits } from 'viem'
 import { useMultiSig } from '@/hooks/useMultiSig'
 import { multiSigABI } from '@/lib/contracts/multiSigABI'
+import { tokenABI } from '@/lib/contracts/tokenABI'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, Clock, ArrowUpRight } from 'lucide-react'
+import { CheckCircle2, Clock } from 'lucide-react'
 
 interface TransactionCardProps {
   multiSigAddress: `0x${string}`
@@ -19,7 +20,7 @@ interface Transaction {
 
 export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps) {
   const { address: userAddress } = useAccount()
-  const { required, confirmTransaction, executeTransaction } = useMultiSig(multiSigAddress)
+  const { required, confirmTransaction } = useMultiSig(multiSigAddress)
 
   // Read transaction data
   const { data: txData, isLoading: txLoading } = useReadContract({
@@ -31,12 +32,53 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
 
   const tx = txData as Transaction | undefined
 
-  // Read if transaction is confirmed (has enough confirmations)
-  const { data: isConfirmed } = useReadContract({
-    address: multiSigAddress,
-    abi: multiSigABI,
-    functionName: 'isConfirmed',
-    args: [txId],
+  // Try to decode ERC20 transfer if transaction has data
+  const decodedERC20 = tx?.data?.startsWith('0xa9059cbb') && tx.data.length === 138
+    ? (() => {
+        try {
+          // Extract destination address from the calldata
+          // Structure: 0xa9059cbb (8 chars) + padded address (64 chars) + amount (64 chars)
+          // Address is in the last 40 chars of the first parameter
+          const destinationHex = '0x' + tx.data.slice(34, 74)
+          const amountHex = '0x' + tx.data.slice(74, 138)
+
+          console.log('Decoding ERC20 transfer:', {
+            fullData: tx.data,
+            dataLength: tx.data.length,
+            destinationHex,
+            amountHex,
+            tokenContract: tx.destination,
+          })
+
+          return {
+            destination: destinationHex as `0x${string}`,
+            amount: BigInt(amountHex),
+            tokenContract: tx.destination,
+          }
+        } catch (error) {
+          console.error('Failed to decode ERC20:', error)
+          return null
+        }
+      })()
+    : null
+
+  // Read token info if it's an ERC20 transaction
+  const { data: tokenSymbol } = useReadContract({
+    address: decodedERC20?.tokenContract,
+    abi: tokenABI,
+    functionName: 'symbol',
+    query: {
+      enabled: !!decodedERC20,
+    },
+  })
+
+  const { data: tokenDecimals } = useReadContract({
+    address: decodedERC20?.tokenContract,
+    abi: tokenABI,
+    functionName: 'decimals',
+    query: {
+      enabled: !!decodedERC20,
+    },
   })
 
   // Read if user has confirmed this transaction
@@ -61,13 +103,11 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
 
   const getStatusColor = () => {
     if (tx.executed) return 'bg-green-500/10 text-green-600 border-green-500/30'
-    if (isConfirmed) return 'bg-blue-500/10 text-blue-600 border-blue-500/30'
     return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/30'
   }
 
   const getStatusText = () => {
     if (tx.executed) return 'Executed'
-    if (isConfirmed) return 'Ready to Execute'
     return 'Pending'
   }
 
@@ -75,12 +115,23 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     confirmTransaction(txId)
   }
 
-  const handleExecute = () => {
-    executeTransaction(txId)
-  }
-
   // Decode transaction data
   const decodeTransaction = () => {
+    // Check if it's ERC20 transfer
+    if (decodedERC20) {
+      const decimals = (tokenDecimals as number) || 18
+      const symbol = (tokenSymbol as string) || 'TOKENS'
+
+      return {
+        type: 'erc20' as const,
+        tokenContract: decodedERC20.tokenContract,
+        destination: decodedERC20.destination,
+        value: decodedERC20.amount,
+        displayValue: formatUnits(decodedERC20.amount, decimals),
+        symbol: symbol,
+      }
+    }
+
     // Check if has data (bytes)
     const hasData = tx.data && tx.data !== '0x' && tx.data.length > 2
 
@@ -92,30 +143,6 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         value: tx.value || BigInt(0),
         displayValue: tx.value ? formatEther(tx.value) : '0',
         symbol: 'ETH',
-      }
-    }
-
-    // Has data - check if it's ERC20 transfer (function selector: 0xa9059cbb)
-    if (tx.data.startsWith('0xa9059cbb') && tx.data.length === 138) {
-      try {
-        // Extract destination address (32 bytes after function selector, padded)
-        const destinationHex = '0x' + tx.data.slice(34, 74)
-
-        // Extract amount (next 32 bytes)
-        const amountHex = '0x' + tx.data.slice(74, 138)
-        const amount = BigInt(amountHex)
-
-        return {
-          type: 'erc20' as const,
-          tokenContract: tx.destination,
-          destination: destinationHex as `0x${string}`,
-          value: amount,
-          displayValue: formatEther(amount),
-          symbol: 'TOKENS',
-        }
-      } catch (error) {
-        console.error('Failed to decode ERC20 transfer:', error)
-        // Fallback to custom if decoding fails
       }
     }
 
@@ -186,10 +213,16 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
 
       {/* Destination */}
       <div className="space-y-1 py-3 border-t border-border/50">
-        <p className="text-xs text-muted-foreground uppercase tracking-wide">Destination</p>
-        <p className="font-mono text-sm">
-          {txInfo.destination ? `${txInfo.destination.slice(0, 10)}...${txInfo.destination.slice(-8)}` : 'Invalid address'}
+        <p className="text-xs text-muted-foreground uppercase tracking-wide">
+          {txInfo.type === 'erc20' ? 'Recipient' : 'Destination'}
         </p>
+        {txInfo.destination ? (
+          <p className="font-mono text-sm">
+            {txInfo.destination.slice(0, 10)}...{txInfo.destination.slice(-8)}
+          </p>
+        ) : (
+          <p className="font-mono text-sm text-destructive">Invalid address</p>
+        )}
       </div>
 
       {/* Calldata (for custom transactions) */}
@@ -207,36 +240,34 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         <div className="flex justify-between items-center">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Status</p>
           <p className="text-xs text-muted-foreground">
-            {isConfirmed ? `${required} of ${required} confirmations` : `Need ${required} confirmations`}
+            Need {required} confirmations
           </p>
         </div>
         <div className="progress-gold">
           <div
             className={`h-2 rounded-full transition-all ${
-              tx.executed ? 'bg-green-500' : isConfirmed ? 'bg-primary' : 'bg-yellow-500'
+              tx.executed ? 'bg-green-500' : 'bg-yellow-500'
             }`}
             style={{
-              width: isConfirmed ? '100%' : '50%',
+              width: tx.executed ? '100%' : '50%',
             }}
           />
         </div>
+        {!tx.executed && (
+          <p className="text-xs text-muted-foreground text-center pt-1">
+            Transaction will execute automatically when threshold is reached
+          </p>
+        )}
       </div>
 
       {/* Actions */}
       {!tx.executed && (
         <div className="flex gap-3 pt-2 border-t border-border/50">
-          {!hasUserConfirmed && (
+          {!hasUserConfirmed ? (
             <Button variant="outline" size="sm" onClick={handleConfirm} className="flex-1">
               Confirm Transaction
             </Button>
-          )}
-          {isConfirmed && (
-            <Button variant="gold" size="sm" onClick={handleExecute} className="flex-1 gap-2">
-              <ArrowUpRight className="w-4 h-4" />
-              Execute
-            </Button>
-          )}
-          {hasUserConfirmed && !isConfirmed && (
+          ) : (
             <div className="flex-1 text-center text-sm text-green-600 py-2 font-medium">
               ✓ You confirmed this transaction
             </div>

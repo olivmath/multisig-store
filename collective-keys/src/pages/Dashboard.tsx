@@ -5,6 +5,7 @@ import { useAccount, useDisconnect, useBalance } from "wagmi";
 import DashboardHeader from "@/components/DashboardHeader";
 import WalletCard from "@/components/WalletCard";
 import CreateWalletModal from "@/components/CreateWalletModal";
+import { EventListener } from "@/components/EventListener";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMultiSigFactory } from "@/hooks/useMultiSigFactory";
@@ -90,6 +91,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <EventListener walletAddresses={userMultiSigs} />
+
       <DashboardHeader
         address={connectedAddress}
         balance={balance ? formatEther(balance.value) : "0"}

@@ -7,11 +7,11 @@ export function useMultiSigFactory() {
   const { address: userAddress } = useAccount()
   const factoryAddress = CONTRACTS[sepolia.id].MultiSigFactory
 
-  // Read user's multisigs
+  // Read user's multisigs (as owner, not just as creator)
   const { data: userMultiSigs, refetch: refetchUserMultiSigs } = useReadContract({
     address: factoryAddress,
     abi: multiSigFactoryABI,
-    functionName: 'getCreatorMultiSigs',
+    functionName: 'getOwnerMultiSigs',
     args: userAddress ? [userAddress] : undefined,
     query: {
       enabled: !!userAddress,
