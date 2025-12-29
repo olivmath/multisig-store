@@ -21,10 +21,7 @@ contract MultiSigFuzzTest is Test {
         vm.deal(address(multiSig), 100 ether);
     }
 
-    function testFuzz_constructor(
-        uint8 numOwners,
-        uint8 requiredConfirmations
-    ) public {
+    function testFuzz_constructor(uint8 numOwners, uint8 requiredConfirmations) public {
         vm.assume(numOwners > 0 && numOwners <= 50);
         vm.assume(requiredConfirmations > 0 && requiredConfirmations <= numOwners);
 
@@ -39,19 +36,14 @@ contract MultiSigFuzzTest is Test {
         assertEq(fuzzMultiSig.getOwners().length, numOwners);
     }
 
-    function testFuzz_submitTransaction(
-        address destination,
-        uint96 value,
-        bytes calldata data
-    ) public {
+    function testFuzz_submitTransaction(address destination, uint96 value, bytes calldata data) public {
         vm.assume(destination != address(0));
         vm.assume(value <= 100 ether);
 
         vm.prank(owners[0]);
         uint256 txId = multiSig.submitTransaction(destination, value, data);
 
-        (address dest, uint256 val, bool executed, bytes memory txData) =
-            multiSig.transactions(txId);
+        (address dest, uint256 val, bool executed, bytes memory txData) = multiSig.transactions(txId);
 
         assertEq(dest, destination);
         assertEq(val, value);
@@ -94,7 +86,7 @@ contract MultiSigFuzzTest is Test {
 
         assertEq(destination.balance, balanceBefore + value);
 
-        (, , bool executed, ) = multiSig.transactions(txId);
+        (,, bool executed,) = multiSig.transactions(txId);
         assertTrue(executed);
     }
 
@@ -103,17 +95,13 @@ contract MultiSigFuzzTest is Test {
 
         for (uint256 i = 0; i < count; i++) {
             vm.prank(owners[0]);
-            multiSig.submitTransaction(
-                address(uint160(i + 1)),
-                1 ether,
-                ""
-            );
+            multiSig.submitTransaction(address(uint160(i + 1)), 1 ether, "");
         }
 
         assertEq(multiSig.txCount(), count);
 
         for (uint256 i = 0; i < count; i++) {
-            (address dest, , , ) = multiSig.transactions(i);
+            (address dest,,,) = multiSig.transactions(i);
             assertEq(dest, address(uint160(i + 1)));
         }
     }
@@ -146,9 +134,7 @@ contract MultiSigFuzzTest is Test {
         assertEq(address(multiSig).balance, balanceBefore + amount);
     }
 
-    function testFuzz_cannotExecuteWithInsufficientConfirmations(
-        uint8 confirmCount
-    ) public {
+    function testFuzz_cannotExecuteWithInsufficientConfirmations(uint8 confirmCount) public {
         vm.assume(confirmCount < 2);
 
         vm.prank(owners[0]);
@@ -161,10 +147,7 @@ contract MultiSigFuzzTest is Test {
         }
     }
 
-    function testFuzz_transactionWithData(
-        bytes calldata data,
-        uint96 value
-    ) public {
+    function testFuzz_transactionWithData(bytes calldata data, uint96 value) public {
         vm.assume(value <= 10 ether);
         vm.assume(data.length <= 10000);
 
@@ -179,7 +162,7 @@ contract MultiSigFuzzTest is Test {
         vm.prank(owners[0]);
         multiSig.executeTransaction(txId);
 
-        (, , bool executed, ) = multiSig.transactions(txId);
+        (,, bool executed,) = multiSig.transactions(txId);
         assertTrue(executed);
     }
 }

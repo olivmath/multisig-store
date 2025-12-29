@@ -4,9 +4,6 @@ pragma solidity ^0.8.4;
 import {MultiSig} from "./MultiSig.sol";
 
 contract MultiSigFactory {
-    /*//////////////////////////////////////////////////////////////
-                                EVENTS
-    //////////////////////////////////////////////////////////////*/
     event MultiSigCreated(
         address indexed multiSig,
         address indexed creator,
@@ -15,9 +12,6 @@ contract MultiSigFactory {
         uint256 timestamp
     );
 
-    /*//////////////////////////////////////////////////////////////
-                                STORAGE
-    //////////////////////////////////////////////////////////////*/
     address[] public deployedMultiSigs;
     mapping(address => address[]) public creatorMultiSigs;
     mapping(address => address[]) public ownerMultiSigs;
@@ -26,9 +20,9 @@ contract MultiSigFactory {
     address public owner;
     uint256 public creationFee;
 
-    constructor() {
+    constructor(uint256 _creationFee) {
         owner = msg.sender;
-        creationFee = 0.01 ether;
+        creationFee = _creationFee;
     }
 
     modifier onlyOwner() {
@@ -36,42 +30,33 @@ contract MultiSigFactory {
         _;
     }
 
-    function updateCreationFee(uint256 _newFee) external onlyOwner {
-        creationFee = _newFee;
+    function updateCreationFee(uint256 newFee) external onlyOwner {
+        creationFee = newFee;
     }
 
-    /*//////////////////////////////////////////////////////////////
-                            FACTORY LOGIC
-    //////////////////////////////////////////////////////////////*/
     function createMultiSig(
-        address[] memory _owners,
-        uint256 _required
-    ) external payable returns (address multiSig) {
-        require(msg.value >= creationFee, "Insufficient creation fee");
+        address[] calldata owners,
+        uint256 required
+    ) external payable returns (address multisig) {
+        require(msg.value >= creationFee, "Insufficient fee");
 
-        (bool success, ) = payable(owner).call{value: msg.value}("");
-        require(success, "Fee transfer failed");
+        MultiSig newMultiSig = new MultiSig(owners, required);
+        multisig = address(newMultiSig);
 
-        MultiSig newMultiSig = new MultiSig(_owners, _required);
-        multiSig = address(newMultiSig);
+        deployedMultiSigs.push(multisig);
+        creatorMultiSigs[msg.sender].push(multisig);
 
-        deployedMultiSigs.push(multiSig);
-        creatorMultiSigs[msg.sender].push(multiSig);
-
-        // Add the multisig to all owners' lists
-        for (uint256 i = 0; i < _owners.length; i++) {
-            ownerMultiSigs[_owners[i]].push(multiSig);
+        uint256 len = owners.length;
+        for (uint256 i; i < len; ++i) {
+            ownerMultiSigs[owners[i]].push(multisig);
         }
 
-        isMultiSig[multiSig] = true;
+        isMultiSig[multisig] = true;
 
-        emit MultiSigCreated(
-            multiSig,
-            msg.sender,
-            _owners,
-            _required,
-            block.timestamp
-        );
+        emit MultiSigCreated(multisig, msg.sender, owners, required, block.timestamp);
+
+        (bool ok,) = owner.call{value: msg.value}("");
+        require(ok, "Fee transfer failed");
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -79,22 +64,6 @@ contract MultiSigFactory {
     //////////////////////////////////////////////////////////////*/
     function getDeployedMultiSigs() external view returns (address[] memory) {
         return deployedMultiSigs;
-    }
-
-    function getCreatorMultiSigs(address creator)
-        external
-        view
-        returns (address[] memory)
-    {
-        return creatorMultiSigs[creator];
-    }
-
-    function getOwnerMultiSigs(address _owner)
-        external
-        view
-        returns (address[] memory)
-    {
-        return ownerMultiSigs[_owner];
     }
 
     function getMultiSigCount() external view returns (uint256) {

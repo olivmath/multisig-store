@@ -30,7 +30,7 @@ contract MultiSigInvariantTest is StdInvariant, Test {
 
     function invariant_executedTransactionsStayExecuted() public view {
         for (uint256 i = 0; i < multiSig.txCount(); i++) {
-            (, , bool executed, ) = multiSig.transactions(i);
+            (,, bool executed,) = multiSig.transactions(i);
             if (executed) {
                 assertTrue(handler.wasExecuted(i));
             }
@@ -47,7 +47,7 @@ contract MultiSigInvariantTest is StdInvariant, Test {
 
     function invariant_cannotExecuteWithoutEnoughConfirmations() public view {
         for (uint256 i = 0; i < multiSig.txCount(); i++) {
-            (, , bool executed, ) = multiSig.transactions(i);
+            (,, bool executed,) = multiSig.transactions(i);
             if (executed) {
                 assertTrue(multiSig.isConfirmed(i));
             }
@@ -80,11 +80,7 @@ contract InvariantHandler is Test {
         owners = multiSig.getOwners();
     }
 
-    function submitTransaction(
-        uint256 ownerIndex,
-        address destination,
-        uint256 value
-    ) public {
+    function submitTransaction(uint256 ownerIndex, address destination, uint256 value) public {
         ownerIndex = bound(ownerIndex, 0, owners.length - 1);
         value = bound(value, 0, address(multiSig).balance);
 

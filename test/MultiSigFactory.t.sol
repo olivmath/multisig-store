@@ -12,11 +12,7 @@ contract MultiSigFactoryTest is Test {
     uint256 public constant CREATION_FEE = 0.01 ether;
 
     event MultiSigCreated(
-        address indexed multiSig,
-        address indexed creator,
-        address[] owners,
-        uint256 required,
-        uint256 timestamp
+        address indexed multiSig, address indexed creator, address[] owners, uint256 required, uint256 timestamp
     );
 
     function setUp() public {
@@ -118,16 +114,16 @@ contract MultiSigFactoryTest is Test {
         vm.prank(owners[0]);
         multiSig.executeTransaction(0);
 
-        (, , bool executed, ) = multiSig.transactions(0);
+        (,, bool executed,) = multiSig.transactions(0);
         assertTrue(executed);
     }
 
     function test_createMultiSig_feeTransfer() public {
-        uint256 initialOwnerBalance = address(this).balance; 
-        
+        uint256 initialOwnerBalance = address(this).balance;
+
         vm.prank(creator);
         factory.createMultiSig{value: CREATION_FEE}(owners, 2);
-        
+
         assertEq(address(this).balance, initialOwnerBalance + CREATION_FEE);
     }
 
@@ -136,22 +132,18 @@ contract MultiSigFactoryTest is Test {
         vm.expectRevert("Insufficient creation fee");
         factory.createMultiSig{value: CREATION_FEE - 1 wei}(owners, 2);
     }
-    
+
     function test_updateCreationFee() public {
         uint256 newFee = 0.05 ether;
         factory.updateCreationFee(newFee);
         assertEq(factory.creationFee(), newFee);
-        
+
         vm.prank(creator);
         vm.expectRevert("Not owner");
         factory.updateCreationFee(0);
     }
 
-    function testFuzz_createMultiSig(
-        uint8 numOwners,
-        uint8 required,
-        address fuzzCreator
-    ) public {
+    function testFuzz_createMultiSig(uint8 numOwners, uint8 required, address fuzzCreator) public {
         vm.assume(numOwners > 0 && numOwners <= 20);
         vm.assume(required > 0 && required <= numOwners);
         vm.assume(fuzzCreator != address(0));

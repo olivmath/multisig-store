@@ -6,12 +6,7 @@ contract MultiSig {
                                 EVENTS
     //////////////////////////////////////////////////////////////*/
     event Deposit(address indexed sender, uint256 value);
-    event SubmitTransaction(
-        uint256 indexed txId,
-        address indexed destination,
-        uint256 value,
-        bytes data
-    );
+    event SubmitTransaction(uint256 indexed txId, address indexed destination, uint256 value, bytes data);
     event ConfirmTransaction(address indexed owner, uint256 indexed txId);
     event ExecuteTransaction(uint256 indexed txId);
 
@@ -26,6 +21,7 @@ contract MultiSig {
     error NoOwners();
     error OwnerNotUnique();
     error AlreadyConfirmed();
+    error InvalidDestination();
 
     /*//////////////////////////////////////////////////////////////
                                 STORAGE
@@ -43,6 +39,7 @@ contract MultiSig {
 
     mapping(uint256 => Transaction) public transactions;
     mapping(uint256 => mapping(address => bool)) public confirmations;
+    mapping(uint256 => uint256) public confirmationCount;
     uint256 public txCount;
 
     /*//////////////////////////////////////////////////////////////
@@ -63,8 +60,7 @@ contract MultiSig {
 
         for (uint256 i; i < len; ++i) {
             address owner = _owners[i];
-            if (owner == address(0)) revert OwnerNotUnique();
-            if (isOwner[owner]) revert OwnerNotUnique();
+            if (owner == address(0) || isOwner[owner]) revert OwnerNotUnique();
 
             isOwner[owner] = true;
             owners.push(owner);
@@ -81,7 +77,9 @@ contract MultiSig {
         uint256 value,
         bytes calldata data
     ) external onlyOwner returns (uint256 txId) {
-        txId = txCount;
+        if (destination == address(0)) revert InvalidDestination();
+
+        txId = txCount++;
 
         transactions[txId] = Transaction({
             destination: destination,
@@ -90,22 +88,25 @@ contract MultiSig {
             data: data
         });
 
-        txCount++;
-
         emit SubmitTransaction(txId, destination, value, data);
 
-        confirmTransaction(txId);
+        _confirmTransaction(txId, msg.sender);
     }
 
-    function confirmTransaction(uint256 txId) public onlyOwner {
+    function confirmTransaction(uint256 txId) external onlyOwner {
+        _confirmTransaction(txId, msg.sender);
+    }
+
+    function _confirmTransaction(uint256 txId, address sender) internal {
         if (txId >= txCount) revert InvalidTransactionId();
-        if (confirmations[txId][msg.sender]) revert AlreadyConfirmed();
+        if (confirmations[txId][sender]) revert AlreadyConfirmed();
 
-        confirmations[txId][msg.sender] = true;
-        emit ConfirmTransaction(msg.sender, txId);
+        confirmations[txId][sender] = true;
+        confirmationCount[txId]++;
 
-        // Auto-execute if threshold is reached
-        if (isConfirmed(txId) && !transactions[txId].executed) {
+        emit ConfirmTransaction(sender, txId);
+
+        if (confirmationCount[txId] >= required && !transactions[txId].executed) {
             _executeTransaction(txId);
         }
     }
@@ -119,7 +120,7 @@ contract MultiSig {
 
         Transaction storage txn = transactions[txId];
         if (txn.executed) revert TransactionAlreadyExecuted();
-        if (!isConfirmed(txId)) revert TransactionNotConfirmed();
+        if (confirmationCount[txId] < required) revert TransactionNotConfirmed();
 
         txn.executed = true;
 
@@ -138,21 +139,20 @@ contract MultiSig {
     /*//////////////////////////////////////////////////////////////
                             VIEW FUNCTIONS
     //////////////////////////////////////////////////////////////*/
-    function isConfirmed(uint256 txId) public view returns (bool) {
-        uint256 count;
-        uint256 len = owners.length;
-
-        for (uint256 i; i < len; ++i) {
-            if (confirmations[txId][owners[i]]) {
-                count++;
-                if (count >= required) return true;
-            }
-        }
-        return false;
+    function isConfirmed(uint256 txId) external view returns (bool) {
+        return confirmationCount[txId] >= required;
     }
 
     function getOwners() external view returns (address[] memory) {
         return owners;
+    }
+
+    function isConfirmedBy(uint256 txId, address owner) external view returns (bool) {
+        return confirmations[txId][owner];
+    }
+
+    function getTransaction(uint256 txId) external view returns (Transaction memory) {
+        return transactions[txId];
     }
 
     /*//////////////////////////////////////////////////////////////

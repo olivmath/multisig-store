@@ -48,7 +48,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.prank(owners[0]);
         multiSig.executeTransaction(txId);
 
-        (, , bool executedBefore, ) = multiSig.transactions(txId);
+        (,, bool executedBefore,) = multiSig.transactions(txId);
         assert(executedBefore);
 
         vm.prank(owners[0]);
@@ -178,7 +178,7 @@ contract MultiSigHalmosTest is SymTest, Test {
         vm.prank(owners[0]);
         multiSig.executeTransaction(txId);
 
-        (, , bool executed, ) = multiSig.transactions(txId);
+        (,, bool executed,) = multiSig.transactions(txId);
         assert(executed);
     }
 

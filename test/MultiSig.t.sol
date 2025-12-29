@@ -13,12 +13,7 @@ contract MultiSigTest is Test {
     address public notOwner;
 
     event Deposit(address indexed sender, uint256 value);
-    event SubmitTransaction(
-        uint256 indexed txId,
-        address indexed destination,
-        uint256 value,
-        bytes data
-    );
+    event SubmitTransaction(uint256 indexed txId, address indexed destination, uint256 value, bytes data);
     event ConfirmTransaction(address indexed owner, uint256 indexed txId);
     event ExecuteTransaction(uint256 indexed txId);
 
@@ -94,8 +89,7 @@ contract MultiSigTest is Test {
         assertEq(txId, 0);
         assertEq(multiSig.txCount(), 1);
 
-        (address dest, uint256 value, bool executed, bytes memory data) =
-            multiSig.transactions(0);
+        (address dest, uint256 value, bool executed, bytes memory data) = multiSig.transactions(0);
         assertEq(dest, owner2);
         assertEq(value, 1 ether);
         assertFalse(executed);
@@ -162,7 +156,7 @@ contract MultiSigTest is Test {
 
         assertEq(owner2.balance, balanceBefore + 1 ether);
 
-        (, , bool executed, ) = multiSig.transactions(0);
+        (,, bool executed,) = multiSig.transactions(0);
         assertTrue(executed);
     }
 
