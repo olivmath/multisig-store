@@ -6,96 +6,96 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 5%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 5%;
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 5%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 56 100% 72%;
-    --primary-foreground: 0 0% 5%;
+    --primary: 45 93% 47%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 94%;
-    --secondary-foreground: 0 0% 5%;
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 0 0% 88%;
-    --muted-foreground: 0 0% 35%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 56 100% 72%;
-    --accent-foreground: 0 0% 5%;
+    --accent: 45 93% 47%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 72% 41%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 82%;
-    --input: 0 0% 82%;
-    --ring: 56 100% 72%;
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 45 93% 47%;
 
     --radius: 0.75rem;
 
-    --chart-1: 56 100% 72%;
-    --chart-2: 56 100% 80%;
-    --chart-3: 56 100% 85%;
+    --chart-1: 45 93% 47%;
+    --chart-2: 45 93% 55%;
+    --chart-3: 45 80% 65%;
     --chart-4: 0 0% 30%;
     --chart-5: 0 0% 50%;
 
     /* Custom tokens */
-    --gold: 56 100% 72%;
-    --gold-light: 56 100% 80%;
-    --gold-dark: 56 100% 60%;
-    --gold-glow: 56 100% 72%;
+    --gold: 45 93% 47%;
+    --gold-light: 45 93% 55%;
+    --gold-dark: 45 93% 35%;
+    --gold-glow: 45 93% 47%;
 
-    --surface-dark: 0 0% 5%;
-    --surface-dark-elevated: 0 0% 10%;
-    --surface-dark-muted: 0 0% 15%;
+    --surface-dark: 0 0% 10%;
+    --surface-dark-elevated: 0 0% 15%;
+    --surface-dark-muted: 0 0% 20%;
   }
 
   .dark {
-    --background: 0 0% 5%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
 
     --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 56 100% 72%;
-    --primary-foreground: 0 0% 5%;
+    --primary: 45 93% 58%;
+    --primary-foreground: 0 0% 10%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 25%;
+    --muted: 0 0% 20%;
     --muted-foreground: 0 0% 70%;
 
-    --accent: 56 100% 72%;
-    --accent-foreground: 0 0% 5%;
+    --accent: 45 93% 58%;
+    --accent-foreground: 0 0% 10%;
 
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 25%;
     --input: 0 0% 25%;
-    --ring: 56 100% 72%;
+    --ring: 45 93% 58%;
 
-    --chart-1: 56 100% 72%;
-    --chart-2: 56 100% 80%;
-    --chart-3: 56 100% 85%;
+    --chart-1: 45 93% 58%;
+    --chart-2: 45 93% 65%;
+    --chart-3: 45 80% 70%;
     --chart-4: 0 0% 40%;
     --chart-5: 0 0% 60%;
 
-    --gold: 56 100% 72%;
-    --gold-light: 56 100% 80%;
-    --gold-dark: 56 100% 60%;
-    --gold-glow: 56 100% 72%;
+    --gold: 45 93% 58%;
+    --gold-light: 45 93% 65%;
+    --gold-dark: 45 93% 45%;
+    --gold-glow: 45 93% 58%;
 
-    --surface-dark: 0 0% 5%;
-    --surface-dark-elevated: 0 0% 10%;
-    --surface-dark-muted: 0 0% 15%;
+    --surface-dark: 0 0% 8%;
+    --surface-dark-elevated: 0 0% 12%;
+    --surface-dark-muted: 0 0% 18%;
   }
 }
 
@@ -117,7 +117,7 @@
 @layer components {
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(56 100% 72%), hsl(56 100% 80%));
+    background-image: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-light)));
   }
 
   .card-hover {
@@ -126,7 +126,7 @@
 
   .card-hover:hover {
     @apply border-primary/30;
-    box-shadow: 0 2px 10px hsl(56 100% 72% / 0.15);
+    box-shadow: 0 2px 10px hsl(var(--gold) / 0.15);
     transform: translateY(-2px);
   }
 }
