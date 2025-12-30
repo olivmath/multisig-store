@@ -1,10 +1,142 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* MultiSigStore Design System - Black & Gold Fintech Aesthetic */
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 5%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
+
+    --primary: 56 100% 72%;
+    --primary-foreground: 0 0% 5%;
+
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 5%;
+
+    --muted: 0 0% 88%;
+    --muted-foreground: 0 0% 35%;
+
+    --accent: 56 100% 72%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 82%;
+    --input: 0 0% 82%;
+    --ring: 56 100% 72%;
+
+    --radius: 0.75rem;
+
+    --chart-1: 56 100% 72%;
+    --chart-2: 56 100% 80%;
+    --chart-3: 56 100% 85%;
+    --chart-4: 0 0% 30%;
+    --chart-5: 0 0% 50%;
+
+    /* Custom tokens */
+    --gold: 56 100% 72%;
+    --gold-light: 56 100% 80%;
+    --gold-dark: 56 100% 60%;
+    --gold-glow: 56 100% 72%;
+
+    --surface-dark: 0 0% 5%;
+    --surface-dark-elevated: 0 0% 10%;
+    --surface-dark-muted: 0 0% 15%;
+  }
+
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 56 100% 72%;
+    --primary-foreground: 0 0% 5%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 25%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 56 100% 72%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 56 100% 72%;
+
+    --chart-1: 56 100% 72%;
+    --chart-2: 56 100% 80%;
+    --chart-3: 56 100% 85%;
+    --chart-4: 0 0% 40%;
+    --chart-5: 0 0% 60%;
+
+    --gold: 56 100% 72%;
+    --gold-light: 56 100% 80%;
+    --gold-dark: 56 100% 60%;
+    --gold-glow: 56 100% 72%;
+
+    --surface-dark: 0 0% 5%;
+    --surface-dark-elevated: 0 0% 10%;
+    --surface-dark-muted: 0 0% 15%;
+  }
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(56 100% 72%), hsl(56 100% 80%));
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply border-primary/30;
+    box-shadow: 0 2px 10px hsl(56 100% 72% / 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+@layer utilities {
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
 }
