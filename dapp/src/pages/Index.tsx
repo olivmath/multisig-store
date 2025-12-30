@@ -1,7 +1,8 @@
-import { ArrowRight, Store } from "lucide-react";
+import { Store } from "lucide-react";
 import Logo from "../components/Logo";
 import StatsCard from "../components/StatsCard";
 import ThemeToggle from "../components/ThemeToggle";
+import ConnectButton from "../components/ConnectButton";
 import { useGlobalStats } from "../hooks/useGlobalStats";
 
 const Index = () => {
@@ -15,10 +16,7 @@ const Index = () => {
           <Logo showTagline size="md" />
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">
-              Launch App
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <ConnectButton />
           </div>
         </div>
       </header>
