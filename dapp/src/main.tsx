@@ -3,7 +3,7 @@ import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from "./App.tsx";
 import "./index.css";
-import { config } from './lib/wagmi/config.ts'
+import { config } from '@/lib/wagmi/config'
 import { NotificationProvider } from './contexts/NotificationContext'
 
 // Enable dark mode by default for the black/gold aesthetic
