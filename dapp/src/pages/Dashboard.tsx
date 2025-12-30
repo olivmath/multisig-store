@@ -28,8 +28,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success("Wallet Created!", {
-        description: "Your multi-signature wallet has been created successfully.",
+      toast.success("Wallet Created", {
+        description: "You deployed a new multisig wallet.",
       });
       setIsModalOpen(false);
       refetchUserMultiSigs();
@@ -66,9 +66,9 @@ const Dashboard = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">My Wallets</h1>
+              <h1 className="text-3xl font-bold mb-2">Your Multisig Wallets</h1>
               <p className="text-muted-foreground">
-                Manage your multi-signature wallets
+                Manage all your multi-signature wallets
               </p>
             </div>
             <button
@@ -76,7 +76,7 @@ const Dashboard = () => {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
             >
               <Plus className="w-5 h-5" />
-              Create Wallet
+              Purchase New Wallet
             </button>
           </div>
         </div>
@@ -87,16 +87,16 @@ const Dashboard = () => {
             <div className="p-6 rounded-full bg-muted mb-4">
               <ShoppingCart className="w-12 h-12 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No wallets yet</h3>
+            <h3 className="text-xl font-semibold mb-2">No Wallets Found</h3>
             <p className="text-muted-foreground mb-6">
-              Create your first multi-signature wallet to get started
+              Purchase your first multisig wallet to begin
             </p>
             <button
               onClick={() => setIsModalOpen(true)}
               className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
             >
               <Plus className="w-5 h-5" />
-              Create Your First Wallet
+              Purchase Your First Wallet
             </button>
           </div>
         ) : (

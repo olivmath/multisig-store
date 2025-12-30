@@ -4,7 +4,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet, LogOut, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
-const ConnectButton = () => {
+interface ConnectButtonProps {
+  variant?: "default" | "launch";
+}
+
+const ConnectButton = ({ variant = "default" }: ConnectButtonProps) => {
   const { address, isConnected } = useAccount();
   const { connectors, connect } = useConnect();
   const { disconnect } = useDisconnect();
@@ -49,7 +53,7 @@ const ConnectButton = () => {
                   disconnect();
                   setIsOpen(false);
                   toast.info("Disconnected", {
-                    description: "You have been successfully disconnected",
+                    description: "Session ended successfully.",
                   });
                 }}
                 className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
@@ -92,15 +96,16 @@ const ConnectButton = () => {
       return 0;
     });
 
+  const buttonText = variant === "launch" ? "Launch App" : "Connect Wallet";
+
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity text-sm sm:text-base"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity text-sm sm:text-base"
       >
         <Wallet className="w-4 h-4" />
-        <span className="hidden xs:inline sm:inline">Connect</span>
-        <span className="hidden sm:inline">Wallet</span>
+        <span>{buttonText}</span>
       </button>
 
       {isOpen && (

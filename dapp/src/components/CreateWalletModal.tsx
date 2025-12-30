@@ -33,7 +33,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
     const trimmedOwner = newOwner.trim();
 
     if (!trimmedOwner) {
-      toast.error("Empty Address", {
+      toast.error("Address Required", {
         description: "Please enter an owner address.",
       });
       return;
@@ -41,14 +41,14 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
 
     if (!trimmedOwner.startsWith("0x") || trimmedOwner.length !== 42 || !/^0x[a-fA-F0-9]{40}$/.test(trimmedOwner)) {
       toast.error("Invalid Address", {
-        description: "Please enter a valid Ethereum address (0x followed by 40 hexadecimal characters).",
+        description: "Please enter a valid Ethereum address.",
       });
       return;
     }
 
     if (owners.includes(trimmedOwner)) {
       toast.error("Duplicate Owner", {
-        description: "This address is already added as an owner.",
+        description: "This address is already added.",
       });
       return;
     }
@@ -56,7 +56,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
     setOwners([...owners, trimmedOwner]);
     setNewOwner("");
     toast.success("Owner Added!", {
-      description: "New owner has been added successfully.",
+      description: "New owner successfully configured.",
     });
   };
 
@@ -73,7 +73,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
       setRequired(newOwners.length);
     }
     toast.success("Owner Removed", {
-      description: "Owner has been removed from the wallet.",
+      description: "Owner removed from wallet.",
     });
   };
 
@@ -86,7 +86,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
     }
 
     if (required <= 0 || required > owners.length) {
-      toast.error("Invalid Required Signatures", {
+      toast.error("Invalid Configuration", {
         description: `Required signatures must be between 1 and ${owners.length}.`,
       });
       return;
@@ -103,7 +103,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
             <div className="p-2 rounded-xl bg-primary/10">
               <Shield className="w-5 h-5 text-primary" />
             </div>
-            Get your New Wallet
+            Configure New Multisig Wallet
           </DialogTitle>
         </DialogHeader>
 
@@ -136,7 +136,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
             {/* Add Owner */}
             <div className="flex gap-2">
               <Input
-                placeholder="0x..."
+                placeholder="Ethereum address (0x...)"
                 value={newOwner}
                 onChange={(e) => setNewOwner(e.target.value)}
                 className="bg-background font-mono text-sm"
@@ -166,7 +166,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
                 onChange={(e) => setRequired(Math.min(Math.max(1, parseInt(e.target.value) || 1), owners.length))}
                 className="bg-background w-24"
               />
-              <span className="text-muted-foreground">of {owners.length} owners</span>
+              <span className="text-muted-foreground">out of {owners.length} owners</span>
             </div>
             {required > 0 && required < owners.length && (
               <div className="progress-gold mt-2">
@@ -182,9 +182,9 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
           <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20">
             <AlertTriangle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium">Wallet Price</p>
+              <p className="text-sm font-medium">Smart Contract Cost</p>
               <p className="text-sm text-muted-foreground">
-                The price for this digital multisig wallet is <span className="text-primary font-semibold">FREE</span>.
+                This multisig contract will be deployed for <span className="text-primary font-semibold">0.01 ETH</span>.
               </p>
             </div>
           </div>
@@ -203,10 +203,10 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
             {isCreating ? (
               <>
                 <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                Creating...
+                Deploying...
               </>
             ) : (
-              "Confirm Creation"
+              "Deploy Multisig Contract"
             )}
           </Button>
         </div>

@@ -175,7 +175,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
   const getTypeLabel = () => {
     if (txInfo.type === 'eth') return 'Send ETH'
     if (txInfo.type === 'erc20') return 'Send Token'
-    return 'Custom'
+    return 'Custom Transaction'
   }
 
   // Get transaction type icon
@@ -209,12 +209,12 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
 
       {/* TX ID */}
       <div className="text-xs text-muted-foreground font-mono">
-        TX #{txId.toString()}
+        Transaction #{txId.toString()}
       </div>
 
       {/* Destination */}
       <div className="space-y-1 py-3 border-t border-border/50">
-        <p className="text-xs text-muted-foreground uppercase tracking-wide">Destination</p>
+        <p className="text-xs text-muted-foreground uppercase tracking-wide">Recipient</p>
         {txInfo.destination ? (
           <CopyableAddress address={txInfo.destination} />
         ) : (
@@ -226,12 +226,12 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
       <div className="space-y-1 py-3 border-t border-border/50 min-h-[60px]">
         {txInfo.type === 'erc20' && txInfo.tokenContract ? (
           <>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Token</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Token Contract</p>
             <CopyableAddress address={txInfo.tokenContract} />
           </>
         ) : txInfo.type === 'custom' && txInfo.calldata && txInfo.calldata !== '0x' ? (
           <>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Calldata</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Transaction Data</p>
             <p className="font-mono text-xs break-all bg-muted/50 p-2 rounded">
               {txInfo.calldata}
             </p>
@@ -286,8 +286,8 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
           <div className="text-xs text-destructive">
             <p className="font-semibold mb-1">Insufficient Balance</p>
             <p>
-              Multisig wallet needs {formatEther(tx.amount)} ETH but only has{' '}
-              {walletBalance ? formatEther(walletBalance.value) : '0'} ETH.
+              This wallet needs {formatEther(tx.amount)} ETH but only has{' '}
+              {walletBalance ? formatEther(walletBalance.value) : '0'}. Add funds before confirming.
             </p>
           </div>
         </div>
@@ -298,12 +298,12 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         {tx.executed ? (
           <Button variant="outline" size="sm" disabled className="w-full bg-green-500/10 text-green-600 border-green-500/30">
             <CheckCircle2 className="w-4 h-4 mr-2" />
-            Transaction Executed
+            Transaction executed successfully
           </Button>
         ) : hasUserConfirmed ? (
           <Button variant="outline" size="sm" disabled className="w-full bg-green-500/10 text-green-600 border-green-500/30">
             <CheckCircle2 className="w-4 h-4 mr-2" />
-            Confirmed
+            You confirmed this transaction
           </Button>
         ) : (
           <Button

@@ -117,9 +117,9 @@ const CreateTransactionModal = ({
   };
 
   const typeOptions = [
-    { value: "eth", label: "Send ETH", icon: ArrowUpRight },
-    { value: "erc20", label: "Send Token", icon: Coins },
-    { value: "custom", label: "Custom", icon: Code },
+    { value: "eth", label: "Ether (ETH)", icon: ArrowUpRight },
+    { value: "erc20", label: "ERC20 Token", icon: Coins },
+    { value: "custom", label: "Custom Transaction", icon: Code },
   ];
 
   return (
@@ -127,7 +127,7 @@ const CreateTransactionModal = ({
       <DialogContent className="sm:max-w-lg bg-card border-border top-[20%] translate-y-0 data-[state=open]:slide-in-from-top-[20%]">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">
-            New Transaction
+            Create New Transaction
           </DialogTitle>
         </DialogHeader>
 
@@ -155,7 +155,7 @@ const CreateTransactionModal = ({
 
           {/* Destination */}
           <div className="space-y-2">
-            <Label htmlFor="destination">Destination</Label>
+            <Label htmlFor="destination">Recipient</Label>
             <Input
               id="destination"
               placeholder="0x..."
@@ -182,7 +182,7 @@ const CreateTransactionModal = ({
           {/* Amount (ETH and ERC20) */}
           {(txType === "eth" || txType === "erc20") && (
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">{txType === "eth" ? "Amount (ETH)" : "Amount"}</Label>
               <div className="flex gap-2">
                 <Input
                   id="amount"
@@ -216,7 +216,7 @@ const CreateTransactionModal = ({
           {txType === "custom" && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="value">Value (ETH)</Label>
+                <Label htmlFor="value">Value</Label>
                 <Input
                   id="value"
                   type="number"
@@ -229,7 +229,7 @@ const CreateTransactionModal = ({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="calldata">Calldata</Label>
+                <Label htmlFor="calldata">Data (Hexadecimal)</Label>
                 <Input
                   id="calldata"
                   placeholder="0x..."
@@ -266,10 +266,10 @@ const CreateTransactionModal = ({
             {isSubmitting ? (
               <>
                 <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                Submitting...
+                Creating...
               </>
             ) : (
-              "Submit Transaction"
+              "Create Transaction"
             )}
           </Button>
         </div>

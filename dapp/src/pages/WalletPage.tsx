@@ -86,7 +86,7 @@ const WalletPage = () => {
           <Identicon address={walletAddress} size={56} className="rounded-xl flex-shrink-0" />
           <div>
             <h1 className="font-display text-3xl font-semibold">
-              Wallet {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+              Multisig Wallet: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
             </h1>
             <CopyableAddress address={walletAddress} className="text-muted-foreground" showIdenticon={false} truncate="long" />
           </div>
@@ -117,14 +117,14 @@ const WalletPage = () => {
               <div className="p-2 rounded-xl bg-primary/10">
                 <Shield className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Required</h3>
+              <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Required Signatures</h3>
             </div>
             <div className="flex-1 flex flex-col justify-center">
               <p className="text-4xl font-bold">
                 {required} / {owners.length}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Signatures required to execute transactions
+                Approvals required
               </p>
             </div>
           </div>
@@ -147,8 +147,9 @@ const WalletPage = () => {
           </div>
           {txCount === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-12 text-center">
-              <p className="text-muted-foreground">No transactions yet</p>
-              <p className="text-sm text-muted-foreground mt-2">Create your first transaction to get started</p>
+              <p className="text-lg font-medium mb-2">No Transactions</p>
+              <p className="text-muted-foreground">This wallet hasn't executed any transactions yet.</p>
+              <p className="text-sm text-muted-foreground mt-2">Click "New Transaction" above to create your first transaction.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

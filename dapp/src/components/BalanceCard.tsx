@@ -141,14 +141,14 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
             <div className="p-2 rounded-xl bg-primary/10">
               <Coins className="w-5 h-5 text-primary" />
             </div>
-            <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Balances</h3>
+            <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Balance</h3>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-primary/10"
           >
             <Plus className="w-4 h-4" />
-            <span>Token</span>
+            <span>Custom Token</span>
           </button>
         </div>
 
@@ -187,7 +187,7 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
 
           {customTokens.length === 0 && (
             <p className="text-xs text-muted-foreground mt-3">
-              Add tokens to track balances
+              Add custom token contract
             </p>
           )}
         </div>

@@ -21,7 +21,7 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
-            <ConnectButton />
+            <ConnectButton variant="launch" />
           </div>
         </div>
       </header>
@@ -36,27 +36,32 @@ const Index = () => {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-fade-in">
               <Store className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Next-Generation Blockchain Security</span>
+              <span className="text-sm font-medium text-primary">Enterprise Blockchain Security</span>
             </div>
 
             {/* Headline */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight mb-6 animate-fade-up">
-              MultiSig<span className="text-primary">Store</span>
+              Collective Protection
               <span className="block text-3xl md:text-4xl lg:text-5xl mt-4 text-muted-foreground font-normal">
-                Secure Multi-Signature Digital Wallets
+                for Digital Assets
               </span>
             </h1>
 
+            {/* Subtitle */}
+            <p className="text-xl md:text-2xl font-medium text-primary mb-4 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+              MultiSig Store: Multisignature Wallets as a Service
+            </p>
+
             {/* Subheadline */}
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-              Buy your secure multisig digital wallets. <br /> Protect your shared assets with multiple signatures.
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: "0.15s" }}>
+              Purchase your pre-deployed multisig smart contract on-chain. Manage shared funds with institutional security and multi-party approvals.
             </p>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
               <StatsCard title="Active Wallets" value={stats.activeWallets.toLocaleString()} />
               <StatsCard title="Unique Owners" value={stats.uniqueOwners.toLocaleString()} />
-              <StatsCard title="Total Transactions" value={stats.totalTransactions.toLocaleString()} />
+              <StatsCard title="Secure Transactions" value={stats.totalTransactions.toLocaleString()} />
             </div>
           </div>
         </div>
@@ -69,7 +74,7 @@ const Index = () => {
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <Logo size="sm" />
           <p className="text-sm text-muted-foreground">
-            © 2025 MultiSigStore @ olivmath. All rights reserved.
+            © 2025 MultiSig Store. All rights reserved.
           </p>
         </div>
       </footer>

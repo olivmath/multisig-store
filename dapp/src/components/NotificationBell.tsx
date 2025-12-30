@@ -61,7 +61,7 @@ export function NotificationBell() {
               className="h-auto p-1 text-xs"
             >
               <Check className="h-3 w-3 mr-1" />
-              Mark all read
+              Mark all as read
             </Button>
           )}
         </div>
