@@ -1,8 +1,11 @@
 import { ArrowRight, Store } from "lucide-react";
 import Logo from "../components/Logo";
 import StatsCard from "../components/StatsCard";
+import { useGlobalStats } from "../hooks/useGlobalStats";
 
 const Index = () => {
+  const stats = useGlobalStats();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -44,9 +47,9 @@ const Index = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-              <StatsCard title="Active Wallets" value="0" />
-              <StatsCard title="Unique Owners" value="0" />
-              <StatsCard title="Total Transactions" value="0" />
+              <StatsCard title="Active Wallets" value={stats.activeWallets.toLocaleString()} />
+              <StatsCard title="Unique Owners" value={stats.uniqueOwners.toLocaleString()} />
+              <StatsCard title="Total Transactions" value={stats.totalTransactions.toLocaleString()} />
             </div>
           </div>
         </div>
