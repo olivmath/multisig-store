@@ -7,6 +7,7 @@ import './index.css'
 import App from './App'
 import { config } from './config/wagmi/config'
 import { NotificationProvider } from './contexts/NotificationContext'
+import { TutorialProvider } from './contexts/TutorialContext'
 
 const queryClient = new QueryClient()
 
@@ -16,7 +17,9 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={config}>
           <NotificationProvider>
-            <App />
+            <TutorialProvider>
+              <App />
+            </TutorialProvider>
           </NotificationProvider>
         </WagmiProvider>
       </QueryClientProvider>
