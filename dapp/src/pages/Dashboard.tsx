@@ -155,8 +155,28 @@ const WalletCardWrapper = ({ address }: { address: string }) => {
 
   if (!owners || !required || txCount === undefined) {
     return (
-      <div className="rounded-2xl bg-card border border-border p-6 h-[200px] animate-pulse">
-        <div className="h-full bg-muted rounded" />
+      <div className="rounded-2xl bg-card border border-border p-6 min-h-[200px] animate-pulse">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-muted rounded-xl" />
+          <div className="space-y-2">
+            <div className="h-4 w-32 bg-muted rounded" />
+            <div className="h-3 w-24 bg-muted rounded" />
+          </div>
+        </div>
+        <div className="space-y-2 mb-4">
+          <div className="h-3 w-16 bg-muted rounded" />
+          <div className="h-4 w-28 bg-muted rounded" />
+        </div>
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+          <div className="space-y-1">
+            <div className="h-3 w-20 bg-muted rounded" />
+            <div className="h-5 w-8 bg-muted rounded" />
+          </div>
+          <div className="space-y-1">
+            <div className="h-3 w-16 bg-muted rounded" />
+            <div className="h-5 w-8 bg-muted rounded" />
+          </div>
+        </div>
       </div>
     );
   }
