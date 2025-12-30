@@ -9,6 +9,35 @@ import { decodeTransaction } from '@/utils/decodeTransaction'
 import { useEffect, useState } from 'react'
 import Identicon from './Identicon'
 
+// Copyable address component
+function CopyableAddress({ address, truncate = true }: { address: string; truncate?: boolean }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(address)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const displayAddress = truncate
+    ? `${address.slice(0, 10)}...${address.slice(-8)}`
+    : address
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="group flex items-center gap-2 font-mono text-sm hover:text-primary transition-colors"
+    >
+      <span>{displayAddress}</span>
+      {copied ? (
+        <Check className="w-3 h-3 text-green-500" />
+      ) : (
+        <Copy className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+      )}
+    </button>
+  )
+}
+
 interface TransactionCardProps {
   multiSigAddress: `0x${string}`
   txId: bigint
@@ -215,34 +244,30 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
       <div className="space-y-1 py-3 border-t border-border/50">
         <p className="text-xs text-muted-foreground uppercase tracking-wide">Destination</p>
         {txInfo.destination ? (
-          <p className="font-mono text-sm">
-            {txInfo.destination.slice(0, 10)}...{txInfo.destination.slice(-8)}
-          </p>
+          <CopyableAddress address={txInfo.destination} />
         ) : (
           <p className="font-mono text-sm text-destructive">Invalid address</p>
         )}
       </div>
 
-      {/* Token (for ERC20) or Calldata (for custom) or empty space */}
-      {txInfo.type === 'erc20' && txInfo.tokenContract && (
-        <div className="space-y-1 py-3 border-t border-border/50">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">Token</p>
-          <p className="font-mono text-sm">
-            {txInfo.tokenContract.slice(0, 10)}...{txInfo.tokenContract.slice(-8)}
-          </p>
-        </div>
-      )}
-      {txInfo.type === 'custom' && txInfo.calldata && txInfo.calldata !== '0x' && (
-        <div className="space-y-1 py-3 border-t border-border/50">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">Calldata</p>
-          <p className="font-mono text-xs break-all bg-muted/50 p-2 rounded">
-            {txInfo.calldata}
-          </p>
-        </div>
-      )}
-      {txInfo.type === 'eth' && (
-        <div className="py-3 border-t border-border/50" />
-      )}
+      {/* Token (for ERC20) or Calldata (for custom) or placeholder for alignment */}
+      <div className="space-y-1 py-3 border-t border-border/50 min-h-[60px]">
+        {txInfo.type === 'erc20' && txInfo.tokenContract ? (
+          <>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Token</p>
+            <CopyableAddress address={txInfo.tokenContract} />
+          </>
+        ) : txInfo.type === 'custom' && txInfo.calldata && txInfo.calldata !== '0x' ? (
+          <>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Calldata</p>
+            <p className="font-mono text-xs break-all bg-muted/50 p-2 rounded">
+              {txInfo.calldata}
+            </p>
+          </>
+        ) : (
+          <div className="h-6" />
+        )}
+      </div>
 
       {/* Confirmations with owner icons */}
       <div className="space-y-3 py-3 border-t border-border/50">
@@ -261,11 +286,18 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
                 className="relative group"
                 title={`${owner.slice(0, 6)}...${owner.slice(-4)}`}
               >
-                {confirmed ? (
-                  <CheckCircle2 className="w-8 h-8 text-green-500" />
-                ) : (
-                  <Circle className="w-8 h-8 text-muted-foreground/30" strokeDasharray="4 2" />
-                )}
+                <div className="relative">
+                  <Identicon
+                    address={owner}
+                    size={32}
+                    className={confirmed ? '' : 'opacity-20'}
+                  />
+                  {!confirmed && (
+                    <div
+                      className="absolute inset-0 rounded-full border-2 border-dashed border-muted-foreground/40"
+                    />
+                  )}
+                </div>
                 <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                   {owner.slice(0, 4)}...{owner.slice(-2)}
                 </span>
