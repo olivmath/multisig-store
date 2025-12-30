@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+
+export const dynamic = 'force-dynamic'
 import { Users, Shield, Coins, ArrowUpRight, Plus, Check, X } from "lucide-react";
 import { useAccount, useDisconnect, useBalance, useReadContract } from "wagmi";
 import { formatUnits, formatEther, parseEther, parseUnits } from "viem";

@@ -7,6 +7,7 @@ import '@fontsource/playfair-display/700.css'
 import '../index.css'
 import { Providers } from '@/components/Providers'
 import { Toaster } from '@/components/ui/toaster'
+import { ClientOnly } from '@/components/ClientOnly'
 
 export const metadata: Metadata = {
   title: 'MultiSigStore - Secure Multi-Signature Wallets',
@@ -21,10 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body>
-        <Providers>
-          {children}
-          <Toaster />
-        </Providers>
+        <ClientOnly>
+          <Providers>
+            {children}
+            <Toaster />
+          </Providers>
+        </ClientOnly>
       </body>
     </html>
   )

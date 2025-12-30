@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useGlobalStats } from "@/hooks/useGlobalStats";
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const { toast } = useToast();
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);

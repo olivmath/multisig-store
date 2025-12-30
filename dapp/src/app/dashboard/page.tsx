@@ -16,6 +16,8 @@ import { useWalletTransactionStats } from "@/hooks/useWalletTransactionStats";
 import { useMultiSig } from "@/hooks/useMultiSig";
 import { formatEther } from "viem";
 
+export const dynamic = 'force-dynamic'
+
 interface PendingWallet {
   id: string;
   name: string;
