@@ -9,6 +9,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
 import { NotificationBell } from "../components/NotificationBell";
 import Identicon from "../components/Identicon";
+import { CopyableAddress } from "../components/CopyableAddress";
 import { TransactionCard } from "../components/TransactionCard";
 import CreateTransactionModal from "../components/CreateTransactionModal";
 import { useMultiSig } from "../hooks/useMultiSig";
@@ -86,9 +87,7 @@ const WalletPage = () => {
               Wallet {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
             </h1>
           </div>
-          <p className="font-mono text-muted-foreground text-sm">
-            {walletAddress}
-          </p>
+          <CopyableAddress address={walletAddress} truncate={false} className="text-muted-foreground" />
         </div>
 
         {/* Info Cards */}
@@ -105,9 +104,7 @@ const WalletPage = () => {
               {owners.map((owner, index) => (
                 <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-background/50">
                   <Identicon address={owner} size={24} />
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {owner.slice(0, 8)}...{owner.slice(-6)}
-                  </span>
+                  <CopyableAddress address={owner} className="text-xs text-muted-foreground" />
                 </div>
               ))}
             </div>

@@ -124,12 +124,9 @@ const CreateTransactionModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg bg-card border-border">
+      <DialogContent className="sm:max-w-lg bg-card border-border top-[20%] translate-y-0 data-[state=open]:slide-in-from-top-[20%]">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-primary/10">
-              <ArrowUpRight className="w-5 h-5 text-primary" />
-            </div>
+          <DialogTitle className="font-display text-2xl">
             New Transaction
           </DialogTitle>
         </DialogHeader>
