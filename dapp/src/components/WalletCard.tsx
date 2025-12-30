@@ -27,7 +27,7 @@ const WalletCard = ({ address, owners, required, txCount, pendingCount }: Wallet
           </div>
           <div>
             <h3 className="font-semibold text-lg">MultiSig Wallet</h3>
-            <CopyableAddress address={address} className="text-xs text-muted-foreground" />
+            <CopyableAddress address={address} className="text-xs text-muted-foreground" identiconSize={16} />
           </div>
         </div>
       </div>

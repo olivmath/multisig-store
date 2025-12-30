@@ -256,17 +256,17 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
               <div
                 key={owner}
                 className="relative group"
-                title={`${owner.slice(0, 6)}...${owner.slice(-4)}`}
               >
                 <div className="relative">
                   <Identicon
                     address={owner}
                     size={32}
                     className={confirmed ? '' : 'opacity-20'}
+                    copyable
                   />
                   {!confirmed && (
                     <div
-                      className="absolute inset-0 rounded-full border-2 border-dashed border-muted-foreground/40"
+                      className="absolute inset-0 rounded-full border-2 border-dashed border-muted-foreground/40 pointer-events-none"
                     />
                   )}
                 </div>

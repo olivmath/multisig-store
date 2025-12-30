@@ -5,7 +5,6 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { toast } from "sonner";
-import Identicon from "./Identicon";
 import { CopyableAddress } from "./CopyableAddress";
 
 interface CreateWalletModalProps {
@@ -119,8 +118,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
                   key={index}
                   className="flex items-center gap-3 p-3 rounded-lg bg-background border border-border"
                 >
-                  <Identicon address={owner} size={32} />
-                  <CopyableAddress address={owner} className="flex-1 truncate" />
+                  <CopyableAddress address={owner} className="flex-1 truncate" identiconSize={32} />
                   {owner === connectedAddress ? (
                     <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">You</span>
                   ) : (

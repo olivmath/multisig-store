@@ -8,7 +8,6 @@ import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
 import { NotificationBell } from "../components/NotificationBell";
-import Identicon from "../components/Identicon";
 import { CopyableAddress } from "../components/CopyableAddress";
 import { TransactionCard } from "../components/TransactionCard";
 import CreateTransactionModal from "../components/CreateTransactionModal";
@@ -87,7 +86,7 @@ const WalletPage = () => {
               Wallet {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
             </h1>
           </div>
-          <CopyableAddress address={walletAddress} truncate={false} className="text-muted-foreground" />
+          <CopyableAddress address={walletAddress} className="text-muted-foreground" showIdenticon={false} />
         </div>
 
         {/* Info Cards */}
@@ -103,8 +102,7 @@ const WalletPage = () => {
             <div className="space-y-2 flex-1">
               {owners.map((owner, index) => (
                 <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-background/50">
-                  <Identicon address={owner} size={24} />
-                  <CopyableAddress address={owner} className="text-xs text-muted-foreground" />
+                  <CopyableAddress address={owner} className="text-xs text-muted-foreground" identiconSize={24} />
                 </div>
               ))}
             </div>
