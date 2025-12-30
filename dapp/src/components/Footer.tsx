@@ -1,7 +1,11 @@
 import { Github, Linkedin, Verified, HelpCircle } from "lucide-react";
 import { useTutorial } from "../contexts/TutorialContext";
 
-export function Footer() {
+interface FooterProps {
+  showTutorial?: boolean;
+}
+
+export function Footer({ showTutorial = true }: FooterProps) {
   const { openTutorial } = useTutorial();
 
   return (
@@ -20,15 +24,17 @@ export function Footer() {
           {" "}- All rights reserved
         </p>
         <div className="flex items-center gap-4">
-          <button
-            data-tour="tutorial-button"
-            onClick={openTutorial}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-            title="View Tutorial"
-          >
-            <HelpCircle className="w-4 h-4" />
-            <span className="hidden sm:inline">Tutorial</span>
-          </button>
+          {showTutorial && (
+            <button
+              data-tour="tutorial-button"
+              onClick={openTutorial}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+              title="View Tutorial"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Tutorial</span>
+            </button>
+          )}
           <a
             href="https://sepolia.etherscan.io/address/0x76ADE170939349b9Ec9730342962b32443601c29#code"
             target="_blank"

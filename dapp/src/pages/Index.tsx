@@ -87,7 +87,7 @@ const Index = () => {
         </section>
       </main>
 
-      <Footer />
+      <Footer showTutorial={false} />
     </div>
   );
 };
