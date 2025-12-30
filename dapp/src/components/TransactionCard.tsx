@@ -257,16 +257,16 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
                 key={owner}
                 className="relative group"
               >
-                <div className="relative">
+                <div className="relative w-8 h-8">
                   <Identicon
                     address={owner}
                     size={32}
-                    className={confirmed ? '' : 'opacity-20'}
+                    className={confirmed ? '' : 'opacity-30'}
                     copyable
                   />
                   {!confirmed && (
                     <div
-                      className="absolute inset-0 rounded-full border-2 border-dashed border-muted-foreground/40 pointer-events-none"
+                      className="absolute inset-0 rounded-full border-2 border-dashed border-muted-foreground/50 pointer-events-none"
                     />
                   )}
                 </div>
