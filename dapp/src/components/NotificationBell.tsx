@@ -1,15 +1,15 @@
 import { Bell, X, Check } from 'lucide-react'
 import { useState } from 'react'
-import { useNotifications } from '@/contexts/NotificationContext'
-import { Button } from '@/components/ui/button'
+import { useNotifications } from '../contexts/NotificationContext'
+import { Button } from './ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import { Badge } from '@/components/ui/badge'
+} from './ui/dropdown-menu'
+import { Badge } from './ui/badge'
 import { useNavigate } from 'react-router-dom'
 
 export function NotificationBell() {

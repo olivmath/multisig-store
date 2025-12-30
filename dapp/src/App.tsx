@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
+import WalletPage from './pages/WalletPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/wallet/:id" element={<WalletPage />} />
       </Routes>
     </BrowserRouter>
   );

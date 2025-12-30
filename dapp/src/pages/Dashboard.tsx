@@ -1,26 +1,43 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Plus, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
+import { toast } from "sonner";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
 import { NotificationBell } from "../components/NotificationBell";
 import WalletCard from "../components/WalletCard";
+import CreateWalletModal from "../components/CreateWalletModal";
 import { useMultiSigFactory } from "../hooks/useMultiSigFactory";
 import { useReadContract } from "wagmi";
 import { multiSigABI } from "../config/contracts/multiSigABI";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { isConnected } = useAccount();
-  const { userMultiSigs } = useMultiSigFactory();
+  const { address, isConnected } = useAccount();
+  const { userMultiSigs, createMultiSig, isCreating, isSuccess, refetchUserMultiSigs } = useMultiSigFactory();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!isConnected) {
       navigate("/");
     }
   }, [isConnected, navigate]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Wallet Created!", {
+        description: "Your multi-signature wallet has been created successfully.",
+      });
+      setIsModalOpen(false);
+      refetchUserMultiSigs();
+    }
+  }, [isSuccess, refetchUserMultiSigs]);
+
+  const handleCreateWallet = ({ owners, required }: { owners: string[]; required: number }) => {
+    createMultiSig(owners as `0x${string}`[], required);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +69,10 @@ const Dashboard = () => {
                 Manage your multi-signature wallets
               </p>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
+            >
               <Plus className="w-5 h-5" />
               Create Wallet
             </button>
@@ -69,7 +89,10 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-6">
               Create your first multi-signature wallet to get started
             </p>
-            <button className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
+            >
               <Plus className="w-5 h-5" />
               Create Your First Wallet
             </button>
@@ -82,6 +105,17 @@ const Dashboard = () => {
           </div>
         )}
       </main>
+
+      {/* Create Wallet Modal */}
+      {address && (
+        <CreateWalletModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          connectedAddress={address}
+          onCreate={handleCreateWallet}
+          isCreating={isCreating}
+        />
+      )}
     </div>
   );
 };
