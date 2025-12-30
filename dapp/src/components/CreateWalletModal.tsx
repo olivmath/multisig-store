@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { toast } from "sonner";
+import { useNotifications } from "../contexts/NotificationContext";
 import { CopyableAddress } from "./CopyableAddress";
 
 interface CreateWalletModalProps {
@@ -19,6 +19,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
   const [owners, setOwners] = useState<string[]>([connectedAddress]);
   const [newOwner, setNewOwner] = useState("");
   const [required, setRequired] = useState(1);
+  const { addNotification } = useNotifications();
 
   // Reset form when modal opens
   useEffect(() => {
@@ -33,37 +34,47 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
     const trimmedOwner = newOwner.trim();
 
     if (!trimmedOwner) {
-      toast.error("Address Required", {
-        description: "Please enter an owner address.",
+      addNotification({
+        type: 'error',
+        title: 'Address Required',
+        message: 'Please enter an owner address.',
       });
       return;
     }
 
     if (!trimmedOwner.startsWith("0x") || trimmedOwner.length !== 42 || !/^0x[a-fA-F0-9]{40}$/.test(trimmedOwner)) {
-      toast.error("Invalid Address", {
-        description: "Please enter a valid Ethereum address.",
+      addNotification({
+        type: 'error',
+        title: 'Invalid Address',
+        message: 'Please enter a valid Ethereum address.',
       });
       return;
     }
 
     if (owners.includes(trimmedOwner)) {
-      toast.error("Duplicate Owner", {
-        description: "This address is already added.",
+      addNotification({
+        type: 'error',
+        title: 'Duplicate Owner',
+        message: 'This address is already added.',
       });
       return;
     }
 
     setOwners([...owners, trimmedOwner]);
     setNewOwner("");
-    toast.success("Owner Added!", {
-      description: "New owner successfully configured.",
+    addNotification({
+      type: 'success',
+      title: 'Owner Added!',
+      message: 'New owner successfully configured.',
     });
   };
 
   const removeOwner = (index: number) => {
     if (owners[index] === connectedAddress) {
-      toast.error("Cannot Remove", {
-        description: "You cannot remove yourself as an owner.",
+      addNotification({
+        type: 'error',
+        title: 'Cannot Remove',
+        message: 'You cannot remove yourself as an owner.',
       });
       return;
     }
@@ -72,22 +83,28 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
     if (required > newOwners.length) {
       setRequired(newOwners.length);
     }
-    toast.success("Owner Removed", {
-      description: "Owner removed from wallet.",
+    addNotification({
+      type: 'success',
+      title: 'Owner Removed',
+      message: 'Owner removed from wallet.',
     });
   };
 
   const handleCreate = async () => {
     if (owners.length === 0) {
-      toast.error("No Owners", {
-        description: "At least one owner is required.",
+      addNotification({
+        type: 'error',
+        title: 'No Owners',
+        message: 'At least one owner is required.',
       });
       return;
     }
 
     if (required <= 0 || required > owners.length) {
-      toast.error("Invalid Configuration", {
-        description: `Required signatures must be between 1 and ${owners.length}.`,
+      addNotification({
+        type: 'error',
+        title: 'Invalid Configuration',
+        message: `Required signatures must be between 1 and ${owners.length}.`,
       });
       return;
     }

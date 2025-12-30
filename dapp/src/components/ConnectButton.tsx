@@ -2,7 +2,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet, LogOut, ChevronDown } from "lucide-react";
-import { toast } from "sonner";
+import { useNotifications } from "../contexts/NotificationContext";
 
 interface ConnectButtonProps {
   variant?: "default" | "launch";
@@ -15,6 +15,7 @@ const ConnectButton = ({ variant = "default" }: ConnectButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { addNotification } = useNotifications();
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -22,12 +23,14 @@ const ConnectButton = ({ variant = "default" }: ConnectButtonProps) => {
 
   useEffect(() => {
     if (isConnected && address && location.pathname === "/") {
-      toast.success("Wallet Connected!", {
-        description: `Successfully connected to ${formatAddress(address)}`,
+      addNotification({
+        type: 'success',
+        title: 'Wallet Connected!',
+        message: `Successfully connected to ${formatAddress(address)}`,
       });
       navigate("/dashboard");
     }
-  }, [isConnected, address, navigate, location]);
+  }, [isConnected, address, navigate, location, addNotification]);
 
   if (isConnected && address) {
     return (
@@ -52,9 +55,6 @@ const ConnectButton = ({ variant = "default" }: ConnectButtonProps) => {
                 onClick={() => {
                   disconnect();
                   setIsOpen(false);
-                  toast.info("Disconnected", {
-                    description: "Session ended successfully.",
-                  });
                 }}
                 className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
               >

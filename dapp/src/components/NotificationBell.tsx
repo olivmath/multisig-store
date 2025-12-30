@@ -1,4 +1,4 @@
-import { Bell, X, Check } from 'lucide-react'
+import { Bell, X, Check, CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { useNotifications } from '../contexts/NotificationContext'
 import { Button } from './ui/button'
@@ -32,6 +32,24 @@ export function NotificationBell() {
     if (notification.walletAddress) {
       navigate(`/wallet/${notification.walletAddress}`)
       setOpen(false)
+    }
+  }
+
+  const getNotificationIcon = (type: typeof notifications[0]['type']) => {
+    switch (type) {
+      case 'success':
+      case 'transaction_confirmed':
+      case 'transaction_executed':
+        return <CheckCircle className="w-4 h-4 text-green-500" />
+      case 'error':
+        return <XCircle className="w-4 h-4 text-destructive" />
+      case 'warning':
+        return <AlertTriangle className="w-4 h-4 text-yellow-500" />
+      case 'info':
+      case 'new_transaction':
+      case 'new_wallet':
+      default:
+        return <Info className="w-4 h-4 text-blue-500" />
     }
   }
 
@@ -82,6 +100,9 @@ export function NotificationBell() {
                 onClick={() => handleNotificationClick(notification)}
               >
                 <div className="flex items-start justify-between w-full gap-2">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {getNotificationIcon(notification.type)}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-sm">{notification.title}</p>

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { toast } from "sonner";
+import { useNotifications } from "../contexts/NotificationContext";
 import { tokenABI } from "@/config/contracts/tokenABI";
 import Identicon from "./Identicon";
 
@@ -42,6 +42,7 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customTokens, setCustomTokens] = useState<CustomToken[]>([]);
   const [newTokenAddress, setNewTokenAddress] = useState("");
+  const { addNotification } = useNotifications();
 
   const { data: ethBalance } = useBalance({ address: walletAddress });
 
@@ -84,22 +85,28 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
 
   const handleAddToken = () => {
     if (!newTokenAddress || newTokenAddress.length !== 42) {
-      toast.error("Invalid Address", {
-        description: "Please enter a valid token address.",
+      addNotification({
+        type: 'error',
+        title: 'Invalid Address',
+        message: 'Please enter a valid token address.',
       });
       return;
     }
 
     if (customTokens.some((t) => t.address.toLowerCase() === newTokenAddress.toLowerCase())) {
-      toast.error("Token Already Added", {
-        description: "This token is already in your list.",
+      addNotification({
+        type: 'error',
+        title: 'Token Already Added',
+        message: 'This token is already in your list.',
       });
       return;
     }
 
     if (!tokenSymbol || tokenDecimals === undefined) {
-      toast.error("Invalid Token", {
-        description: "Could not fetch token information. Make sure it's a valid ERC20 token.",
+      addNotification({
+        type: 'error',
+        title: 'Invalid Token',
+        message: "Could not fetch token information. Make sure it's a valid ERC20 token.",
       });
       return;
     }
@@ -113,8 +120,10 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
     setCustomTokens([...customTokens, newToken]);
     setNewTokenAddress("");
     setIsModalOpen(false);
-    toast.success("Token Added!", {
-      description: `${tokenSymbol} has been added to your balance list.`,
+    addNotification({
+      type: 'success',
+      title: 'Token Added!',
+      message: `${tokenSymbol} has been added to your balance list.`,
     });
   };
 
@@ -124,8 +133,10 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
     if (updated.length === 0) {
       localStorage.removeItem(`customTokens-${walletAddress}`);
     }
-    toast.success("Token Removed", {
-      description: "Token has been removed from your list.",
+    addNotification({
+      type: 'success',
+      title: 'Token Removed',
+      message: 'Token has been removed from your list.',
     });
   };
 

@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, ReactNode } from 'rea
 
 export interface Notification {
   id: string
-  type: 'new_transaction' | 'new_wallet' | 'transaction_confirmed' | 'transaction_executed'
+  type: 'success' | 'error' | 'info' | 'warning' | 'new_transaction' | 'new_wallet' | 'transaction_confirmed' | 'transaction_executed'
   title: string
   message: string
   walletAddress?: string

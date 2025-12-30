@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { toast } from "sonner";
+import { useNotifications } from "../contexts/NotificationContext";
 import { parseEther, parseUnits } from "viem";
 
 type TransactionType = "eth" | "erc20" | "custom";
@@ -32,6 +32,7 @@ const CreateTransactionModal = ({
   const [tokenAddress, setTokenAddress] = useState("");
   const [tokenDecimals, setTokenDecimals] = useState("18");
   const [calldata, setCalldata] = useState("");
+  const { addNotification } = useNotifications();
 
   // Reset form when modal opens
   useEffect(() => {
@@ -52,16 +53,20 @@ const CreateTransactionModal = ({
   const handleSubmit = () => {
     // Validate destination
     if (!isValidAddress(destination)) {
-      toast.error("Invalid Destination", {
-        description: "Please enter a valid Ethereum address.",
+      addNotification({
+        type: 'error',
+        title: 'Invalid Destination',
+        message: 'Please enter a valid Ethereum address.',
       });
       return;
     }
 
     if (txType === "eth") {
       if (!amount || parseFloat(amount) <= 0) {
-        toast.error("Invalid Amount", {
-          description: "Please enter a valid amount.",
+        addNotification({
+          type: 'error',
+          title: 'Invalid Amount',
+          message: 'Please enter a valid amount.',
         });
         return;
       }
@@ -69,21 +74,27 @@ const CreateTransactionModal = ({
         const amountWei = parseEther(amount);
         onSubmitETH(destination as `0x${string}`, amountWei);
       } catch {
-        toast.error("Invalid Amount", {
-          description: "Please enter a valid ETH amount.",
+        addNotification({
+          type: 'error',
+          title: 'Invalid Amount',
+          message: 'Please enter a valid ETH amount.',
         });
         return;
       }
     } else if (txType === "erc20") {
       if (!isValidAddress(tokenAddress)) {
-        toast.error("Invalid Token Address", {
-          description: "Please enter a valid token contract address.",
+        addNotification({
+          type: 'error',
+          title: 'Invalid Token Address',
+          message: 'Please enter a valid token contract address.',
         });
         return;
       }
       if (!amount || parseFloat(amount) <= 0) {
-        toast.error("Invalid Amount", {
-          description: "Please enter a valid amount.",
+        addNotification({
+          type: 'error',
+          title: 'Invalid Amount',
+          message: 'Please enter a valid amount.',
         });
         return;
       }
@@ -92,15 +103,19 @@ const CreateTransactionModal = ({
         const amountUnits = parseUnits(amount, decimals);
         onSubmitERC20(tokenAddress as `0x${string}`, destination as `0x${string}`, amountUnits);
       } catch {
-        toast.error("Invalid Amount", {
-          description: "Please enter a valid token amount.",
+        addNotification({
+          type: 'error',
+          title: 'Invalid Amount',
+          message: 'Please enter a valid token amount.',
         });
         return;
       }
     } else if (txType === "custom") {
       if (!calldata.startsWith("0x")) {
-        toast.error("Invalid Calldata", {
-          description: "Calldata must start with 0x.",
+        addNotification({
+          type: 'error',
+          title: 'Invalid Calldata',
+          message: 'Calldata must start with 0x.',
         });
         return;
       }
@@ -108,8 +123,10 @@ const CreateTransactionModal = ({
         const value = amount ? parseEther(amount) : BigInt(0);
         onSubmitCustom(destination as `0x${string}`, value, calldata as `0x${string}`);
       } catch {
-        toast.error("Invalid Value", {
-          description: "Please enter a valid ETH value.",
+        addNotification({
+          type: 'error',
+          title: 'Invalid Value',
+          message: 'Please enter a valid ETH value.',
         });
         return;
       }

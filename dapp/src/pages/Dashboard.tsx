@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Plus, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
-import { toast } from "sonner";
+import { useNotifications } from "../contexts/NotificationContext";
 import { Layout } from "../components/Layout";
 import WalletCard from "../components/WalletCard";
 import CreateWalletModal from "../components/CreateWalletModal";
@@ -15,6 +15,7 @@ const Dashboard = () => {
   const { address, isConnected } = useAccount();
   const { userMultiSigs, createMultiSig, isCreating, isSuccess, refetchUserMultiSigs } = useMultiSigFactory();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addNotification } = useNotifications();
 
   useEffect(() => {
     if (!isConnected) {
@@ -24,13 +25,15 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success("Wallet Created", {
-        description: "You deployed a new multisig wallet.",
+      addNotification({
+        type: 'success',
+        title: 'Wallet Created',
+        message: 'You deployed a new multisig wallet.',
       });
       setIsModalOpen(false);
       refetchUserMultiSigs();
     }
-  }, [isSuccess, refetchUserMultiSigs]);
+  }, [isSuccess, refetchUserMultiSigs, addNotification]);
 
   const handleCreateWallet = ({ owners, required }: { owners: string[]; required: number }) => {
     createMultiSig(owners as `0x${string}`[], required);

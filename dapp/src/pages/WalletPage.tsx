@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Users, Shield, ArrowLeft, Plus } from "lucide-react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { toast } from "sonner";
+import { useNotifications } from "../contexts/NotificationContext";
 import { Layout } from "../components/Layout";
 import { CopyableAddress } from "../components/CopyableAddress";
 import { BalanceCard } from "../components/BalanceCard";
@@ -16,6 +16,7 @@ const WalletPage = () => {
   const navigate = useNavigate();
   const { isConnected } = useAccount();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addNotification } = useNotifications();
 
   const walletAddress = id as `0x${string}` | undefined;
   const { owners, required, txCount, submitETH, submitERC20, submitCustomTransaction, submitTxHash } = useMultiSig(walletAddress);
@@ -32,12 +33,15 @@ const WalletPage = () => {
 
   useEffect(() => {
     if (isSubmitSuccess) {
-      toast.success("Transaction Submitted!", {
-        description: "Your transaction has been submitted and is awaiting confirmations.",
+      addNotification({
+        type: 'success',
+        title: 'Transaction Submitted!',
+        message: 'Your transaction has been submitted and is awaiting confirmations.',
+        walletAddress: walletAddress,
       });
       setIsModalOpen(false);
     }
-  }, [isSubmitSuccess]);
+  }, [isSubmitSuccess, addNotification, walletAddress]);
 
   if (!walletAddress) {
     return (
