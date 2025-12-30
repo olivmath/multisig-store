@@ -8,6 +8,7 @@ import { NetworkSelector } from "./NetworkSelector";
 import { Footer } from "./Footer";
 import { Tutorial } from "./Tutorial";
 import { useTutorial } from "../contexts/TutorialContext";
+import { AnnouncementBanner } from "./AnnouncementBanner";
 
 interface LayoutProps {
   children: ReactNode;

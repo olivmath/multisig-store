@@ -146,7 +146,7 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
 
   return (
     <>
-      <div className="rounded-2xl border border-border bg-card p-6 flex flex-col">
+      <div className="rounded-2xl border border-border bg-card p-6 flex flex-col h-[200px]">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-primary/10">
@@ -163,7 +163,7 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
           </button>
         </div>
 
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-y-auto">
           {/* ETH Balance */}
           <div className="flex justify-between items-center py-3 border-b border-border/50">
             <div className="flex items-center gap-3">

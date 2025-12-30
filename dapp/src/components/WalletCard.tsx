@@ -17,7 +17,7 @@ const WalletCard = ({ address, owners, required, txCount, pendingCount }: Wallet
   return (
     <button
       onClick={() => navigate(`/wallet/${address}`)}
-      className="group w-full text-left relative overflow-hidden rounded-2xl bg-card border border-border p-6 card-hover"
+      className="group w-full h-[200px] text-left relative overflow-hidden rounded-2xl bg-card border border-border p-6 card-hover"
     >
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/70 to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 

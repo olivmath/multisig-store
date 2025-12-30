@@ -77,14 +77,14 @@ const WalletPage = () => {
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {/* Owners Card */}
-          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col">
+          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col h-[200px]">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-xl bg-primary/10">
                 <Users className="w-5 h-5 text-primary" />
               </div>
               <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Owners</h3>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 overflow-y-auto">
               {owners.map((owner, index) => (
                 <div key={index} className="flex items-center gap-2 py-2 border-b border-border/50 last:border-0">
                   <CopyableAddress address={owner} className="text-sm" identiconSize={28} truncate="short" />
@@ -94,7 +94,7 @@ const WalletPage = () => {
           </div>
 
           {/* Required Signatures Card */}
-          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col">
+          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col h-[200px]">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-xl bg-primary/10">
                 <Shield className="w-5 h-5 text-primary" />

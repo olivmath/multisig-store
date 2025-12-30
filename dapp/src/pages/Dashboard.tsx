@@ -155,8 +155,8 @@ const WalletCardWrapper = ({ address }: { address: string }) => {
 
   if (!owners || !required || txCount === undefined) {
     return (
-      <div className="rounded-2xl bg-card border border-border p-6 animate-pulse">
-        <div className="h-24 bg-muted rounded" />
+      <div className="rounded-2xl bg-card border border-border p-6 h-[200px] animate-pulse">
+        <div className="h-full bg-muted rounded" />
       </div>
     );
   }
