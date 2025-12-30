@@ -57,6 +57,34 @@ const ConnectButton = () => {
     );
   }
 
+  // Filter connectors like dapp2 does
+  const filteredConnectors = connectors
+    .filter((connector) => {
+      const id = connector.id.toLowerCase();
+
+      // Show WalletConnect
+      if (id.includes('walletconnect')) return true;
+
+      // Show MetaMask or treat first injected as MetaMask
+      if (id.includes('metamask') || id === 'io.metamask') return true;
+
+      // Show Injected only if no MetaMask is available
+      if (id === 'injected' && !connectors.some(c => c.id.includes('metamask'))) {
+        return true;
+      }
+
+      return false;
+    })
+    .sort((a, b) => {
+      // MetaMask/Injected first
+      const aIsMetaMask = a.id.includes('metamask') || a.id === 'io.metamask' || a.id === 'injected';
+      const bIsMetaMask = b.id.includes('metamask') || b.id === 'io.metamask' || b.id === 'injected';
+
+      if (aIsMetaMask && !bIsMetaMask) return -1;
+      if (!aIsMetaMask && bIsMetaMask) return 1;
+      return 0;
+    });
+
   return (
     <div className="relative">
       <button
@@ -74,7 +102,7 @@ const ConnectButton = () => {
             onClick={() => setIsOpen(false)}
           />
           <div className="absolute right-0 mt-2 w-64 rounded-lg border border-border bg-card shadow-lg z-20 p-2">
-            {connectors.map((connector) => (
+            {filteredConnectors.map((connector) => (
               <button
                 key={connector.id}
                 onClick={() => {
