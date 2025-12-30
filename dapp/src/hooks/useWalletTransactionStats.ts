@@ -54,14 +54,20 @@ export function useWalletTransactionStats(walletAddress: `0x${string}` | undefin
 
     const pending = transactionsData.filter((txResult) => {
       if (!txResult?.result) return false
-      const tx = txResult.result as any
-      return !tx.executed
+      // Transaction result is an array: [txType, token, to, amount, executed, data]
+      const tx = txResult.result as any[]
+      const executed = tx[4] as boolean  // Index 4 is the executed field
+      return !executed
     }).length
 
     console.log('[useWalletTransactionStats] Recalculating pending count:', {
       walletAddress,
       totalTx: transactionsData.length,
       pendingTx: pending,
+      rawData: transactionsData.map(r => ({
+        result: r?.result,
+        executed: r?.result ? (r.result as any[])[4] : undefined
+      })),
       timestamp: new Date().toISOString()
     })
 
