@@ -1,8 +1,8 @@
 import { useReadContract, useReadContracts } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
-import { multiSigFactoryABI } from '../lib/contracts/multiSigFactoryABI'
-import { multiSigABI } from '../lib/contracts/multiSigABI'
-import { CONTRACTS } from '../lib/contracts/addresses'
+import { multiSigFactoryABI } from '../config/contracts/multiSigFactoryABI'
+import { multiSigABI } from '../config/contracts/multiSigABI'
+import { CONTRACTS } from '../config/contracts/addresses'
 import { useMemo } from 'react'
 
 export function useGlobalStats() {
