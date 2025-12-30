@@ -8,6 +8,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
 import { NotificationBell } from "../components/NotificationBell";
 import Identicon from "../components/Identicon";
+import { TransactionCard } from "../components/TransactionCard";
 import { useMultiSig } from "../hooks/useMultiSig";
 
 const WalletPage = () => {
@@ -134,19 +135,22 @@ const WalletPage = () => {
         </div>
 
         {/* Transactions */}
-        <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="mb-6">
           <h2 className="text-2xl font-semibold mb-6">Transactions</h2>
           {txCount === 0 ? (
-            <div className="text-center py-12">
+            <div className="rounded-2xl border border-border bg-card p-12 text-center">
               <p className="text-muted-foreground">No transactions yet</p>
               <p className="text-sm text-muted-foreground mt-2">Create your first transaction to get started</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              <p className="text-muted-foreground">Total transactions: {txCount}</p>
-              <p className="text-sm text-muted-foreground">
-                Transaction list feature coming soon. You can see transactions on-chain using a block explorer.
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: txCount }, (_, i) => BigInt(i)).reverse().map((txId) => (
+                <TransactionCard
+                  key={txId.toString()}
+                  multiSigAddress={walletAddress}
+                  txId={txId}
+                />
+              ))}
             </div>
           )}
         </div>
