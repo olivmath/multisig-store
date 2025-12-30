@@ -7,95 +7,95 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
+    --foreground: 0 0% 5%;
 
     --card: 0 0% 98%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 0 0% 5%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 0 0% 5%;
 
-    --primary: 45 93% 47%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 45 100% 42%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 5%;
 
-    --muted: 0 0% 93%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 30%;
 
-    --accent: 45 93% 47%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 45 100% 42%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 72% 41%;
+    --destructive: 0 84% 40%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 85%;
-    --input: 0 0% 85%;
-    --ring: 45 93% 47%;
+    --border: 0 0% 75%;
+    --input: 0 0% 75%;
+    --ring: 45 100% 42%;
 
     --radius: 0.75rem;
 
-    --chart-1: 45 93% 47%;
-    --chart-2: 45 93% 55%;
-    --chart-3: 45 80% 65%;
-    --chart-4: 0 0% 30%;
-    --chart-5: 0 0% 50%;
+    --chart-1: 45 100% 42%;
+    --chart-2: 45 90% 50%;
+    --chart-3: 45 80% 60%;
+    --chart-4: 0 0% 25%;
+    --chart-5: 0 0% 45%;
 
     /* Custom tokens */
-    --gold: 45 93% 47%;
-    --gold-light: 45 93% 55%;
-    --gold-dark: 45 93% 35%;
-    --gold-glow: 45 93% 47%;
+    --gold: 45 100% 42%;
+    --gold-light: 45 90% 50%;
+    --gold-dark: 45 100% 32%;
+    --gold-glow: 45 100% 42%;
 
-    --surface-dark: 0 0% 10%;
-    --surface-dark-elevated: 0 0% 15%;
-    --surface-dark-muted: 0 0% 20%;
+    --surface-dark: 0 0% 5%;
+    --surface-dark-elevated: 0 0% 12%;
+    --surface-dark-muted: 0 0% 18%;
   }
 
   .dark {
-    --background: 0 0% 8%;
-    --foreground: 0 0% 95%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 95%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 45 93% 58%;
-    --primary-foreground: 0 0% 10%;
+    --primary: 45 100% 50%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 0 0% 18%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 45 93% 58%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 45 100% 50%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 72% 55%;
+    --destructive: 0 84% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
-    --ring: 45 93% 58%;
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
+    --ring: 45 100% 50%;
 
-    --chart-1: 45 93% 58%;
-    --chart-2: 45 93% 65%;
-    --chart-3: 45 80% 70%;
-    --chart-4: 0 0% 40%;
-    --chart-5: 0 0% 60%;
+    --chart-1: 45 100% 50%;
+    --chart-2: 45 90% 58%;
+    --chart-3: 45 80% 65%;
+    --chart-4: 0 0% 35%;
+    --chart-5: 0 0% 55%;
 
-    --gold: 45 93% 58%;
-    --gold-light: 45 93% 65%;
-    --gold-dark: 45 93% 45%;
-    --gold-glow: 45 93% 58%;
+    --gold: 45 100% 50%;
+    --gold-light: 45 90% 58%;
+    --gold-dark: 45 100% 40%;
+    --gold-glow: 45 100% 50%;
 
-    --surface-dark: 0 0% 8%;
-    --surface-dark-elevated: 0 0% 12%;
-    --surface-dark-muted: 0 0% 18%;
+    --surface-dark: 0 0% 4%;
+    --surface-dark-elevated: 0 0% 8%;
+    --surface-dark-muted: 0 0% 14%;
   }
 }
 
