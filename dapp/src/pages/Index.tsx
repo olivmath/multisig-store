@@ -53,11 +53,6 @@ const Index = () => {
           {/* Content */}
           <div className="relative container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto text-center">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-fade-in">
-                <Store className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Enterprise Blockchain Security</span>
-              </div>
 
               {/* Headline */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 animate-fade-up">
@@ -81,9 +76,9 @@ const Index = () => {
               <div className="mb-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
                 <Link
                   to="/tutorial"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-primary/30 bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border border-primary/30 bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
                 >
-                  <PlayCircle className="w-5 h-5" />
+                  <PlayCircle className="w-4 h-4" />
                   Try Interactive Demo
                 </Link>
               </div>
