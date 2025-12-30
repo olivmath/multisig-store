@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Users, Shield, ArrowLeft, Plus } from "lucide-react";
-import { useAccount, useBalance, useWaitForTransactionReceipt } from "wagmi";
-import { formatEther } from "viem";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { toast } from "sonner";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
@@ -10,6 +9,7 @@ import ConnectButton from "../components/ConnectButton";
 import { NotificationBell } from "../components/NotificationBell";
 import { NetworkSelector } from "../components/NetworkSelector";
 import { CopyableAddress } from "../components/CopyableAddress";
+import { BalanceCard } from "../components/BalanceCard";
 import { TransactionCard } from "../components/TransactionCard";
 import CreateTransactionModal from "../components/CreateTransactionModal";
 import { useMultiSig } from "../hooks/useMultiSig";
@@ -22,7 +22,6 @@ const WalletPage = () => {
 
   const walletAddress = id as `0x${string}` | undefined;
   const { owners, required, txCount, submitETH, submitERC20, submitCustomTransaction, submitTxHash } = useMultiSig(walletAddress);
-  const { data: walletBalance } = useBalance({ address: walletAddress });
 
   const { isLoading: isSubmitting, isSuccess: isSubmitSuccess } = useWaitForTransactionReceipt({
     hash: submitTxHash,
@@ -129,22 +128,7 @@ const WalletPage = () => {
           </div>
 
           {/* Balance Card */}
-          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z"/>
-                </svg>
-              </div>
-              <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Balance</h3>
-            </div>
-            <div className="flex-1 flex flex-col justify-center">
-              <p className="text-4xl font-bold">
-                {walletBalance ? parseFloat(formatEther(walletBalance.value)).toFixed(4) : "0.0000"}
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">ETH</p>
-            </div>
-          </div>
+          <BalanceCard walletAddress={walletAddress} />
         </div>
 
         {/* Transactions */}
