@@ -97,7 +97,7 @@ const Index = () => {
         <div className="container px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <Logo size="sm" />
           <p className="text-sm text-muted-foreground">
-            © 2025 MultiSigStore. All rights reserved.
+            © 2025 MultiSigStore @ olivmath. All rights reserved.
           </p>
         </div>
       </footer>

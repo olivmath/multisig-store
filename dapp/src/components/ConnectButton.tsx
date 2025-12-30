@@ -1,5 +1,6 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet, LogOut, ChevronDown } from "lucide-react";
 
 const ConnectButton = () => {
@@ -7,6 +8,14 @@ const ConnectButton = () => {
   const { connectors, connect } = useConnect();
   const { disconnect } = useDisconnect();
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (isConnected && location.pathname === "/") {
+      navigate("/dashboard");
+    }
+  }, [isConnected, navigate, location]);
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
