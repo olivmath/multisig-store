@@ -29,12 +29,17 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
   // Read multisig balance to check if it can execute
   const { data: walletBalance } = useBalance({ address: multiSigAddress })
 
-  // Read transaction data
+  // Read transaction data - refetch every 2 seconds to catch execution
   const { data: txData, isLoading: txLoading, refetch: refetchTx } = useReadContract({
     address: multiSigAddress,
     abi: multiSigABI,
     functionName: 'transactions',
     args: [txId],
+    query: {
+      refetchInterval: 2000, // Refetch every 2 seconds
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    },
   })
 
   // Convert array response to object
@@ -70,12 +75,17 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     },
   })
 
-  // Read confirmation count for this transaction
+  // Read confirmation count for this transaction - refetch every 2 seconds
   const { data: confirmationCount, refetch: refetchConfCount } = useReadContract({
     address: multiSigAddress,
     abi: multiSigABI,
     functionName: 'confirmationCount',
     args: [txId],
+    query: {
+      refetchInterval: 2000, // Refetch every 2 seconds
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    },
   })
 
   // Read if user has confirmed this transaction

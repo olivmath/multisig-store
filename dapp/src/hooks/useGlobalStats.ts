@@ -8,11 +8,16 @@ import { useMemo } from 'react'
 export function useGlobalStats() {
   const factoryAddress = CONTRACTS[sepolia.id].MultiSigFactory
 
-  // Get all deployed multisigs
+  // Get all deployed multisigs - refetch every 5 seconds to catch new wallets
   const { data: allMultiSigs } = useReadContract({
     address: factoryAddress,
     abi: multiSigFactoryABI,
     functionName: 'getDeployedMultiSigs',
+    query: {
+      refetchInterval: 5000, // Refetch every 5 seconds
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    },
   })
 
   const multiSigAddresses = (allMultiSigs as `0x${string}`[]) || []
@@ -36,11 +41,14 @@ export function useGlobalStats() {
     return calls
   }, [multiSigAddresses])
 
-  // Fetch all data with multicall
+  // Fetch all data with multicall - refetch every 5 seconds
   const { data: results } = useReadContracts({
     contracts: contracts as any,
     query: {
       enabled: contracts.length > 0,
+      refetchInterval: 5000, // Refetch every 5 seconds
+      refetchOnWindowFocus: true,
+      staleTime: 0,
     },
   })
 
@@ -68,11 +76,15 @@ export function useGlobalStats() {
       }
     }
 
+    // Add the number of wallet creations to total transactions
+    // Each deployed multisig represents one creation transaction
+    txTotal += activeWallets
+
     return {
       uniqueOwners: allOwnersSet.size,
       totalTransactions: txTotal,
     }
-  }, [results])
+  }, [results, activeWallets])
 
   return {
     activeWallets,

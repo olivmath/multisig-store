@@ -3,7 +3,7 @@ import { multiSigABI } from '@/lib/contracts/multiSigABI'
 import { useMemo } from 'react'
 
 export function useWalletTransactionStats(walletAddress: `0x${string}` | undefined) {
-  // Get transaction count
+  // Get transaction count - refetch every 3 seconds to catch new transactions
   const { data: txCountResult } = useReadContracts({
     contracts: [
       {
@@ -14,6 +14,9 @@ export function useWalletTransactionStats(walletAddress: `0x${string}` | undefin
     ],
     query: {
       enabled: !!walletAddress,
+      refetchInterval: 3000, // Refetch every 3 seconds
+      refetchOnWindowFocus: true,
+      staleTime: 0, // Always consider data stale
     },
   })
 
@@ -39,6 +42,9 @@ export function useWalletTransactionStats(walletAddress: `0x${string}` | undefin
     contracts: transactionContracts as any,
     query: {
       enabled: transactionContracts.length > 0,
+      refetchInterval: 3000, // Refetch every 3 seconds to catch status changes
+      refetchOnWindowFocus: true,
+      staleTime: 0, // Always consider data stale
     },
   })
 
@@ -46,12 +52,21 @@ export function useWalletTransactionStats(walletAddress: `0x${string}` | undefin
   const pendingCount = useMemo(() => {
     if (!transactionsData) return 0
 
-    return transactionsData.filter((txResult) => {
+    const pending = transactionsData.filter((txResult) => {
       if (!txResult?.result) return false
       const tx = txResult.result as any
       return !tx.executed
     }).length
-  }, [transactionsData])
+
+    console.log('[useWalletTransactionStats] Recalculating pending count:', {
+      walletAddress,
+      totalTx: transactionsData.length,
+      pendingTx: pending,
+      timestamp: new Date().toISOString()
+    })
+
+    return pending
+  }, [transactionsData, walletAddress])
 
   return {
     totalTransactions: txCount,
