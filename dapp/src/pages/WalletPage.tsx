@@ -8,6 +8,7 @@ import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
 import { NotificationBell } from "../components/NotificationBell";
+import { NetworkSelector } from "../components/NetworkSelector";
 import { CopyableAddress } from "../components/CopyableAddress";
 import { TransactionCard } from "../components/TransactionCard";
 import CreateTransactionModal from "../components/CreateTransactionModal";
@@ -62,6 +63,7 @@ const WalletPage = () => {
             <Logo size="sm" />
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
+            <NetworkSelector />
             <ThemeToggle />
             <NotificationBell />
             <ConnectButton />
