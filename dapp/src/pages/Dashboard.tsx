@@ -5,6 +5,7 @@ import { useAccount } from "wagmi";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
+import { NotificationBell } from "../components/NotificationBell";
 import WalletCard from "../components/WalletCard";
 import { useMultiSigFactory } from "../hooks/useMultiSigFactory";
 import { useReadContract } from "wagmi";
@@ -34,6 +35,7 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
+            <NotificationBell />
             <ConnectButton />
           </div>
         </div>
