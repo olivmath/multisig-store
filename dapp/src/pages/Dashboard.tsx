@@ -165,7 +165,7 @@ const WalletCardWrapper = ({ address }: { address: string }) => {
     if (!transactionsData) return 0;
     return transactionsData.filter((txResult) => {
       if (!txResult?.result) return false;
-      const tx = txResult.result as any[];
+      const tx = txResult.result as unknown as any[];
       const executed = tx[4] as boolean; // Index 4 is executed field
       return !executed;
     }).length;
