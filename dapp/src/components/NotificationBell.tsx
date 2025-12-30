@@ -56,7 +56,7 @@ export function NotificationBell() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="relative h-10 w-10">
+        <Button data-tour="notifications" variant="outline" size="icon" className="relative h-10 w-10">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge

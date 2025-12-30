@@ -6,8 +6,7 @@ import ConnectButton from "./ConnectButton";
 import { NotificationBell } from "./NotificationBell";
 import { NetworkSelector } from "./NetworkSelector";
 import { Footer } from "./Footer";
-import { Tutorial } from "./Tutorial";
-import { useTutorial } from "../contexts/TutorialContext";
+import { GuidedTour } from "./GuidedTour";
 import { AnnouncementBanner } from "./AnnouncementBanner";
 
 interface LayoutProps {
@@ -15,8 +14,6 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const { showTutorial, closeTutorial } = useTutorial();
-
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Announcement Banner */}
@@ -50,8 +47,8 @@ export function Layout({ children }: LayoutProps) {
       {/* Footer - Fixed */}
       <Footer />
 
-      {/* Tutorial Modal */}
-      <Tutorial forceOpen={showTutorial} onClose={closeTutorial} />
+      {/* Guided Tour */}
+      <GuidedTour />
     </div>
   );
 }

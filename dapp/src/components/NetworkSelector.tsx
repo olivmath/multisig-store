@@ -41,7 +41,7 @@ export function NetworkSelector() {
     : '0.0000'
 
   return (
-    <div className="flex items-center gap-3">
+    <div data-tour="network-selector" className="flex items-center gap-3">
       {/* Balance */}
       <div className="hidden sm:flex items-center gap-2 h-10 px-3 rounded-lg bg-card border border-border">
         <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24">

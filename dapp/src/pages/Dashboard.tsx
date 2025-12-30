@@ -52,6 +52,7 @@ const Dashboard = () => {
               </p>
             </div>
             <button
+              data-tour="purchase-wallet"
               onClick={() => setIsModalOpen(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
             >
@@ -63,7 +64,7 @@ const Dashboard = () => {
 
         {/* Wallets Grid */}
         {userMultiSigs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16">
+          <div data-tour="empty-state" className="flex flex-col items-center justify-center py-16">
             <div className="p-6 rounded-full bg-muted mb-4">
               <ShoppingCart className="w-12 h-12 text-muted-foreground" />
             </div>
@@ -80,7 +81,7 @@ const Dashboard = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div data-tour="wallet-cards" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {userMultiSigs.map((walletAddress) => (
               <WalletCardWrapper key={walletAddress} address={walletAddress} />
             ))}

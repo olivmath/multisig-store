@@ -34,7 +34,7 @@ const ConnectButton = ({ variant = "default" }: ConnectButtonProps) => {
 
   if (isConnected && address) {
     return (
-      <div className="relative">
+      <div data-tour="connect-wallet" className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 h-10 px-3 rounded-lg border border-border bg-card hover:bg-accent transition-colors"

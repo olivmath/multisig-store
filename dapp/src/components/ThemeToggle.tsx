@@ -18,6 +18,7 @@ const ThemeToggle = () => {
 
   return (
     <button
+      data-tour="theme-toggle"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className="relative w-10 h-10 rounded-lg border border-border bg-card hover:bg-accent transition-colors flex items-center justify-center"
       aria-label="Toggle theme"

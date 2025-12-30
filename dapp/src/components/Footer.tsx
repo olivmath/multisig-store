@@ -1,4 +1,4 @@
-import { Github, Linkedin, FileCode, HelpCircle } from "lucide-react";
+import { Github, Linkedin, Verified, HelpCircle } from "lucide-react";
 import { useTutorial } from "../contexts/TutorialContext";
 
 export function Footer() {
@@ -21,6 +21,7 @@ export function Footer() {
         </p>
         <div className="flex items-center gap-4">
           <button
+            data-tour="tutorial-button"
             onClick={openTutorial}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
             title="View Tutorial"
@@ -35,8 +36,8 @@ export function Footer() {
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
             title="View Contract"
           >
-            <FileCode className="w-4 h-4" />
-            <span className="hidden sm:inline">Contract</span>
+            <Verified className="w-4 h-4" />
+            <span className="hidden sm:inline">Contract Verified</span>
           </a>
           <a
             href="https://www.linkedin.com/in/olivmath/"
