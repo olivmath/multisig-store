@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Users, Shield, ArrowLeft, Plus } from "lucide-react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { toast } from "sonner";
-import Logo from "../components/Logo";
-import ThemeToggle from "../components/ThemeToggle";
-import ConnectButton from "../components/ConnectButton";
-import { NotificationBell } from "../components/NotificationBell";
-import { NetworkSelector } from "../components/NetworkSelector";
+import { Layout } from "../components/Layout";
 import { CopyableAddress } from "../components/CopyableAddress";
 import { BalanceCard } from "../components/BalanceCard";
 import Identicon from "../components/Identicon";
@@ -52,26 +48,8 @@ const WalletPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/dashboard" className="hidden sm:block">
-            <Logo size="md" />
-          </Link>
-          <Link to="/dashboard" className="block sm:hidden">
-            <Logo size="sm" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <NotificationBell />
-            <NetworkSelector />
-            <ConnectButton />
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <button
           onClick={() => navigate("/dashboard")}
@@ -163,7 +141,7 @@ const WalletPage = () => {
             </div>
           )}
         </div>
-      </main>
+      </div>
 
       {/* Create Transaction Modal */}
       <CreateTransactionModal
@@ -174,7 +152,7 @@ const WalletPage = () => {
         onSubmitCustom={submitCustomTransaction}
         isSubmitting={isSubmitting}
       />
-    </div>
+    </Layout>
   );
 };
 

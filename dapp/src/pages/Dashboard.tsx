@@ -1,13 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
 import { Plus, ShoppingCart } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { toast } from "sonner";
-import Logo from "../components/Logo";
-import ThemeToggle from "../components/ThemeToggle";
-import ConnectButton from "../components/ConnectButton";
-import { NotificationBell } from "../components/NotificationBell";
-import { NetworkSelector } from "../components/NetworkSelector";
+import { Layout } from "../components/Layout";
 import WalletCard from "../components/WalletCard";
 import CreateWalletModal from "../components/CreateWalletModal";
 import { useMultiSigFactory } from "../hooks/useMultiSigFactory";
@@ -41,27 +37,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/dashboard" className="hidden sm:block">
-            <Logo size="md" />
-          </Link>
-          <Link to="/dashboard" className="block sm:hidden">
-            <Logo size="sm" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <NotificationBell />
-            <NetworkSelector />
-            <ConnectButton />
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -106,7 +83,7 @@ const Dashboard = () => {
             ))}
           </div>
         )}
-      </main>
+      </div>
 
       {/* Create Wallet Modal */}
       {address && (
@@ -118,7 +95,7 @@ const Dashboard = () => {
           isCreating={isCreating}
         />
       )}
-    </div>
+    </Layout>
   );
 };
 
