@@ -5,6 +5,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
 import { AnnouncementBanner } from "../components/AnnouncementBanner";
 import { useGlobalStats } from "../hooks/useGlobalStats";
+import Silk from "../components/Silk";
 
 const Index = () => {
   const stats = useGlobalStats();
@@ -35,7 +36,17 @@ const Index = () => {
       {/* Hero Section - Scrollable */}
       <main className="flex-1 overflow-y-auto">
         <section className="relative min-h-full flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
+          {/* Silk Background */}
+          <div className="absolute inset-0">
+            <Silk
+              speed={6.3}
+              scale={1}
+              color="#7B7481"
+              noiseIntensity={1.5}
+              rotation={0}
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/60" />
 
           {/* Content */}
           <div className="relative container mx-auto px-4 py-12">
