@@ -116,7 +116,7 @@ const joyrideSteps: Step[] = [
   },
   // Step 7 - MultiSig Digital Wallet
   {
-    target: "body",
+    target: '[data-demo="info-cards"]',
     content: (
       <div className="text-left">
         <h3 className="text-lg font-bold mb-3">MultiSig Digital Wallet</h3>
@@ -125,7 +125,7 @@ const joyrideSteps: Step[] = [
         </p>
       </div>
     ),
-    placement: "center",
+    placement: "top",
     disableBeacon: true,
   },
   // Step 8 - Create New Transaction
@@ -265,7 +265,6 @@ export function TutorialMode({ onComplete }: TutorialModeProps) {
       run={isRunning}
       continuous
       showSkipButton
-      showProgress
       scrollToFirstStep
       disableOverlayClose
       callback={handleCallback}
@@ -273,7 +272,7 @@ export function TutorialMode({ onComplete }: TutorialModeProps) {
         back: "Back",
         close: "Close",
         last: "Finish",
-        next: "Next",
+        next: `Next ${stepIndex + 1}/${joyrideSteps.length}`,
         skip: "Skip Tutorial",
       }}
       styles={{

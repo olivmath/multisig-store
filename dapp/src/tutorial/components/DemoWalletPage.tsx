@@ -38,7 +38,7 @@ export function DemoWalletPage() {
         </div>
 
         {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div data-demo="info-cards" className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {/* Owners Card */}
           <div data-demo="owners-list" className="rounded-2xl border border-border bg-card p-6 flex flex-col min-h-[200px]">
             <div className="flex items-center gap-3 mb-4">

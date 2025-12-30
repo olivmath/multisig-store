@@ -102,7 +102,7 @@ export function DemoModeProvider({ children }: { children: ReactNode }) {
     setState(prev => {
       const newWallet: DemoWallet = {
         ...DEMO_NEW_WALLET,
-        transactions: [],
+        transactions: DEMO_TRANSACTIONS,
       };
       return {
         ...prev,
