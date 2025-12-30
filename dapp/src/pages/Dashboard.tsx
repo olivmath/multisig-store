@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAccount, useDisconnect, useBalance } from "wagmi";
 import DashboardHeader from "@/components/DashboardHeader";
@@ -105,9 +105,9 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-display text-3xl font-semibold mb-2">My Wallets</h1>
+            <h1 className="font-display text-3xl font-semibold mb-2">Store Wallets</h1>
             <p className="text-muted-foreground">
-              Manage your multisig wallets and transactions
+              Buy your multisig wallets!
             </p>
           </div>
           <Button
@@ -117,7 +117,7 @@ const Dashboard = () => {
             disabled={isCreating}
             className="gap-2"
           >
-            <Plus className="w-5 h-5" />
+            <ShoppingCart className="w-5 h-5" />
             {isCreating ? "Creating..." : "Create New Wallet"}
           </Button>
         </div>

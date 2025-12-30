@@ -115,7 +115,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
 
   const getStatusColor = () => {
     if (tx.executed) return 'bg-green-500/10 text-green-600 border-green-500/30'
-    return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/30'
+    return 'bg-primary/10 text-primary border-primary/30'
   }
 
   const getStatusText = () => {
@@ -231,7 +231,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         <div className="progress-gold">
           <div
             className={`h-2 rounded-full transition-all ${
-              tx.executed ? 'bg-green-500' : 'bg-yellow-500'
+              tx.executed ? 'bg-green-500' : 'bg-primary'
             }`}
             style={{
               width: tx.executed ? '100%' : `${((confirmationCount ? Number(confirmationCount) : 0) / required) * 100}%`,

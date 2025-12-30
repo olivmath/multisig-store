@@ -278,13 +278,7 @@ const WalletPage = () => {
               <p className="text-5xl font-display font-bold text-primary mb-2">
                 {required}<span className="text-2xl text-muted-foreground">/{owners.length}</span>
               </p>
-              <p className="text-sm text-muted-foreground mb-4">Approvals needed</p>
-              <div className="mt-auto progress-gold">
-                <div
-                  className="progress-gold-fill"
-                  style={{ width: `${owners.length > 0 ? (required / owners.length) * 100 : 0}%` }}
-                />
-              </div>
+              <p className="text-sm text-muted-foreground">Approvals needed</p>
             </div>
           </div>
 

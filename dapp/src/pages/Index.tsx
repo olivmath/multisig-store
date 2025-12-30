@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { ArrowRight, Shield } from "lucide-react";
+import { ArrowRight, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 import StatsCard from "@/components/StatsCard";
 import ConnectWalletModal from "@/components/ConnectWalletModal";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import heroBg from "@/assets/hero-bg.jpg";
 import { useGlobalStats } from "@/hooks/useGlobalStats";
 
 const Index = () => {
@@ -42,21 +41,14 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
         {/* Background */}
-        <div className="absolute inset-0">
-          <img 
-            src={heroBg} 
-            alt="Security background" 
-            className="w-full h-full object-cover opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
 
         {/* Content */}
         <div className="relative container px-4 py-20">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-fade-in">
-              <Shield className="w-4 h-4 text-primary" />
+              <Store className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">Next-Generation Blockchain Security</span>
             </div>
 
