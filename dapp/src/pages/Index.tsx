@@ -1,6 +1,7 @@
 import { ArrowRight, Store } from "lucide-react";
 import Logo from "../components/Logo";
 import StatsCard from "../components/StatsCard";
+import ThemeToggle from "../components/ThemeToggle";
 import { useGlobalStats } from "../hooks/useGlobalStats";
 
 const Index = () => {
@@ -12,10 +13,13 @@ const Index = () => {
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Logo showTagline size="md" />
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">
-            Launch App
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity">
+              Launch App
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </header>
 
