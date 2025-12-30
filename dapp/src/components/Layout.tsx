@@ -11,9 +11,11 @@ import { AnnouncementBanner } from "./AnnouncementBanner";
 
 interface LayoutProps {
   children: ReactNode;
+  hasWallets?: boolean;
+  isWalletPage?: boolean;
 }
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children, hasWallets = false, isWalletPage = false }: LayoutProps) {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Announcement Banner */}
@@ -48,7 +50,7 @@ export function Layout({ children }: LayoutProps) {
       <Footer />
 
       {/* Guided Tour */}
-      <GuidedTour />
+      <GuidedTour hasWallets={hasWallets} isWalletPage={isWalletPage} />
     </div>
   );
 }

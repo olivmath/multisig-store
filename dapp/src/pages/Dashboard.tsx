@@ -7,7 +7,8 @@ import { Layout } from "../components/Layout";
 import WalletCard from "../components/WalletCard";
 import CreateWalletModal from "../components/CreateWalletModal";
 import { useMultiSigFactory } from "../hooks/useMultiSigFactory";
-import { useReadContract, useReadContracts } from "wagmi";
+import { useReadContract, useReadContracts, useBalance } from "wagmi";
+import { formatEther } from "viem";
 import { multiSigABI } from "../config/contracts/multiSigABI";
 
 const Dashboard = () => {
@@ -40,7 +41,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Layout>
+    <Layout hasWallets={userMultiSigs.length > 0}>
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
@@ -123,6 +124,10 @@ const WalletCardWrapper = ({ address }: { address: string }) => {
     functionName: 'txCount',
   });
 
+  const { data: balanceData } = useBalance({
+    address: address as `0x${string}`,
+  });
+
   // Get all transactions to count pending ones
   const txCountNum = txCount ? Number(txCount) : 0;
 
@@ -182,6 +187,8 @@ const WalletCardWrapper = ({ address }: { address: string }) => {
     );
   }
 
+  const balance = balanceData ? parseFloat(formatEther(balanceData.value)).toFixed(4) : '0';
+
   return (
     <WalletCard
       address={address}
@@ -189,6 +196,7 @@ const WalletCardWrapper = ({ address }: { address: string }) => {
       required={Number(required)}
       txCount={txCountNum}
       pendingCount={pendingCount}
+      balance={balance}
     />
   );
 };

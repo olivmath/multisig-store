@@ -1,4 +1,4 @@
-import { Users, Clock } from "lucide-react";
+import { Users, Clock, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CopyableAddress } from "./CopyableAddress";
 import Identicon from "./Identicon";
@@ -9,18 +9,17 @@ interface WalletCardProps {
   required: number;
   txCount: number;
   pendingCount: number;
+  balance?: string;
 }
 
-const WalletCard = ({ address, owners, required, txCount, pendingCount }: WalletCardProps) => {
+const WalletCard = ({ address, owners, required, txCount, pendingCount, balance }: WalletCardProps) => {
   const navigate = useNavigate();
 
   return (
     <button
       onClick={() => navigate(`/wallet/${address}`)}
-      className="group w-full min-h-[200px] text-left relative overflow-hidden rounded-2xl bg-card border border-border p-6 card-hover"
+      className="w-full min-h-[200px] text-left rounded-2xl bg-card border border-border p-6 card-hover"
     >
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/70 to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <Identicon address={address} size={40} className="rounded-xl" />
@@ -29,6 +28,12 @@ const WalletCard = ({ address, owners, required, txCount, pendingCount }: Wallet
             <CopyableAddress address={address} className="text-xs text-muted-foreground" showIdenticon={false} truncate="short" />
           </div>
         </div>
+        {balance && (
+          <div className="flex items-center gap-1.5 text-right">
+            <Wallet className="w-4 h-4 text-muted-foreground" />
+            <span className="font-semibold">{balance} ETH</span>
+          </div>
+        )}
       </div>
 
       <div className="mb-4">

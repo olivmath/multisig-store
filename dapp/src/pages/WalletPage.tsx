@@ -52,7 +52,7 @@ const WalletPage = () => {
   }
 
   return (
-    <Layout>
+    <Layout isWalletPage>
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <button
@@ -77,7 +77,7 @@ const WalletPage = () => {
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {/* Owners Card */}
-          <div className="rounded-2xl border border-border bg-card p-6 flex flex-col min-h-[200px]">
+          <div data-tour="owners-list" className="rounded-2xl border border-border bg-card p-6 flex flex-col min-h-[200px]">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-xl bg-primary/10">
                 <Users className="w-5 h-5 text-primary" />
@@ -112,7 +112,9 @@ const WalletPage = () => {
           </div>
 
           {/* Balance Card */}
-          <BalanceCard walletAddress={walletAddress} />
+          <div data-tour="wallet-balance">
+            <BalanceCard walletAddress={walletAddress} />
+          </div>
         </div>
 
         {/* Transactions */}
@@ -120,6 +122,7 @@ const WalletPage = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold">Transactions</h2>
             <button
+              data-tour="create-transaction"
               onClick={() => setIsModalOpen(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
             >
@@ -134,7 +137,7 @@ const WalletPage = () => {
               <p className="text-sm text-muted-foreground mt-2">Click "New Transaction" above to create your first transaction.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div data-tour="transactions-list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: txCount }, (_, i) => BigInt(i)).reverse().map((txId) => (
                 <TransactionCard
                   key={txId.toString()}
