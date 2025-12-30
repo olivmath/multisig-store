@@ -1,7 +1,8 @@
-import { Users, Clock, Wallet } from "lucide-react";
+import { Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CopyableAddress } from "./CopyableAddress";
 import Identicon from "./Identicon";
+import { EthereumIcon } from "./EthereumIcon";
 
 interface WalletCardProps {
   address: string;
@@ -30,7 +31,7 @@ const WalletCard = ({ address, owners, required, txCount, pendingCount, balance 
         </div>
         {balance && (
           <div className="flex items-center gap-1.5 text-right">
-            <Wallet className="w-4 h-4 text-muted-foreground" />
+            <EthereumIcon className="w-4 h-4 text-blue-500" />
             <span className="font-semibold">{balance} ETH</span>
           </div>
         )}

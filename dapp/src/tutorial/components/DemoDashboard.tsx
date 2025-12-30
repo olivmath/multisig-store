@@ -1,9 +1,10 @@
-import { Plus, ShoppingCart, Users, Shield, Clock, Wallet } from "lucide-react";
+import { Plus, ShoppingCart, Users, Shield, Clock } from "lucide-react";
 import { formatEther } from "viem";
 import { useDemoMode } from "../DemoModeContext";
 import { DemoLayout } from "./DemoLayout";
 import Identicon from "../../components/Identicon";
 import { CopyableAddress } from "../../components/CopyableAddress";
+import { EthereumIcon } from "../../components/EthereumIcon";
 
 export function DemoDashboard() {
   const demoMode = useDemoMode();
@@ -97,7 +98,7 @@ function DemoWalletCard({ wallet, onClick }: DemoWalletCardProps) {
       <div className="mb-4">
         <p className="text-sm text-muted-foreground">Balance</p>
         <p className="text-xl font-semibold flex items-center gap-2">
-          <Wallet className="w-5 h-5 text-primary" />
+          <EthereumIcon className="w-5 h-5 text-blue-500" />
           {balance} ETH
         </p>
       </div>

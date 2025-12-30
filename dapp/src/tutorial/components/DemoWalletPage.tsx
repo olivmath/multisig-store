@@ -1,9 +1,10 @@
-import { ArrowLeft, Plus, Users, Shield, Wallet, Check, Clock } from "lucide-react";
+import { ArrowLeft, Plus, Users, Shield, Check, Clock } from "lucide-react";
 import { formatEther } from "viem";
 import { useDemoMode } from "../DemoModeContext";
 import { DemoLayout } from "./DemoLayout";
 import Identicon from "../../components/Identicon";
 import { CopyableAddress } from "../../components/CopyableAddress";
+import { EthereumIcon } from "../../components/EthereumIcon";
 
 export function DemoWalletPage() {
   const demoMode = useDemoMode();
@@ -76,8 +77,8 @@ export function DemoWalletPage() {
           {/* Balance Card */}
           <div data-demo="wallet-balance" className="rounded-2xl border border-border bg-card p-6 flex flex-col min-h-[200px]">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl bg-primary/10">
-                <Wallet className="w-5 h-5 text-primary" />
+              <div className="p-2 rounded-xl bg-blue-500/10">
+                <EthereumIcon className="w-5 h-5 text-blue-500" />
               </div>
               <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Balance</h3>
             </div>
