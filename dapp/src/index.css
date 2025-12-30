@@ -104,6 +104,10 @@
     @apply border-border;
   }
 
+  html {
+    font-size: 115%;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: system-ui, -apple-system, sans-serif;

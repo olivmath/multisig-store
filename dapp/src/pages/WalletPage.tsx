@@ -68,7 +68,7 @@ const WalletPage = () => {
           <Identicon address={walletAddress} size={56} className="rounded-xl flex-shrink-0" />
           <div>
             <h1 className="font-display text-3xl font-semibold">
-              Multisig Wallet: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+              Multisig Wallet
             </h1>
             <CopyableAddress address={walletAddress} className="text-muted-foreground" showIdenticon={false} truncate="long" />
           </div>

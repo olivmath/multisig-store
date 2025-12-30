@@ -3,7 +3,7 @@ import Logo from "../components/Logo";
 import StatsCard from "../components/StatsCard";
 import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
-import SilkBackground from "../components/SilkBackground";
+import Silk from "../components/Silk";
 import { AnnouncementBanner } from "../components/AnnouncementBanner";
 import { useGlobalStats } from "../hooks/useGlobalStats";
 
@@ -38,7 +38,13 @@ const Index = () => {
         <section className="relative min-h-full flex items-center justify-center overflow-hidden">
           {/* Silk Background */}
           <div className="absolute inset-0">
-            <SilkBackground color="#D4AF37" speed={1} />
+            <Silk
+              speed={5}
+              scale={1}
+              color="#D4AF37"
+              noiseIntensity={1.5}
+              rotation={0}
+            />
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
 

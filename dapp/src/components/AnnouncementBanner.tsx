@@ -44,16 +44,16 @@ export function AnnouncementBanner({
 
   return (
     <div className={`border-b ${variantStyles[variant]}`}>
-      <div className="container mx-auto px-4 py-2 flex items-center justify-center gap-2 text-sm">
-        <Icon className="w-4 h-4 flex-shrink-0" />
+      <div className="container mx-auto px-4 py-4 flex items-center justify-center gap-3 text-base">
+        <Icon className="w-5 h-5 flex-shrink-0" />
         <span className="text-center">{children}</span>
         {dismissible && (
           <button
             onClick={handleDismiss}
-            className="ml-2 p-0.5 rounded hover:bg-background/20 transition-colors flex-shrink-0"
+            className="ml-2 p-1 rounded hover:bg-background/20 transition-colors flex-shrink-0"
             aria-label="Dismiss"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         )}
       </div>
