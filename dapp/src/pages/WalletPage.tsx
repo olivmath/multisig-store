@@ -103,7 +103,7 @@ const WalletPage = () => {
             <div className="space-y-2 flex-1">
               {owners.map((owner, index) => (
                 <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-background/50">
-                  <CopyableAddress address={owner} className="text-xs text-muted-foreground" identiconSize={24} />
+                  <CopyableAddress address={owner} className="text-xs text-muted-foreground" identiconSize={28} truncate="short" />
                 </div>
               ))}
             </div>

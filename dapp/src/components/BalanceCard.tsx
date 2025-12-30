@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useBalance, useReadContract } from "wagmi";
 import { formatUnits } from "viem";
-import { ChevronDown, Plus, Trash2, Coins } from "lucide-react";
+import { Plus, Trash2, Coins } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -19,7 +19,7 @@ interface BalanceCardProps {
   walletAddress: `0x${string}`;
 }
 
-function TokenBalance({ walletAddress, token }: { walletAddress: `0x${string}`; token: CustomToken }) {
+function TokenBalanceValue({ walletAddress, token }: { walletAddress: `0x${string}`; token: CustomToken }) {
   const { data: balance } = useReadContract({
     address: token.address,
     abi: tokenABI,
@@ -34,16 +34,10 @@ function TokenBalance({ walletAddress, token }: { walletAddress: `0x${string}`; 
     ? parseFloat(formatUnits(balance as bigint, token.decimals)).toFixed(4)
     : "0.0000";
 
-  return (
-    <div className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
-      <span className="text-sm text-muted-foreground">{token.symbol}</span>
-      <span className="font-semibold">{formattedBalance}</span>
-    </div>
-  );
+  return <span className="font-semibold tabular-nums">{formattedBalance}</span>;
 }
 
 export function BalanceCard({ walletAddress }: BalanceCardProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customTokens, setCustomTokens] = useState<CustomToken[]>([]);
   const [newTokenAddress, setNewTokenAddress] = useState("");
@@ -148,50 +142,33 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
             </div>
             <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Balances</h3>
           </div>
-          <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-muted"
-            >
-              <Plus className="w-3 h-3" />
-              <span>Add Token</span>
-              <ChevronDown className={`w-3 h-3 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
-            </button>
-            {isDropdownOpen && (
-              <div className="absolute right-0 top-full mt-1 bg-popover border border-border rounded-lg shadow-lg z-10 min-w-[140px]">
-                <button
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    setIsModalOpen(true);
-                  }}
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-lg flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  + Custom Token
-                </button>
-              </div>
-            )}
-          </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-primary/10"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Token</span>
+          </button>
         </div>
 
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col space-y-1">
           {/* ETH Balance */}
-          <div className="flex justify-between items-center py-2 border-b border-border/50">
+          <div className="flex justify-between items-center py-2">
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z" />
               </svg>
-              <span className="text-sm text-muted-foreground">ETH</span>
+              <span className="text-sm font-medium">ETH</span>
             </div>
-            <span className="font-semibold">{ethBalanceFormatted}</span>
+            <span className="font-semibold tabular-nums">{ethBalanceFormatted}</span>
           </div>
 
           {/* Custom Token Balances */}
           {customTokens.map((token) => (
-            <div key={token.address} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0 group">
-              <span className="text-sm text-muted-foreground">{token.symbol}</span>
-              <div className="flex items-center gap-2">
-                <TokenBalance walletAddress={walletAddress} token={token} />
+            <div key={token.address} className="flex justify-between items-center py-2 group">
+              <span className="text-sm font-medium">{token.symbol}</span>
+              <div className="flex items-center gap-3">
+                <TokenBalanceValue walletAddress={walletAddress} token={token} />
                 <button
                   onClick={() => handleRemoveToken(token.address)}
                   className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all"
@@ -204,7 +181,7 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
 
           {customTokens.length === 0 && (
             <p className="text-xs text-muted-foreground mt-2">
-              Click "Add Token" to track custom tokens
+              Add tokens to track balances
             </p>
           )}
         </div>

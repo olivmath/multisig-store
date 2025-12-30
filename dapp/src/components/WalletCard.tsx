@@ -1,6 +1,7 @@
-import { Wallet, Users, Clock } from "lucide-react";
+import { Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CopyableAddress } from "./CopyableAddress";
+import Identicon from "./Identicon";
 
 interface WalletCardProps {
   address: string;
@@ -22,12 +23,10 @@ const WalletCard = ({ address, owners, required, txCount, pendingCount }: Wallet
 
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-            <Wallet className="w-5 h-5 text-primary" />
-          </div>
+          <Identicon address={address} size={40} className="rounded-xl" />
           <div>
             <h3 className="font-semibold text-lg">MultiSig Wallet</h3>
-            <CopyableAddress address={address} className="text-xs text-muted-foreground" identiconSize={16} />
+            <CopyableAddress address={address} className="text-xs text-muted-foreground" showIdenticon={false} truncate="short" />
           </div>
         </div>
       </div>
