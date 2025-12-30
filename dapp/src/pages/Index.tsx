@@ -4,6 +4,7 @@ import StatsCard from "../components/StatsCard";
 import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
 import SilkBackground from "../components/SilkBackground";
+import { AnnouncementBanner } from "../components/AnnouncementBanner";
 import { useGlobalStats } from "../hooks/useGlobalStats";
 
 const Index = () => {
@@ -11,16 +12,21 @@ const Index = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background">
+      {/* Announcement Banner */}
+      <AnnouncementBanner variant="promo" storageKey="new-version-banner-v1">
+        New version available! Now with <strong>custom token tracking</strong> and improved security.
+      </AnnouncementBanner>
+
       {/* Header - Fixed */}
       <header className="flex-shrink-0 border-b border-border bg-background/80 backdrop-blur-xl z-50">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="container mx-auto flex h-20 items-center justify-between px-4">
           <div className="hidden sm:block">
             <Logo showTagline size="md" />
           </div>
           <div className="block sm:hidden">
             <Logo size="sm" />
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             <ConnectButton variant="launch" />
           </div>
