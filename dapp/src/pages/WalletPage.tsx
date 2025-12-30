@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Users, Shield, ArrowLeft } from "lucide-react";
 import { useAccount, useBalance } from "wagmi";
 import { formatEther } from "viem";
@@ -39,12 +39,12 @@ const WalletPage = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="hidden sm:block">
+          <Link to="/dashboard" className="hidden sm:block">
             <Logo size="md" />
-          </div>
-          <div className="block sm:hidden">
+          </Link>
+          <Link to="/dashboard" className="block sm:hidden">
             <Logo size="sm" />
-          </div>
+          </Link>
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
             <NotificationBell />

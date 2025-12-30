@@ -1,13 +1,15 @@
-import { Wallet, Users } from "lucide-react";
+import { Wallet, Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface WalletCardProps {
   address: string;
   owners: string[];
   required: number;
+  txCount: number;
+  pendingCount: number;
 }
 
-const WalletCard = ({ address, owners, required }: WalletCardProps) => {
+const WalletCard = ({ address, owners, required, txCount, pendingCount }: WalletCardProps) => {
   const navigate = useNavigate();
 
   return (
@@ -45,12 +47,15 @@ const WalletCard = ({ address, owners, required }: WalletCardProps) => {
 
       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Balance</p>
-          <p className="font-semibold">0 ETH</p>
+          <p className="text-xs text-muted-foreground mb-1">Transactions</p>
+          <p className="font-semibold">{txCount}</p>
         </div>
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Transactions</p>
-          <p className="font-semibold">0</p>
+          <div className="flex items-center gap-1 mb-1">
+            <Clock className="w-3 h-3 text-muted-foreground" />
+            <p className="text-xs text-muted-foreground">Pending</p>
+          </div>
+          <p className="font-semibold">{pendingCount}</p>
         </div>
       </div>
     </button>

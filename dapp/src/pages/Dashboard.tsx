@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Plus, ShoppingCart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { toast } from "sonner";
 import Logo from "../components/Logo";
@@ -10,7 +10,7 @@ import { NotificationBell } from "../components/NotificationBell";
 import WalletCard from "../components/WalletCard";
 import CreateWalletModal from "../components/CreateWalletModal";
 import { useMultiSigFactory } from "../hooks/useMultiSigFactory";
-import { useReadContract } from "wagmi";
+import { useReadContract, useReadContracts } from "wagmi";
 import { multiSigABI } from "../config/contracts/multiSigABI";
 
 const Dashboard = () => {
@@ -44,12 +44,12 @@ const Dashboard = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="hidden sm:block">
+          <Link to="/dashboard" className="hidden sm:block">
             <Logo size="md" />
-          </div>
-          <div className="block sm:hidden">
+          </Link>
+          <Link to="/dashboard" className="block sm:hidden">
             <Logo size="sm" />
-          </div>
+          </Link>
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
             <NotificationBell />
@@ -134,7 +134,44 @@ const WalletCardWrapper = ({ address }: { address: string }) => {
     functionName: 'required',
   });
 
-  if (!owners || !required) {
+  const { data: txCount } = useReadContract({
+    address: address as `0x${string}`,
+    abi: multiSigABI,
+    functionName: 'txCount',
+  });
+
+  // Get all transactions to count pending ones
+  const txCountNum = txCount ? Number(txCount) : 0;
+
+  const transactionContracts = useMemo(() => {
+    if (txCountNum === 0) return [];
+    return Array.from({ length: txCountNum }, (_, i) => ({
+      address: address as `0x${string}`,
+      abi: multiSigABI,
+      functionName: 'transactions' as const,
+      args: [BigInt(i)],
+    }));
+  }, [address, txCountNum]);
+
+  const { data: transactionsData } = useReadContracts({
+    contracts: transactionContracts,
+    query: {
+      enabled: transactionContracts.length > 0,
+    },
+  });
+
+  // Count pending transactions (executed === false)
+  const pendingCount = useMemo(() => {
+    if (!transactionsData) return 0;
+    return transactionsData.filter((txResult) => {
+      if (!txResult?.result) return false;
+      const tx = txResult.result as any[];
+      const executed = tx[4] as boolean; // Index 4 is executed field
+      return !executed;
+    }).length;
+  }, [transactionsData]);
+
+  if (!owners || !required || txCount === undefined) {
     return (
       <div className="rounded-2xl bg-card border border-border p-6 animate-pulse">
         <div className="h-24 bg-muted rounded" />
@@ -147,6 +184,8 @@ const WalletCardWrapper = ({ address }: { address: string }) => {
       address={address}
       owners={owners as string[]}
       required={Number(required)}
+      txCount={txCountNum}
+      pendingCount={pendingCount}
     />
   );
 };
