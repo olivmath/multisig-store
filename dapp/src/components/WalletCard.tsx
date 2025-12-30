@@ -1,5 +1,6 @@
 import { Wallet, Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { CopyableAddress } from "./CopyableAddress";
 
 interface WalletCardProps {
   address: string;
@@ -26,9 +27,7 @@ const WalletCard = ({ address, owners, required, txCount, pendingCount }: Wallet
           </div>
           <div>
             <h3 className="font-semibold text-lg">MultiSig Wallet</h3>
-            <p className="text-xs text-muted-foreground font-mono">
-              {address.slice(0, 6)}...{address.slice(-4)}
-            </p>
+            <CopyableAddress address={address} className="text-xs text-muted-foreground" />
           </div>
         </div>
       </div>

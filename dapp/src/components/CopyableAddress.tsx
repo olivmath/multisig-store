@@ -10,7 +10,9 @@ interface CopyableAddressProps {
 export function CopyableAddress({ address, truncate = true, className = '' }: CopyableAddressProps) {
   const [copied, setCopied] = useState(false)
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
     await navigator.clipboard.writeText(address)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)

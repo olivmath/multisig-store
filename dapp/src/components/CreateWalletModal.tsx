@@ -6,6 +6,7 @@ import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { toast } from "sonner";
 import Identicon from "./Identicon";
+import { CopyableAddress } from "./CopyableAddress";
 
 interface CreateWalletModalProps {
   isOpen: boolean;
@@ -119,9 +120,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
                   className="flex items-center gap-3 p-3 rounded-lg bg-background border border-border"
                 >
                   <Identicon address={owner} size={32} />
-                  <span className="flex-1 font-mono text-sm truncate">
-                    {owner.slice(0, 10)}...{owner.slice(-8)}
-                  </span>
+                  <CopyableAddress address={owner} className="flex-1 truncate" />
                   {owner === connectedAddress ? (
                     <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">You</span>
                   ) : (
