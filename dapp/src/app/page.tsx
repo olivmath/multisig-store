@@ -1,6 +1,8 @@
+'use client'
+
 import { useState } from "react";
 import { ArrowRight, Store } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import StatsCard from "@/components/StatsCard";
 import ConnectWalletModal from "@/components/ConnectWalletModal";
@@ -8,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useGlobalStats } from "@/hooks/useGlobalStats";
 
-const Index = () => {
+export default function Home() {
   const { toast } = useToast();
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleConnect = (address: string) => {
     toast({
@@ -19,7 +21,7 @@ const Index = () => {
       description: `Successfully connected to ${address.slice(0, 6)}...${address.slice(-4)}`,
       variant: "default",
     });
-    setTimeout(() => navigate("/dashboard"), 500);
+    setTimeout(() => router.push("/dashboard"), 500);
   };
 
   // Read real stats from blockchain
@@ -110,6 +112,4 @@ const Index = () => {
       />
     </div>
   );
-};
-
-export default Index;
+}

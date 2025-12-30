@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+'use client'
+
+import { useEffect, useState } from "react";
 import { Plus, ShoppingCart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useAccount, useDisconnect, useBalance } from "wagmi";
 import DashboardHeader from "@/components/DashboardHeader";
 import WalletCard from "@/components/WalletCard";
@@ -9,20 +11,10 @@ import { EventListener } from "@/components/EventListener";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMultiSigFactory } from "@/hooks/useMultiSigFactory";
-import { useMultiSig } from "@/hooks/useMultiSig";
 import { usePendingWallets } from "@/hooks/usePendingWallets";
 import { useWalletTransactionStats } from "@/hooks/useWalletTransactionStats";
+import { useMultiSig } from "@/hooks/useMultiSig";
 import { formatEther } from "viem";
-import { useState } from "react";
-
-interface WalletData {
-  id: string;
-  address: string;
-  name: string;
-  owners: string[];
-  required: number;
-  balance: string;
-}
 
 interface PendingWallet {
   id: string;
@@ -31,9 +23,9 @@ interface PendingWallet {
   pendingCount: number;
 }
 
-const Dashboard = () => {
+export default function Dashboard() {
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { address: connectedAddress, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -44,9 +36,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!isConnected) {
-      navigate("/");
+      router.push("/");
     }
-  }, [isConnected, navigate]);
+  }, [isConnected, router]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -68,7 +60,7 @@ const Dashboard = () => {
       description: "You have been successfully disconnected.",
       variant: "default",
     });
-    setTimeout(() => navigate("/"), 500);
+    setTimeout(() => router.push("/"), 500);
   };
 
   const handleCreateWallet = (wallet: { name: string; owners: string[]; required: number }) => {
@@ -154,7 +146,7 @@ const Dashboard = () => {
       />
     </div>
   );
-};
+}
 
 // Component to display individual MultiSig wallet card with data from blockchain
 function MultiSigWalletCard({ address, className }: { address: `0x${string}`; className?: string }) {
@@ -181,5 +173,3 @@ function MultiSigWalletCard({ address, className }: { address: `0x${string}`; cl
     />
   );
 }
-
-export default Dashboard;

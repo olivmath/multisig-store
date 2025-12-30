@@ -1,5 +1,5 @@
 import { Wallet, Users, FileText, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import Identicon from "./Identicon";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +18,8 @@ interface WalletCardProps {
 const WalletCard = ({ id, address, name, owners, required, balance, totalTransactions = 0, pendingTransactions = 0, className }: WalletCardProps) => {
 
   return (
-    <Link 
-      to={`/wallet/${id}`}
+    <Link
+      href={`/wallet/${id}`}
       className={cn(
         "group block relative overflow-hidden rounded-2xl bg-card border border-border p-6 card-hover",
         className

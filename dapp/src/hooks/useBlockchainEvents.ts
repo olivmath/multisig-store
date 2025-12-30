@@ -25,9 +25,9 @@ export function useBlockchainEvents(walletAddresses: `0x${string}`[]) {
       onLogs: (logs) => {
         logs.forEach((log) => {
           const { multiSig, creator, owners } = log.args as {
-            multiSig: string
-            creator: string
-            owners: string[]
+            multiSig: `0x${string}`
+            creator: `0x${string}`
+            owners: readonly `0x${string}`[]
           }
 
           // Check if user is one of the owners

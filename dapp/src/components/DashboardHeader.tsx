@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Bell, ChevronDown, LogOut, Wallet, ArrowRight, CheckCircle } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
 import { useChainId, useSwitchChain } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import Logo from "./Logo";
@@ -44,7 +44,6 @@ const DashboardHeader = ({ address, balance, network, pendingWallets, onLogout }
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const totalPending = pendingWallets.reduce((sum, w) => sum + w.pendingCount, 0);
 
@@ -52,7 +51,7 @@ const DashboardHeader = ({ address, balance, network, pendingWallets, onLogout }
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/dashboard">
+        <Link href="/dashboard">
           <Logo size="sm" />
         </Link>
 
@@ -84,7 +83,7 @@ const DashboardHeader = ({ address, balance, network, pendingWallets, onLogout }
                   {pendingWallets.map((wallet) => (
                     <Link
                       key={wallet.id}
-                      to={`/wallet/${wallet.id}`}
+                      href={`/wallet/${wallet.id}`}
                       className="flex items-center gap-3 p-4 hover:bg-secondary transition-colors border-b border-border last:border-b-0 group"
                     >
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -132,7 +131,7 @@ const DashboardHeader = ({ address, balance, network, pendingWallets, onLogout }
                 <DropdownMenuItem
                   key={net.id}
                   onClick={() => {
-                    switchChain({ chainId: net.id }, {
+                    switchChain({ chainId: net.id as 31337 | 11155111 }, {
                       onSuccess: () => {
                         toast({
                           title: "Network Changed",

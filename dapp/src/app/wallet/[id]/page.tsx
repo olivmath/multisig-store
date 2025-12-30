@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useRouter } from "next/navigation";
 import { Users, Shield, Coins, ArrowUpRight, Plus, Check, X } from "lucide-react";
 import { useAccount, useDisconnect, useBalance, useReadContract } from "wagmi";
 import { formatUnits, formatEther, parseEther, parseUnits } from "viem";
@@ -23,9 +25,10 @@ import { useMultiSigFactory } from "@/hooks/useMultiSigFactory";
 import { usePendingWallets } from "@/hooks/usePendingWallets";
 import { tokenABI } from "@/lib/contracts/tokenABI";
 
-const WalletPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+export default function WalletPage() {
+  const params = useParams();
+  const id = params?.id as string;
+  const router = useRouter();
   const { toast } = useToast();
   const { address: connectedAddress, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
@@ -87,9 +90,9 @@ const WalletPage = () => {
 
   useEffect(() => {
     if (!isConnected) {
-      navigate("/");
+      router.push("/");
     }
-  }, [isConnected, navigate]);
+  }, [isConnected, router]);
 
   const handleLogout = () => {
     disconnect();
@@ -98,7 +101,7 @@ const WalletPage = () => {
       description: "You have been successfully disconnected.",
       variant: "default",
     });
-    setTimeout(() => navigate("/"), 500);
+    setTimeout(() => router.push("/"), 500);
   };
 
   const handleSaveCustomToken = () => {
@@ -433,6 +436,4 @@ const WalletPage = () => {
       />
     </div>
   );
-};
-
-export default WalletPage;
+}

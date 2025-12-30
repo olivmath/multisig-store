@@ -1,5 +1,8 @@
+'use client'
+
 import { Bell, X, Check } from 'lucide-react'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useNotifications } from '@/contexts/NotificationContext'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,12 +13,11 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
-import { useNavigate } from 'react-router-dom'
 
 export function NotificationBell() {
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotification } = useNotifications()
   const [open, setOpen] = useState(false)
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const formatTimestamp = (timestamp: number) => {
     const seconds = Math.floor((Date.now() - timestamp) / 1000)
@@ -30,7 +32,7 @@ export function NotificationBell() {
 
     // Navigate to wallet page if notification has wallet address
     if (notification.walletAddress) {
-      navigate(`/wallet/${notification.walletAddress}`)
+      router.push(`/wallet/${notification.walletAddress}`)
       setOpen(false)
     }
   }
