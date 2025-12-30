@@ -8,6 +8,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
 import { tokenABI } from "@/config/contracts/tokenABI";
+import Identicon from "./Identicon";
 
 interface CustomToken {
   address: `0x${string}`;
@@ -151,13 +152,15 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
           </button>
         </div>
 
-        <div className="flex-1 flex flex-col space-y-1">
+        <div className="flex-1 flex flex-col">
           {/* ETH Balance */}
-          <div className="flex justify-between items-center py-2">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z" />
-              </svg>
+          <div className="flex justify-between items-center py-3 border-b border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
+                <svg className="w-4 h-4 text-foreground" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z" />
+                </svg>
+              </div>
               <span className="text-sm font-medium">ETH</span>
             </div>
             <span className="font-semibold tabular-nums">{ethBalanceFormatted}</span>
@@ -165,8 +168,11 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
 
           {/* Custom Token Balances */}
           {customTokens.map((token) => (
-            <div key={token.address} className="flex justify-between items-center py-2 group">
-              <span className="text-sm font-medium">{token.symbol}</span>
+            <div key={token.address} className="flex justify-between items-center py-3 border-b border-border/50 last:border-0 group">
+              <div className="flex items-center gap-3">
+                <Identicon address={token.address} size={28} />
+                <span className="text-sm font-medium">{token.symbol}</span>
+              </div>
               <div className="flex items-center gap-3">
                 <TokenBalanceValue walletAddress={walletAddress} token={token} />
                 <button
@@ -180,7 +186,7 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
           ))}
 
           {customTokens.length === 0 && (
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground mt-3">
               Add tokens to track balances
             </p>
           )}

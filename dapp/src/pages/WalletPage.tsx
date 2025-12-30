@@ -10,6 +10,7 @@ import { NotificationBell } from "../components/NotificationBell";
 import { NetworkSelector } from "../components/NetworkSelector";
 import { CopyableAddress } from "../components/CopyableAddress";
 import { BalanceCard } from "../components/BalanceCard";
+import Identicon from "../components/Identicon";
 import { TransactionCard } from "../components/TransactionCard";
 import CreateTransactionModal from "../components/CreateTransactionModal";
 import { useMultiSig } from "../hooks/useMultiSig";
@@ -61,10 +62,10 @@ const WalletPage = () => {
           <Link to="/dashboard" className="block sm:hidden">
             <Logo size="sm" />
           </Link>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <NetworkSelector />
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <NotificationBell />
+            <NetworkSelector />
             <ConnectButton />
           </div>
         </div>
@@ -81,13 +82,14 @@ const WalletPage = () => {
         </button>
 
         {/* Wallet Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="mb-8 flex items-center gap-4">
+          <Identicon address={walletAddress} size={56} className="rounded-xl flex-shrink-0" />
+          <div>
             <h1 className="font-display text-3xl font-semibold">
               Wallet {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
             </h1>
+            <CopyableAddress address={walletAddress} className="text-muted-foreground" showIdenticon={false} truncate="long" />
           </div>
-          <CopyableAddress address={walletAddress} className="text-muted-foreground" showIdenticon={false} />
         </div>
 
         {/* Info Cards */}
@@ -100,10 +102,10 @@ const WalletPage = () => {
               </div>
               <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Owners</h3>
             </div>
-            <div className="space-y-2 flex-1">
+            <div className="flex-1">
               {owners.map((owner, index) => (
-                <div key={index} className="flex items-center gap-2 p-2 rounded-lg bg-background/50">
-                  <CopyableAddress address={owner} className="text-xs text-muted-foreground" identiconSize={28} truncate="short" />
+                <div key={index} className="flex items-center gap-2 py-2 border-b border-border/50 last:border-0">
+                  <CopyableAddress address={owner} className="text-sm" identiconSize={28} truncate="short" />
                 </div>
               ))}
             </div>
