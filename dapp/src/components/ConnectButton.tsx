@@ -2,6 +2,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet, LogOut, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
 const ConnectButton = () => {
   const { address, isConnected } = useAccount();
@@ -11,15 +12,18 @@ const ConnectButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    if (isConnected && location.pathname === "/") {
-      navigate("/dashboard");
-    }
-  }, [isConnected, navigate, location]);
-
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
+
+  useEffect(() => {
+    if (isConnected && address && location.pathname === "/") {
+      toast.success("Wallet Connected!", {
+        description: `Successfully connected to ${formatAddress(address)}`,
+      });
+      navigate("/dashboard");
+    }
+  }, [isConnected, address, navigate, location]);
 
   if (isConnected && address) {
     return (
@@ -44,6 +48,9 @@ const ConnectButton = () => {
                 onClick={() => {
                   disconnect();
                   setIsOpen(false);
+                  toast.info("Disconnected", {
+                    description: "You have been successfully disconnected",
+                  });
                 }}
                 className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
               >
