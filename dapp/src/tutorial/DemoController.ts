@@ -1,207 +1,86 @@
 export type DemoAction =
-  | { type: "navigate"; path: string }
-  | { type: "click"; selector: string }
-  | { type: "fill"; selector: string; value: string }
-  | { type: "wait"; ms: number }
   | { type: "openModal"; modalType: "wallet" | "transaction" }
   | { type: "closeModal" }
   | { type: "createWallet" }
   | { type: "selectWallet"; address: string }
   | { type: "createTransaction" }
-  | { type: "confirmTransaction" }
-  | { type: "showNotification"; message: string };
+  | { type: "confirmTransaction" };
 
 export interface DemoStep {
   id: number;
   name: string;
-  description: string;
-  target: string;
   actions: DemoAction[];
-  placement?: "center" | "top" | "bottom" | "left" | "right";
 }
 
+// Actions are executed BEFORE the step is shown
+// So step 2 needs to open the modal so that step 2 can show the owner input
 export const DEMO_STEPS: DemoStep[] = [
   {
     id: 0,
     name: "welcome",
-    description: "Welcome to MultiSig Store",
-    target: "body",
-    placement: "center",
     actions: [],
   },
   {
     id: 1,
-    name: "dashboard-overview",
-    description: "Your Wallets Dashboard",
-    target: '[data-demo="wallet-cards"]',
-    placement: "top",
+    name: "purchase-button",
     actions: [],
   },
   {
     id: 2,
-    name: "purchase-button",
-    description: "Purchase New Wallet",
-    target: '[data-demo="purchase-wallet"]',
-    placement: "bottom",
-    actions: [],
-  },
-  {
-    id: 3,
-    name: "wallet-modal-open",
-    description: "Create Wallet Modal",
-    target: '[data-demo="wallet-modal"]',
-    placement: "center",
+    name: "owner-input",
     actions: [
       { type: "openModal", modalType: "wallet" },
     ],
   },
   {
+    id: 3,
+    name: "required-input",
+    actions: [],
+  },
+  {
     id: 4,
-    name: "wallet-modal-owners",
-    description: "Configure Owners",
-    target: '[data-demo="owner-input"]',
-    placement: "right",
+    name: "deploy-button",
     actions: [],
   },
   {
     id: 5,
-    name: "wallet-modal-required",
-    description: "Set Required Signatures",
-    target: '[data-demo="required-input"]',
-    placement: "right",
-    actions: [],
-  },
-  {
-    id: 6,
-    name: "wallet-created",
-    description: "Wallet Deployed",
-    target: '[data-demo="wallet-cards"]',
-    placement: "top",
+    name: "wallet-deployed",
     actions: [
       { type: "createWallet" },
       { type: "closeModal" },
     ],
   },
   {
-    id: 7,
-    name: "select-wallet",
-    description: "Open Wallet Details",
-    target: '[data-demo="wallet-card"]',
-    placement: "right",
+    id: 6,
+    name: "wallet-page",
     actions: [
       { type: "selectWallet", address: "0xMultiSig111111111111111111111111111111111" },
     ],
   },
   {
-    id: 8,
-    name: "wallet-page-overview",
-    description: "Wallet Management",
-    target: "body",
-    placement: "center",
-    actions: [],
-  },
-  {
-    id: 9,
-    name: "wallet-balance",
-    description: "Wallet Balance",
-    target: '[data-demo="wallet-balance"]',
-    placement: "left",
-    actions: [],
-  },
-  {
-    id: 10,
-    name: "owners-list",
-    description: "Wallet Owners",
-    target: '[data-demo="owners-list"]',
-    placement: "right",
-    actions: [],
-  },
-  {
-    id: 11,
+    id: 7,
     name: "create-transaction-button",
-    description: "Create Transaction",
-    target: '[data-demo="create-transaction"]',
-    placement: "bottom",
     actions: [],
   },
   {
-    id: 12,
-    name: "transaction-modal",
-    description: "Transaction Types",
-    target: '[data-demo="tx-modal"]',
-    placement: "center",
+    id: 8,
+    name: "transaction-types",
     actions: [
       { type: "openModal", modalType: "transaction" },
     ],
   },
   {
-    id: 13,
-    name: "transaction-types",
-    description: "Select Transaction Type",
-    target: '[data-demo="tx-type-tabs"]',
-    placement: "top",
-    actions: [],
-  },
-  {
-    id: 14,
+    id: 9,
     name: "transaction-form",
-    description: "Fill Transaction Details",
-    target: '[data-demo="tx-form"]',
-    placement: "right",
     actions: [],
   },
   {
-    id: 15,
+    id: 10,
     name: "transaction-submitted",
-    description: "Transaction Submitted",
-    target: '[data-demo="transactions-list"]',
-    placement: "top",
     actions: [
       { type: "createTransaction" },
       { type: "closeModal" },
     ],
-  },
-  {
-    id: 16,
-    name: "pending-transaction",
-    description: "Pending Transaction",
-    target: '[data-demo="transaction-card"]',
-    placement: "right",
-    actions: [],
-  },
-  {
-    id: 17,
-    name: "confirm-transaction",
-    description: "Confirm Transaction",
-    target: '[data-demo="confirm-tx-btn"]',
-    placement: "top",
-    actions: [],
-  },
-  {
-    id: 18,
-    name: "transaction-executed",
-    description: "Transaction Executed",
-    target: '[data-demo="transaction-card"]',
-    placement: "right",
-    actions: [
-      { type: "confirmTransaction" },
-    ],
-  },
-  {
-    id: 19,
-    name: "notifications",
-    description: "Notifications",
-    target: '[data-demo="notifications"]',
-    placement: "bottom",
-    actions: [],
-  },
-  {
-    id: 20,
-    name: "finish",
-    description: "Tutorial Complete",
-    target: "body",
-    placement: "center",
-    actions: [],
   },
 ];
 

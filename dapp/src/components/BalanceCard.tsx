@@ -9,6 +9,7 @@ import { Label } from "./ui/label";
 import { useNotifications } from "../contexts/NotificationContext";
 import { tokenABI } from "@/config/contracts/tokenABI";
 import Identicon from "./Identicon";
+import { EthereumIcon } from "./EthereumIcon";
 
 interface CustomToken {
   address: `0x${string}`;
@@ -168,10 +169,8 @@ export function BalanceCard({ walletAddress }: BalanceCardProps) {
           {/* ETH Balance */}
           <div className="flex justify-between items-center py-3 border-b border-border/50">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
-                <svg className="w-4 h-4 text-foreground" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z" />
-                </svg>
+              <div className="w-7 h-7 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <EthereumIcon className="w-4 h-4 text-blue-500" />
               </div>
               <span className="text-sm font-medium">ETH</span>
             </div>

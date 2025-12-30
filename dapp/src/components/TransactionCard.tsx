@@ -4,11 +4,12 @@ import { useMultiSig } from '@/hooks/useMultiSig'
 import { multiSigABI } from '@/config/contracts/multiSigABI'
 import { tokenABI } from '@/config/contracts/tokenABI'
 import { Button } from '@/components/ui/button'
-import { ArrowUpRight, Coins, Code, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Coins, Code, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { decodeTransaction } from '@/utils/decodeTransaction'
 import { useEffect } from 'react'
 import Identicon from './Identicon'
 import { CopyableAddress } from './CopyableAddress'
+import { EthereumIcon } from './EthereumIcon'
 
 interface TransactionCardProps {
   multiSigAddress: `0x${string}`
@@ -214,7 +215,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
 
   // Get transaction type icon
   const getTypeIcon = () => {
-    if (txInfo.type === 'eth') return <ArrowUpRight className="w-4 h-4" />
+    if (txInfo.type === 'eth') return <EthereumIcon className="w-4 h-4" />
     if (txInfo.type === 'erc20') return <Coins className="w-4 h-4" />
     return <Code className="w-4 h-4" />
   }

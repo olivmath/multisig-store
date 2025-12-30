@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowUpRight, Coins, Code, AlertTriangle } from "lucide-react";
+import { Coins, Code, AlertTriangle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useNotifications } from "../contexts/NotificationContext";
 import { parseEther, parseUnits } from "viem";
 import { isValidAddress } from "../utils/validation";
+import { EthereumIcon } from "./EthereumIcon";
 
 type TransactionType = "eth" | "erc20" | "custom";
 
@@ -131,10 +132,16 @@ const CreateTransactionModal = ({
   };
 
   const typeOptions = [
-    { value: "eth", label: "Ether (ETH)", icon: ArrowUpRight },
-    { value: "erc20", label: "ERC20 Token", icon: Coins },
-    { value: "custom", label: "Custom Transaction", icon: Code },
+    { value: "eth", label: "Ether (ETH)" },
+    { value: "erc20", label: "ERC20 Token" },
+    { value: "custom", label: "Custom Transaction" },
   ];
+
+  const getTypeIcon = (type: string) => {
+    if (type === "eth") return <EthereumIcon className="w-5 h-5" />;
+    if (type === "erc20") return <Coins className="w-5 h-5" />;
+    return <Code className="w-5 h-5" />;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -160,7 +167,7 @@ const CreateTransactionModal = ({
                       : "border-border bg-background hover:border-primary/50"
                   }`}
                 >
-                  <option.icon className="w-5 h-5" />
+                  {getTypeIcon(option.value)}
                   <span className="text-xs font-medium">{option.label}</span>
                 </button>
               ))}
