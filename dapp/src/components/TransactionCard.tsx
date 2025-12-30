@@ -35,25 +35,25 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     functionName: 'getConfirmers',
     args: [txId],
     query: {
-      refetchInterval: 2000,
+      refetchInterval: 10000,
       refetchOnWindowFocus: true,
-      staleTime: 0,
+      staleTime: 5000,
     },
   })
 
   // Read multisig balance to check if it can execute
   const { data: walletBalance } = useBalance({ address: multiSigAddress })
 
-  // Read transaction data - refetch every 2 seconds to catch execution
+  // Read transaction data
   const { data: txData, isLoading: txLoading, refetch: refetchTx } = useReadContract({
     address: multiSigAddress,
     abi: multiSigABI,
     functionName: 'transactions',
     args: [txId],
     query: {
-      refetchInterval: 2000, // Refetch every 2 seconds
+      refetchInterval: 10000,
       refetchOnWindowFocus: true,
-      staleTime: 0,
+      staleTime: 5000,
     },
   })
 
@@ -90,16 +90,16 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     },
   })
 
-  // Read confirmation count for this transaction - refetch every 2 seconds
+  // Read confirmation count for this transaction
   const { data: confirmationCount, refetch: refetchConfCount } = useReadContract({
     address: multiSigAddress,
     abi: multiSigABI,
     functionName: 'confirmationCount',
     args: [txId],
     query: {
-      refetchInterval: 2000, // Refetch every 2 seconds
+      refetchInterval: 10000,
       refetchOnWindowFocus: true,
-      staleTime: 0,
+      staleTime: 5000,
     },
   })
 

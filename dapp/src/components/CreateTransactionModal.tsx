@@ -6,6 +6,7 @@ import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useNotifications } from "../contexts/NotificationContext";
 import { parseEther, parseUnits } from "viem";
+import { isValidAddress } from "../utils/validation";
 
 type TransactionType = "eth" | "erc20" | "custom";
 
@@ -45,10 +46,6 @@ const CreateTransactionModal = ({
       setCalldata("");
     }
   }, [isOpen]);
-
-  const isValidAddress = (addr: string) => {
-    return addr.startsWith("0x") && addr.length === 42 && /^0x[a-fA-F0-9]{40}$/.test(addr);
-  };
 
   const handleSubmit = () => {
     // Validate destination

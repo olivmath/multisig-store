@@ -87,29 +87,6 @@ const dashboardSteps: Step[] = [
     disableBeacon: true,
   },
   {
-    target: '[data-tour="network-selector"]',
-    content: (
-      <div className="text-left">
-        <h3 className="text-lg font-bold mb-3">Network & Balance</h3>
-        <p className="mb-3">
-          Your ETH balance and current network are shown here.
-        </p>
-        <div className="bg-muted/50 rounded-lg p-3 text-sm">
-          <p className="font-medium mb-2">Available networks:</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li><strong>Sepolia:</strong> Ethereum testnet (free test ETH)</li>
-            <li><strong>Anvil:</strong> Local development network</li>
-          </ul>
-        </div>
-        <p className="mt-3 text-sm text-yellow-600 dark:text-yellow-400">
-          Always verify you're on the correct network before transacting!
-        </p>
-      </div>
-    ),
-    placement: "bottom",
-    disableBeacon: true,
-  },
-  {
     target: '[data-tour="tutorial-button"]',
     content: (
       <div className="text-left">
@@ -154,8 +131,7 @@ const emptyStateSteps: Step[] = [
     disableBeacon: true,
   },
   dashboardSteps[3], // Notifications
-  dashboardSteps[4], // Network selector
-  dashboardSteps[5], // Tutorial button
+  dashboardSteps[4], // Tutorial button
 ];
 
 // Wallet page tour - explains transactions

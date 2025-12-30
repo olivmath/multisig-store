@@ -1,4 +1,5 @@
-import { Store } from "lucide-react";
+import { Store, PlayCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
 import StatsCard from "../components/StatsCard";
 import ThemeToggle from "../components/ThemeToggle";
@@ -72,9 +73,20 @@ const Index = () => {
               </p>
 
               {/* Subheadline */}
-              <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-up" style={{ animationDelay: "0.15s" }}>
+              <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6 animate-fade-up" style={{ animationDelay: "0.15s" }}>
                 Purchase your pre-deployed multisig smart contract on-chain. Manage shared funds with institutional security and multi-party approvals.
               </p>
+
+              {/* Try Demo Button */}
+              <div className="mb-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+                <Link
+                  to="/tutorial"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-primary/30 bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
+                >
+                  <PlayCircle className="w-5 h-5" />
+                  Try Interactive Demo
+                </Link>
+              </div>
 
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-up" style={{ animationDelay: "0.3s" }}>

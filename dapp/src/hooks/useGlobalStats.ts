@@ -13,9 +13,9 @@ export function useGlobalStats() {
     abi: multiSigFactoryABI,
     functionName: 'getDeployedMultiSigs',
     query: {
-      refetchInterval: 5000,
+      refetchInterval: 30000,
       refetchOnWindowFocus: true,
-      staleTime: 0,
+      staleTime: 15000,
     },
   })
 
@@ -43,9 +43,9 @@ export function useGlobalStats() {
     contracts: contracts as any,
     query: {
       enabled: contracts.length > 0,
-      refetchInterval: 5000,
+      refetchInterval: 30000,
       refetchOnWindowFocus: true,
-      staleTime: 0,
+      staleTime: 15000,
     },
   })
 

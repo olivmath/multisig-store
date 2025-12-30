@@ -1,4 +1,5 @@
-import { Github, Linkedin, Verified, HelpCircle } from "lucide-react";
+import { Github, Linkedin, Verified, HelpCircle, PlayCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useTutorial } from "../contexts/TutorialContext";
 
 interface FooterProps {
@@ -24,6 +25,14 @@ export function Footer({ showTutorial = true }: FooterProps) {
           {" "}- All rights reserved
         </p>
         <div className="flex items-center gap-4">
+          <Link
+            to="/tutorial"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+            title="Interactive Demo"
+          >
+            <PlayCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">Try Demo</span>
+          </Link>
           {showTutorial && (
             <button
               data-tour="tutorial-button"

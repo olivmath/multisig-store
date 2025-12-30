@@ -27,7 +27,8 @@ function TokenBalanceValue({ walletAddress, token }: { walletAddress: `0x${strin
     functionName: "balanceOf",
     args: [walletAddress],
     query: {
-      refetchInterval: 10000,
+      refetchInterval: 15000,
+      staleTime: 5000,
     },
   });
 

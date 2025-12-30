@@ -6,6 +6,7 @@ import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useNotifications } from "../contexts/NotificationContext";
 import { CopyableAddress } from "./CopyableAddress";
+import { isValidAddress } from "../utils/validation";
 
 interface CreateWalletModalProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
       return;
     }
 
-    if (!trimmedOwner.startsWith("0x") || trimmedOwner.length !== 42 || !/^0x[a-fA-F0-9]{40}$/.test(trimmedOwner)) {
+    if (!isValidAddress(trimmedOwner)) {
       addNotification({
         type: 'error',
         title: 'Invalid Address',
