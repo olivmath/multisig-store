@@ -1,10 +1,10 @@
-import { useAccount, useReadContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useReadContract, useWaitForTransactionReceipt, useBalance } from 'wagmi'
 import { formatEther } from 'viem'
 import { useMultiSig } from '@/hooks/useMultiSig'
 import { multiSigABI } from '@/lib/contracts/multiSigABI'
 import { tokenABI } from '@/lib/contracts/tokenABI'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, ArrowUpRight, Coins, Code } from 'lucide-react'
+import { CheckCircle2, ArrowUpRight, Coins, Code, AlertTriangle } from 'lucide-react'
 import { decodeTransaction } from '@/lib/utils/decodeTransaction'
 import { useEffect } from 'react'
 
@@ -25,6 +25,9 @@ interface Transaction {
 export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps) {
   const { address: userAddress } = useAccount()
   const { required, confirmTransaction, confirmTxHash } = useMultiSig(multiSigAddress)
+
+  // Read multisig balance to check if it can execute
+  const { data: walletBalance } = useBalance({ address: multiSigAddress })
 
   // Read transaction data
   const { data: txData, isLoading: txLoading, refetch: refetchTx } = useReadContract({
@@ -132,6 +135,17 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     symbol: tokenSymbol as string,
     decimals: tokenDecimals as number,
   })
+
+  // Check if this confirmation will trigger execution
+  const currentConfirmations = confirmationCount ? Number(confirmationCount) : 0
+  const willExecute = !hasUserConfirmed && currentConfirmations + 1 >= required
+
+  // Check if wallet has enough balance for ETH transactions
+  const hasInsufficientBalance =
+    willExecute &&
+    txInfo.type === 'eth' &&
+    walletBalance &&
+    walletBalance.value < tx.amount
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 space-y-4 hover:border-primary/50 transition-colors">
@@ -245,6 +259,20 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         )}
       </div>
 
+      {/* Insufficient Balance Warning */}
+      {!tx.executed && hasInsufficientBalance && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+          <div className="text-xs text-destructive">
+            <p className="font-semibold mb-1">Insufficient Balance</p>
+            <p>
+              Multisig wallet needs {formatEther(tx.amount)} ETH but only has{' '}
+              {walletBalance ? formatEther(walletBalance.value) : '0'} ETH. Add funds before confirming.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       {!tx.executed && (
         <div className="flex gap-3 pt-2 border-t border-border/50">
@@ -253,7 +281,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
               variant="outline"
               size="sm"
               onClick={handleConfirm}
-              disabled={isConfirmPending}
+              disabled={isConfirmPending || hasInsufficientBalance}
               className="flex-1"
             >
               {isConfirmPending ? 'Confirming...' : 'Confirm Transaction'}

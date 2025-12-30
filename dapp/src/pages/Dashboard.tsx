@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMultiSigFactory } from "@/hooks/useMultiSigFactory";
 import { useMultiSig } from "@/hooks/useMultiSig";
 import { usePendingWallets } from "@/hooks/usePendingWallets";
+import { useWalletTransactionStats } from "@/hooks/useWalletTransactionStats";
 import { formatEther } from "viem";
 import { useState } from "react";
 
@@ -118,7 +119,7 @@ const Dashboard = () => {
             className="gap-2"
           >
             <ShoppingCart className="w-5 h-5" />
-            {isCreating ? "Creating..." : "Create New Wallet"}
+            {isCreating ? "Buying..." : "Buy New Wallet"}
           </Button>
         </div>
 
@@ -157,8 +158,9 @@ const Dashboard = () => {
 
 // Component to display individual MultiSig wallet card with data from blockchain
 function MultiSigWalletCard({ address, className }: { address: `0x${string}`; className?: string }) {
-  const { owners, required, txCount } = useMultiSig(address);
+  const { owners, required } = useMultiSig(address);
   const { data: balance } = useBalance({ address });
+  const { totalTransactions, pendingTransactions } = useWalletTransactionStats(address);
 
   // Always render WalletCard, even during loading
   // Use a placeholder owner address if data is still loading
@@ -173,6 +175,8 @@ function MultiSigWalletCard({ address, className }: { address: `0x${string}`; cl
       owners={displayOwners}
       required={displayRequired}
       balance={balance ? formatEther(balance.value) : "0"}
+      totalTransactions={totalTransactions}
+      pendingTransactions={pendingTransactions}
       className={className}
     />
   );

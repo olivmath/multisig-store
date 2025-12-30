@@ -118,7 +118,7 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: Crea
             <div className="p-2 rounded-xl bg-primary/10">
               <Shield className="w-5 h-5 text-primary" />
             </div>
-            Create New Wallet
+            Get your New Wallet
           </DialogTitle>
         </DialogHeader>
 
@@ -200,9 +200,9 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate }: Crea
           <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20">
             <AlertTriangle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium">Creation Fee</p>
+              <p className="text-sm font-medium">Wallet Price</p>
               <p className="text-sm text-muted-foreground">
-                Creating this wallet requires a fee of <span className="text-primary font-semibold">0.01 ETH</span> for contract deployment.
+                The price for this digital multisig wallet is <span className="text-primary font-semibold">0.01 ETH</span>.
               </p>
             </div>
           </div>

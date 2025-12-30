@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Bell, ChevronDown, LogOut, Wallet, ArrowRight, CheckCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useChainId, useSwitchChain } from "wagmi";
+import { sepolia } from "wagmi/chains";
 import Logo from "./Logo";
 import Identicon from "./Identicon";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "./NotificationBell";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,13 +36,14 @@ interface DashboardHeaderProps {
 }
 
 const networks = [
-  { id: "mainnet", name: "Ethereum Mainnet" },
-  { id: "sepolia", name: "Sepolia Testnet" },
-  { id: "goerli", name: "Goerli Testnet" },
+  { id: sepolia.id, name: "Sepolia" },
+  { id: 31337, name: "Anvil" },
 ];
 
 const DashboardHeader = ({ address, balance, network, pendingWallets, onLogout }: DashboardHeaderProps) => {
-  const [currentNetwork, setCurrentNetwork] = useState(network);
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const totalPending = pendingWallets.reduce((sum, w) => sum + w.pendingCount, 0);
@@ -119,7 +123,7 @@ const DashboardHeader = ({ address, balance, network, pendingWallets, onLogout }
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-500" />
-                {networks.find(n => n.id === currentNetwork)?.name || "Network"}
+                {networks.find(n => n.id === chainId)?.name || "Network"}
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -127,11 +131,30 @@ const DashboardHeader = ({ address, balance, network, pendingWallets, onLogout }
               {networks.map((net) => (
                 <DropdownMenuItem
                   key={net.id}
-                  onClick={() => setCurrentNetwork(net.id)}
-                  className={currentNetwork === net.id ? "bg-secondary" : ""}
+                  onClick={() => {
+                    switchChain({ chainId: net.id }, {
+                      onSuccess: () => {
+                        toast({
+                          title: "Network Changed",
+                          description: `Switched to ${net.name}`,
+                          variant: "default",
+                        });
+                        // Refresh the page to reload contracts
+                        window.location.reload();
+                      },
+                      onError: (error) => {
+                        toast({
+                          title: "Network Change Failed",
+                          description: error.message,
+                          variant: "destructive",
+                        });
+                      },
+                    });
+                  }}
+                  className={chainId === net.id ? "bg-secondary" : ""}
                 >
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${currentNetwork === net.id ? 'bg-green-500' : 'bg-muted'}`} />
+                    <div className={`w-2 h-2 rounded-full ${chainId === net.id ? 'bg-green-500' : 'bg-muted'}`} />
                     {net.name}
                   </div>
                 </DropdownMenuItem>

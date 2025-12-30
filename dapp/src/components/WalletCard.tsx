@@ -1,4 +1,4 @@
-import { Wallet, Users } from "lucide-react";
+import { Wallet, Users, FileText, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import Identicon from "./Identicon";
 import { cn } from "@/lib/utils";
@@ -10,11 +10,12 @@ interface WalletCardProps {
   owners: string[];
   required: number;
   balance: string;
+  totalTransactions?: number;
+  pendingTransactions?: number;
   className?: string;
 }
 
-const WalletCard = ({ id, address, name, owners, required, balance, className }: WalletCardProps) => {
-  const progress = (required / owners.length) * 100;
+const WalletCard = ({ id, address, name, owners, required, balance, totalTransactions = 0, pendingTransactions = 0, className }: WalletCardProps) => {
 
   return (
     <Link 
@@ -60,17 +61,29 @@ const WalletCard = ({ id, address, name, owners, required, balance, className }:
         </div>
       </div>
 
-      {/* Required signatures */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-muted-foreground">Required</span>
-          <span className="text-sm font-semibold text-primary">{required}/{owners.length}</span>
+      {/* Transaction Stats */}
+      <div className="mb-4 grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Total Transactions</span>
+          </div>
+          <p className="text-xl font-display font-bold text-foreground">{totalTransactions}</p>
         </div>
-        <div className="progress-gold">
-          <div 
-            className="progress-gold-fill"
-            style={{ width: `${progress}%` }}
-          />
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Pending</span>
+          </div>
+          <p className="text-xl font-display font-bold text-primary">{pendingTransactions}</p>
+        </div>
+      </div>
+
+      {/* Required signatures */}
+      <div className="mb-4 py-3 border-t border-border">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Required Signatures</span>
+          <span className="text-sm font-semibold text-primary">{required}/{owners.length}</span>
         </div>
       </div>
 
@@ -80,15 +93,6 @@ const WalletCard = ({ id, address, name, owners, required, balance, className }:
         <span className="text-lg font-display font-semibold">
           {balance} <span className="text-primary text-sm">ETH</span>
         </span>
-      </div>
-
-      {/* Hover indicator */}
-      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-          <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
       </div>
     </Link>
   );
