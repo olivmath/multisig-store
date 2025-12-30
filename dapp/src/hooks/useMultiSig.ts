@@ -78,19 +78,6 @@ export function useMultiSig(multiSigAddress: `0x${string}` | undefined) {
     })
   }
 
-  // Write: Execute transaction
-  const { writeContract: execute } = useWriteContract()
-
-  const executeTransaction = (txId: bigint) => {
-    if (!multiSigAddress) return
-    execute({
-      address: multiSigAddress,
-      abi: multiSigABI,
-      functionName: 'executeTransaction',
-      args: [txId],
-    })
-  }
-
   return {
     owners: (owners as `0x${string}`[]) || [],
     required: required ? Number(required) : 0,
@@ -101,6 +88,5 @@ export function useMultiSig(multiSigAddress: `0x${string}` | undefined) {
     submitTxHash,
     confirmTransaction,
     confirmTxHash,
-    executeTransaction,
   }
 }
