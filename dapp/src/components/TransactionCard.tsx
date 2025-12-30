@@ -4,9 +4,10 @@ import { useMultiSig } from '@/hooks/useMultiSig'
 import { multiSigABI } from '@/config/contracts/multiSigABI'
 import { tokenABI } from '@/config/contracts/tokenABI'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, ArrowUpRight, Coins, Code, AlertTriangle } from 'lucide-react'
+import { ArrowUpRight, Coins, Code, AlertTriangle, CheckCircle2, Copy, Check } from 'lucide-react'
 import { decodeTransaction } from '@/utils/decodeTransaction'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import Identicon from './Identicon'
 
 interface TransactionCardProps {
   multiSigAddress: `0x${string}`
@@ -24,7 +25,20 @@ interface Transaction {
 
 export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps) {
   const { address: userAddress } = useAccount()
-  const { required, confirmTransaction, confirmTxHash } = useMultiSig(multiSigAddress)
+  const { required, confirmTransaction, confirmTxHash, owners } = useMultiSig(multiSigAddress)
+
+  // Read confirmers for this transaction
+  const { data: confirmers, refetch: refetchConfirmers } = useReadContract({
+    address: multiSigAddress,
+    abi: multiSigABI,
+    functionName: 'getConfirmers',
+    args: [txId],
+    query: {
+      refetchInterval: 2000,
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    },
+  })
 
   // Read multisig balance to check if it can execute
   const { data: walletBalance } = useBalance({ address: multiSigAddress })
@@ -113,9 +127,10 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         refetchTx()
         refetchConfirmation()
         refetchConfCount()
+        refetchConfirmers()
       }, 2000)
     }
-  }, [isConfirmSuccess, refetchTx, refetchConfirmation, refetchConfCount])
+  }, [isConfirmSuccess, refetchTx, refetchConfirmation, refetchConfCount, refetchConfirmers])
 
   if (txLoading || !tx || !required) {
     return (
@@ -124,16 +139,6 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         <div className="h-3 bg-muted rounded w-2/3"></div>
       </div>
     )
-  }
-
-  const getStatusColor = () => {
-    if (tx.executed) return 'bg-green-500/10 text-green-600 border-green-500/30'
-    return 'bg-primary/10 text-primary border-primary/30'
-  }
-
-  const getStatusText = () => {
-    if (tx.executed) return 'Executed'
-    return 'Pending'
   }
 
   const handleConfirm = () => {
@@ -157,74 +162,58 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
     walletBalance &&
     walletBalance.value < tx.amount
 
-  return (
-    <div className="rounded-2xl border border-border bg-card p-6 space-y-4 hover:border-primary/50 transition-colors">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground font-mono">TX #{txId.toString()}</span>
-            <span className={`text-xs px-3 py-1 rounded-full border font-medium ${getStatusColor()}`}>
-              {getStatusText()}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {txInfo.type === 'eth' && (
-              <ArrowUpRight className="w-4 h-4 text-primary" />
-            )}
-            {txInfo.type === 'erc20' && (
-              <Coins className="w-4 h-4 text-primary" />
-            )}
-            {txInfo.type === 'custom' && (
-              <Code className="w-4 h-4 text-primary" />
-            )}
-            <p className="text-sm text-muted-foreground">
-              {txInfo.type === 'eth' && 'Send ETH'}
-              {txInfo.type === 'erc20' && 'Send ERC20 Token'}
-              {txInfo.type === 'custom' && 'Custom Transaction'}
-            </p>
-          </div>
-        </div>
+  // Get confirmers as array of addresses
+  const confirmersList = (confirmers as `0x${string}`[]) || []
 
+  // Helper to check if an owner has confirmed
+  const hasOwnerConfirmed = (owner: `0x${string}`) => {
+    return confirmersList.some((c) => c.toLowerCase() === owner.toLowerCase())
+  }
+
+  // Get transaction type label
+  const getTypeLabel = () => {
+    if (txInfo.type === 'eth') return 'Send ETH'
+    if (txInfo.type === 'erc20') return 'Send Token'
+    return 'Custom'
+  }
+
+  // Get transaction type icon
+  const getTypeIcon = () => {
+    if (txInfo.type === 'eth') return <ArrowUpRight className="w-4 h-4" />
+    if (txInfo.type === 'erc20') return <Coins className="w-4 h-4" />
+    return <Code className="w-4 h-4" />
+  }
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 space-y-4 hover:border-primary/50 transition-colors">
+      {/* Header: Type (left) + Value (right) */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <span className={`p-2 rounded-lg ${tx.executed ? 'bg-green-500/10 text-green-600' : 'bg-primary/10 text-primary'}`}>
+            {getTypeIcon()}
+          </span>
+          <span className="font-medium">{getTypeLabel()}</span>
+          {tx.executed && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/30">
+              Executed
+            </span>
+          )}
+        </div>
         <div className="text-right">
-          {txInfo.type === 'eth' && (
-            <p className="text-2xl font-display font-bold text-primary">
-              {txInfo.displayValue} {txInfo.symbol}
-            </p>
-          )}
-          {txInfo.type === 'erc20' && (
-            <p className="text-2xl font-display font-bold text-primary">
-              {txInfo.displayValue} {txInfo.symbol}
-            </p>
-          )}
-          {txInfo.type === 'custom' && tx.amount > 0 && (
-            <p className="text-2xl font-display font-bold text-primary">
-              {formatEther(tx.amount)} ETH
-            </p>
-          )}
+          <p className="text-xl font-display font-bold text-primary">
+            {txInfo.displayValue} {txInfo.symbol}
+          </p>
         </div>
       </div>
 
-      {/* Token Contract (for ERC20) or Spacer */}
-      {txInfo.type === 'erc20' ? (
-        <div className="space-y-1 py-3 border-t border-border/50">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide">Token Contract</p>
-          <p className="font-mono text-sm">
-            {txInfo.tokenContract!.slice(0, 10)}...{txInfo.tokenContract!.slice(-8)}
-          </p>
-        </div>
-      ) : (
-        <div className="py-3 border-t border-border/50 opacity-0 pointer-events-none">
-          <p className="text-xs uppercase tracking-wide">Spacer</p>
-          <p className="text-sm">Placeholder</p>
-        </div>
-      )}
+      {/* TX ID */}
+      <div className="text-xs text-muted-foreground font-mono">
+        TX #{txId.toString()}
+      </div>
 
       {/* Destination */}
       <div className="space-y-1 py-3 border-t border-border/50">
-        <p className="text-xs text-muted-foreground uppercase tracking-wide">
-          {txInfo.type === 'erc20' ? 'Recipient' : 'Destination'}
-        </p>
+        <p className="text-xs text-muted-foreground uppercase tracking-wide">Destination</p>
         {txInfo.destination ? (
           <p className="font-mono text-sm">
             {txInfo.destination.slice(0, 10)}...{txInfo.destination.slice(-8)}
@@ -234,8 +223,16 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
         )}
       </div>
 
-      {/* Calldata (for custom transactions) */}
-      {txInfo.type === 'custom' && (
+      {/* Token (for ERC20) or Calldata (for custom) or empty space */}
+      {txInfo.type === 'erc20' && txInfo.tokenContract && (
+        <div className="space-y-1 py-3 border-t border-border/50">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Token</p>
+          <p className="font-mono text-sm">
+            {txInfo.tokenContract.slice(0, 10)}...{txInfo.tokenContract.slice(-8)}
+          </p>
+        </div>
+      )}
+      {txInfo.type === 'custom' && txInfo.calldata && txInfo.calldata !== '0x' && (
         <div className="space-y-1 py-3 border-t border-border/50">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Calldata</p>
           <p className="font-mono text-xs break-all bg-muted/50 p-2 rounded">
@@ -243,30 +240,39 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
           </p>
         </div>
       )}
+      {txInfo.type === 'eth' && (
+        <div className="py-3 border-t border-border/50" />
+      )}
 
-      {/* Confirmations Progress */}
-      <div className="space-y-2 pb-2">
+      {/* Confirmations with owner icons */}
+      <div className="space-y-3 py-3 border-t border-border/50">
         <div className="flex justify-between items-center">
           <p className="text-xs text-muted-foreground uppercase tracking-wide">Confirmations</p>
           <p className="text-sm font-semibold">
             {confirmationCount ? Number(confirmationCount) : 0}/{required}
           </p>
         </div>
-        <div className="progress-gold">
-          <div
-            className={`h-2 rounded-full transition-all ${
-              tx.executed ? 'bg-green-500' : 'bg-primary'
-            }`}
-            style={{
-              width: tx.executed ? '100%' : `${((confirmationCount ? Number(confirmationCount) : 0) / required) * 100}%`,
-            }}
-          />
+        <div className="flex gap-2 flex-wrap">
+          {owners.map((owner) => {
+            const confirmed = hasOwnerConfirmed(owner)
+            return (
+              <div
+                key={owner}
+                className="relative group"
+                title={`${owner.slice(0, 6)}...${owner.slice(-4)}`}
+              >
+                {confirmed ? (
+                  <CheckCircle2 className="w-8 h-8 text-green-500" />
+                ) : (
+                  <Circle className="w-8 h-8 text-muted-foreground/30" strokeDasharray="4 2" />
+                )}
+                <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {owner.slice(0, 4)}...{owner.slice(-2)}
+                </span>
+              </div>
+            )
+          })}
         </div>
-        {!tx.executed && (
-          <p className="text-xs text-muted-foreground text-center pt-1">
-            Transaction will execute automatically when threshold is reached
-          </p>
-        )}
       </div>
 
       {/* Insufficient Balance Warning */}
@@ -277,38 +283,36 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
             <p className="font-semibold mb-1">Insufficient Balance</p>
             <p>
               Multisig wallet needs {formatEther(tx.amount)} ETH but only has{' '}
-              {walletBalance ? formatEther(walletBalance.value) : '0'} ETH. Add funds before confirming.
+              {walletBalance ? formatEther(walletBalance.value) : '0'} ETH.
             </p>
           </div>
         </div>
       )}
 
       {/* Actions */}
-      {!tx.executed && (
-        <div className="flex gap-3 pt-2 border-t border-border/50">
-          {!hasUserConfirmed ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleConfirm}
-              disabled={isConfirmPending || hasInsufficientBalance}
-              className="flex-1"
-            >
-              {isConfirmPending ? 'Confirming...' : 'Confirm Transaction'}
-            </Button>
-          ) : (
-            <div className="flex-1 text-center text-sm text-green-600 py-2 font-medium">
-              ✓ You confirmed this transaction
-            </div>
-          )}
-        </div>
-      )}
-
-      {tx.executed && (
-        <div className="text-center text-sm text-green-600 py-2 font-medium border-t border-border/50">
-          ✓ Transaction executed successfully
-        </div>
-      )}
+      <div className="pt-2 border-t border-border/50">
+        {tx.executed ? (
+          <Button variant="outline" size="sm" disabled className="w-full bg-green-500/10 text-green-600 border-green-500/30">
+            <CheckCircle2 className="w-4 h-4 mr-2" />
+            Transaction Executed
+          </Button>
+        ) : hasUserConfirmed ? (
+          <Button variant="outline" size="sm" disabled className="w-full bg-green-500/10 text-green-600 border-green-500/30">
+            <CheckCircle2 className="w-4 h-4 mr-2" />
+            Confirmed
+          </Button>
+        ) : (
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleConfirm}
+            disabled={isConfirmPending || hasInsufficientBalance}
+            className="w-full"
+          >
+            {isConfirmPending ? 'Confirming...' : 'Confirm Transaction'}
+          </Button>
+        )}
+      </div>
     </div>
   )
 }
