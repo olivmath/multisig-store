@@ -71,7 +71,7 @@ const WalletPage = () => {
         </div>
       </header>
 
-      <main className="container px-4 py-8">
+      <main className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <button
           onClick={() => navigate("/dashboard")}

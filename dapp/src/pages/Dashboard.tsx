@@ -51,10 +51,10 @@ const Dashboard = () => {
           <Link to="/dashboard" className="block sm:hidden">
             <Logo size="sm" />
           </Link>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <NetworkSelector />
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <NotificationBell />
+            <NetworkSelector />
             <ConnectButton />
           </div>
         </div>
