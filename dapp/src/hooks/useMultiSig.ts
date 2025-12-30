@@ -32,12 +32,12 @@ export function useMultiSig(multiSigAddress: `0x${string}` | undefined) {
     },
   })
 
-  // Write: Submit ETH transaction
-  const { writeContract: submitEth } = useWriteContract()
+  // Write: Submit transactions (shared hook to track tx hash)
+  const { writeContract: submitTx, data: submitTxHash } = useWriteContract()
 
   const submitETH = (to: `0x${string}`, amount: bigint) => {
     if (!multiSigAddress) return
-    submitEth({
+    submitTx({
       address: multiSigAddress,
       abi: multiSigABI,
       functionName: 'submitETH',
@@ -45,12 +45,9 @@ export function useMultiSig(multiSigAddress: `0x${string}` | undefined) {
     })
   }
 
-  // Write: Submit ERC20 transaction
-  const { writeContract: submitErc20 } = useWriteContract()
-
   const submitERC20 = (token: `0x${string}`, to: `0x${string}`, amount: bigint) => {
     if (!multiSigAddress) return
-    submitErc20({
+    submitTx({
       address: multiSigAddress,
       abi: multiSigABI,
       functionName: 'submitERC20',
@@ -58,12 +55,9 @@ export function useMultiSig(multiSigAddress: `0x${string}` | undefined) {
     })
   }
 
-  // Write: Submit custom transaction
-  const { writeContract: submitCustom } = useWriteContract()
-
   const submitCustomTransaction = (to: `0x${string}`, value: bigint, data: `0x${string}`) => {
     if (!multiSigAddress) return
-    submitCustom({
+    submitTx({
       address: multiSigAddress,
       abi: multiSigABI,
       functionName: 'submitCustom',
@@ -104,6 +98,7 @@ export function useMultiSig(multiSigAddress: `0x${string}` | undefined) {
     submitETH,
     submitERC20,
     submitCustomTransaction,
+    submitTxHash,
     confirmTransaction,
     confirmTxHash,
     executeTransaction,

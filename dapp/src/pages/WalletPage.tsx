@@ -1,30 +1,46 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Users, Shield, ArrowLeft } from "lucide-react";
-import { useAccount, useBalance } from "wagmi";
+import { Users, Shield, ArrowLeft, Plus } from "lucide-react";
+import { useAccount, useBalance, useWaitForTransactionReceipt } from "wagmi";
 import { formatEther } from "viem";
+import { toast } from "sonner";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 import ConnectButton from "../components/ConnectButton";
 import { NotificationBell } from "../components/NotificationBell";
 import Identicon from "../components/Identicon";
 import { TransactionCard } from "../components/TransactionCard";
+import CreateTransactionModal from "../components/CreateTransactionModal";
 import { useMultiSig } from "../hooks/useMultiSig";
 
 const WalletPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isConnected } = useAccount();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const walletAddress = id as `0x${string}` | undefined;
-  const { owners, required, txCount } = useMultiSig(walletAddress);
+  const { owners, required, txCount, submitETH, submitERC20, submitCustomTransaction, submitTxHash } = useMultiSig(walletAddress);
   const { data: walletBalance } = useBalance({ address: walletAddress });
+
+  const { isLoading: isSubmitting, isSuccess: isSubmitSuccess } = useWaitForTransactionReceipt({
+    hash: submitTxHash,
+  });
 
   useEffect(() => {
     if (!isConnected) {
       navigate("/");
     }
   }, [isConnected, navigate]);
+
+  useEffect(() => {
+    if (isSubmitSuccess) {
+      toast.success("Transaction Submitted!", {
+        description: "Your transaction has been submitted and is awaiting confirmations.",
+      });
+      setIsModalOpen(false);
+    }
+  }, [isSubmitSuccess]);
 
   if (!walletAddress) {
     return (
@@ -136,7 +152,16 @@ const WalletPage = () => {
 
         {/* Transactions */}
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-6">Transactions</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold">Transactions</h2>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-5 h-5" />
+              New Transaction
+            </button>
+          </div>
           {txCount === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-12 text-center">
               <p className="text-muted-foreground">No transactions yet</p>
@@ -155,6 +180,16 @@ const WalletPage = () => {
           )}
         </div>
       </main>
+
+      {/* Create Transaction Modal */}
+      <CreateTransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmitETH={submitETH}
+        onSubmitERC20={submitERC20}
+        onSubmitCustom={submitCustomTransaction}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 };
