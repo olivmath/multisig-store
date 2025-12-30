@@ -15,7 +15,19 @@ if (walletConnectProjectId) {
   connectors.push(
     walletConnect({
       projectId: walletConnectProjectId,
+      metadata: {
+        name: 'MultiSigStore',
+        description: 'Secure Multi-Signature Digital Wallets',
+        url: 'https://multisigstore.vercel.app',
+        icons: ['https://multisigstore.vercel.app/favicon.ico'],
+      },
       showQrModal: true,
+      qrModalOptions: {
+        themeMode: 'dark',
+        themeVariables: {
+          '--wcm-z-index': '9999',
+        },
+      },
     })
   )
 }

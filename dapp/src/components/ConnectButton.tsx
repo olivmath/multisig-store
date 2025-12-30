@@ -26,10 +26,10 @@ const ConnectButton = () => {
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card hover:bg-accent transition-colors"
+          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg border border-border bg-card hover:bg-accent transition-colors"
         >
           <Wallet className="w-4 h-4 text-primary" />
-          <span className="font-mono text-sm">{formatAddress(address)}</span>
+          <span className="font-mono text-xs sm:text-sm">{formatAddress(address)}</span>
           <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
@@ -89,10 +89,11 @@ const ConnectButton = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
+        className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity text-sm sm:text-base"
       >
         <Wallet className="w-4 h-4" />
-        Connect Wallet
+        <span className="hidden xs:inline sm:inline">Connect</span>
+        <span className="hidden sm:inline">Wallet</span>
       </button>
 
       {isOpen && (

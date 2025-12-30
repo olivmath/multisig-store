@@ -13,8 +13,13 @@ const Index = () => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Logo showTagline size="md" />
-          <div className="flex items-center gap-4">
+          <div className="hidden sm:block">
+            <Logo showTagline size="md" />
+          </div>
+          <div className="block sm:hidden">
+            <Logo size="sm" />
+          </div>
+          <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
             <ConnectButton />
           </div>
