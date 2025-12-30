@@ -19,16 +19,21 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="h-screen flex flex-col bg-background">
+      {/* Announcement Banner */}
+      <AnnouncementBanner variant="warning" storageKey="testnet-banner-v1">
+        This app is running on <strong>Sepolia Testnet</strong>. Do not use real funds.
+      </AnnouncementBanner>
+
       {/* Header - Fixed */}
       <header className="flex-shrink-0 border-b border-border bg-background/80 backdrop-blur-xl z-50">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="container mx-auto flex h-20 items-center justify-between px-4">
           <Link to="/dashboard" className="hidden sm:block">
             <Logo size="md" />
           </Link>
           <Link to="/dashboard" className="block sm:hidden">
             <Logo size="sm" />
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             <NotificationBell />
             <NetworkSelector />

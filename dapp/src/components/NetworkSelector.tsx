@@ -43,7 +43,7 @@ export function NetworkSelector() {
   return (
     <div className="flex items-center gap-3">
       {/* Balance */}
-      <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border">
+      <div className="hidden sm:flex items-center gap-2 h-10 px-3 rounded-lg bg-card border border-border">
         <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24">
           <path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z"/>
         </svg>
@@ -54,7 +54,7 @@ export function NetworkSelector() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-primary/50 transition-colors"
+          className="flex items-center gap-2 h-10 px-3 rounded-lg bg-card border border-border hover:border-primary/50 transition-colors"
         >
           <div className={`w-2 h-2 rounded-full ${currentNetwork.color}`} />
           <span className="text-sm font-medium">{currentNetwork.label}</span>
