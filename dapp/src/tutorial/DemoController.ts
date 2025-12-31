@@ -82,6 +82,11 @@ export const DEMO_STEPS: DemoStep[] = [
       { type: "closeModal" },
     ],
   },
+  {
+    id: 11,
+    name: "notifications",
+    actions: [],
+  },
 ];
 
 export function getStepById(id: number): DemoStep | undefined {

@@ -200,6 +200,26 @@ const joyrideSteps: Step[] = [
     placement: "top",
     disableBeacon: true,
   },
+  // Step 12 - Notifications
+  {
+    target: '[data-demo="notifications"]',
+    content: (
+      <div className="text-left">
+        <h3 className="text-lg font-bold mb-3">Notifications</h3>
+        <p className="mb-3 text-sm text-muted-foreground">
+          Stay updated with real-time notifications about your wallets.
+        </p>
+        <p className="text-sm text-yellow-600 dark:text-yellow-400 mb-1">You'll be notified when:</p>
+        <ul className="list-disc list-inside space-y-1 text-sm text-yellow-600 dark:text-yellow-400">
+          <li>A new transaction is submitted</li>
+          <li>Someone confirms a transaction</li>
+          <li>A transaction is executed</li>
+        </ul>
+      </div>
+    ),
+    placement: "bottom",
+    disableBeacon: true,
+  },
 ];
 
 interface TutorialModeProps {

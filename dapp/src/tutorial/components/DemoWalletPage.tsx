@@ -161,6 +161,9 @@ function DemoTransactionCard({ tx, required, isFirst }: DemoTransactionCardProps
     "bg-orange-500/10 text-orange-600 dark:text-orange-400",
   ];
 
+  // Check if current user has already confirmed
+  const userHasConfirmed = tx.confirmedBy.includes(demoMode.userAddress);
+
   return (
     <div
       data-demo={isFirst ? "transaction-card" : undefined}
@@ -216,13 +219,23 @@ function DemoTransactionCard({ tx, required, isFirst }: DemoTransactionCardProps
         </div>
 
         {!tx.executed && isFirst && (
-          <button
-            data-demo="confirm-tx-btn"
-            onClick={() => demoMode.confirmTransaction()}
-            className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            Confirm
-          </button>
+          userHasConfirmed ? (
+            <button
+              data-demo="confirmed-btn"
+              disabled
+              className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-sm font-medium cursor-not-allowed"
+            >
+              Confirmed
+            </button>
+          ) : (
+            <button
+              data-demo="confirm-tx-btn"
+              onClick={() => demoMode.confirmTransaction()}
+              className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              Confirm
+            </button>
+          )
         )}
       </div>
     </div>
