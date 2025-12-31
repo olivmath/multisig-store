@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 import Identicon from './Identicon'
 import { CopyableAddress } from './CopyableAddress'
 import { EthereumIcon } from './EthereumIcon'
+import { useDemoModeOptional } from '@/tutorial/DemoModeContext'
 
 interface TransactionCardProps {
   multiSigAddress: `0x${string}`
@@ -26,8 +27,137 @@ interface Transaction {
 }
 
 export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps) {
+  const demoMode = useDemoModeOptional()
   const { address: userAddress } = useAccount()
   const { required, confirmTransaction, confirmTxHash, owners } = useMultiSig(multiSigAddress)
+
+  // Demo mode: render simplified card with mock data
+  if (demoMode) {
+    const demoTx = demoMode.getTransactionData(multiSigAddress, txId)
+    const walletData = demoMode.getWalletData(multiSigAddress)
+
+    if (!demoTx || !walletData) {
+      return null
+    }
+
+    const txInfo = {
+      type: demoTx.txType === 0 ? 'eth' : demoTx.txType === 1 ? 'erc20' : 'custom',
+      displayValue: formatEther(demoTx.amount),
+      symbol: 'ETH',
+      destination: demoTx.to,
+    }
+
+    const userHasConfirmed = demoTx.confirmedBy.includes(demoMode.userAddress)
+
+    const getTypeLabel = () => {
+      if (txInfo.type === 'eth') return 'Send ETH'
+      if (txInfo.type === 'erc20') return 'Send Token'
+      return 'Custom Transaction'
+    }
+
+    const getTypeIcon = () => {
+      if (txInfo.type === 'eth') return <EthereumIcon className="w-4 h-4" />
+      if (txInfo.type === 'erc20') return <Coins className="w-4 h-4" />
+      return <Code className="w-4 h-4" />
+    }
+
+    return (
+      <div className="rounded-2xl border border-border bg-card p-5 space-y-4 hover:border-primary/50 transition-colors">
+        {/* Header: Type (left) + Value (right) */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <span className={`p-2 rounded-lg ${demoTx.executed ? 'bg-green-500/10 text-green-600' : 'bg-primary/10 text-primary'}`}>
+              {getTypeIcon()}
+            </span>
+            <span className="font-medium">{getTypeLabel()}</span>
+            {demoTx.executed && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/30">
+                Executed
+              </span>
+            )}
+          </div>
+          <div className="text-right">
+            <p className="text-xl font-display font-bold text-primary">
+              {txInfo.displayValue} {txInfo.symbol}
+            </p>
+          </div>
+        </div>
+
+        {/* TX ID */}
+        <div className="text-xs text-muted-foreground font-mono">
+          Transaction #{txId.toString()}
+        </div>
+
+        {/* Destination */}
+        <div className="space-y-1 py-3 border-t border-border/50">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Recipient</p>
+          <CopyableAddress address={txInfo.destination} />
+        </div>
+
+        {/* Placeholder for alignment */}
+        <div className="space-y-1 py-3 border-t border-border/50 min-h-[60px]">
+          <div className="h-6" />
+        </div>
+
+        {/* Confirmations with owner icons */}
+        <div className="space-y-3 py-3 border-t border-border/50">
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Confirmations</p>
+            <p className="text-sm font-semibold">
+              {demoTx.confirmCount}/{walletData.required}
+            </p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {walletData.owners.map((owner) => {
+              const confirmed = demoTx.confirmedBy.some(c => c.toLowerCase() === owner.toLowerCase())
+              return (
+                <div key={owner} className="relative group">
+                  <div className="relative w-8 h-8">
+                    <Identicon
+                      address={owner}
+                      size={32}
+                      className={confirmed ? '' : 'opacity-30'}
+                      copyable
+                    />
+                    {!confirmed && (
+                      <div className="absolute inset-0 rounded-full border-2 border-dashed border-muted-foreground/50 pointer-events-none" />
+                    )}
+                  </div>
+                  <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    {owner.slice(0, 4)}...{owner.slice(-2)}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="pt-2 border-t border-border/50">
+          {demoTx.executed ? (
+            <Button variant="outline" size="sm" disabled className="w-full bg-green-500/10 text-green-600 border-green-500/30">
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              Transaction executed successfully
+            </Button>
+          ) : userHasConfirmed ? (
+            <Button variant="outline" size="sm" disabled className="w-full bg-green-500/10 text-green-600 border-green-500/30">
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              You confirmed this transaction
+            </Button>
+          ) : (
+            <Button
+              variant="gold"
+              size="sm"
+              onClick={() => confirmTransaction(txId)}
+              className="w-full"
+            >
+              Confirm Transaction
+            </Button>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   // Read confirmers for this transaction
   const { data: confirmers, refetch: refetchConfirmers } = useReadContract({

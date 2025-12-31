@@ -10,6 +10,7 @@ import { useNotifications } from "../contexts/NotificationContext";
 import { tokenABI } from "@/config/contracts/tokenABI";
 import Identicon from "./Identicon";
 import { EthereumIcon } from "./EthereumIcon";
+import { useDemoModeOptional } from "@/tutorial/DemoModeContext";
 
 interface CustomToken {
   address: `0x${string}`;
@@ -41,12 +42,54 @@ function TokenBalanceValue({ walletAddress, token }: { walletAddress: `0x${strin
 }
 
 export function BalanceCard({ walletAddress }: BalanceCardProps) {
+  const demoMode = useDemoModeOptional();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customTokens, setCustomTokens] = useState<CustomToken[]>([]);
   const [newTokenAddress, setNewTokenAddress] = useState("");
   const { addNotification } = useNotifications();
 
-  const { data: ethBalance } = useBalance({ address: walletAddress });
+  const { data: ethBalance } = useBalance({
+    address: walletAddress,
+    query: { enabled: !demoMode },
+  });
+
+  // Demo mode: render simplified card
+  if (demoMode) {
+    const walletData = demoMode.getWalletData(walletAddress);
+    const ethBalanceFormatted = walletData
+      ? parseFloat(formatUnits(walletData.balance, 18)).toFixed(4)
+      : "0.0000";
+
+    return (
+      <div className="rounded-2xl border border-border bg-card p-6 flex flex-col min-h-[200px]">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-primary/10">
+              <Coins className="w-5 h-5 text-primary" />
+            </div>
+            <h3 className="font-display font-semibold uppercase tracking-wide text-sm">Balance</h3>
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col overflow-y-auto">
+          {/* ETH Balance */}
+          <div className="flex justify-between items-center py-3 border-b border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <EthereumIcon className="w-4 h-4 text-blue-500" />
+              </div>
+              <span className="text-sm font-medium">ETH</span>
+            </div>
+            <span className="font-semibold tabular-nums">{ethBalanceFormatted}</span>
+          </div>
+
+          <p className="text-xs text-muted-foreground mt-3">
+            Demo mode - custom tokens disabled
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Load custom tokens from localStorage
   useEffect(() => {

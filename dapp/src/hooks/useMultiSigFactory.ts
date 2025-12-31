@@ -2,8 +2,10 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { sepolia } from 'wagmi/chains'
 import { multiSigFactoryABI } from '../config/contracts/multiSigFactoryABI'
 import { CONTRACTS, CREATION_FEE } from '../config/contracts/addresses'
+import { useDemoModeOptional } from '../tutorial/DemoModeContext'
 
 export function useMultiSigFactory() {
+  const demoMode = useDemoModeOptional()
   const { address: userAddress } = useAccount()
   const factoryAddress = CONTRACTS[sepolia.id].MultiSigFactory
 
@@ -14,7 +16,7 @@ export function useMultiSigFactory() {
     functionName: 'getOwnerMultiSigs',
     args: userAddress ? [userAddress] : undefined,
     query: {
-      enabled: !!userAddress,
+      enabled: !!userAddress && !demoMode,
       refetchOnMount: true,
       refetchOnWindowFocus: true,
     },
@@ -24,6 +26,10 @@ export function useMultiSigFactory() {
   const { writeContract, data: hash, isPending } = useWriteContract()
 
   const createMultiSig = (owners: `0x${string}`[], required: number) => {
+    if (demoMode) {
+      demoMode.createWallet()
+      return
+    }
     writeContract({
       address: factoryAddress,
       abi: multiSigFactoryABI,
@@ -35,6 +41,17 @@ export function useMultiSigFactory() {
 
   // Wait for TX confirmation
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
+
+  // Demo mode: return mock data
+  if (demoMode) {
+    return {
+      userMultiSigs: demoMode.wallets.map(w => w.address),
+      createMultiSig,
+      isCreating: false,
+      isSuccess: demoMode.newWalletCreated,
+      refetchUserMultiSigs: () => Promise.resolve({ data: undefined }),
+    }
+  }
 
   return {
     userMultiSigs: (userMultiSigs as `0x${string}`[]) || [],

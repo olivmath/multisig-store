@@ -44,6 +44,7 @@ interface DemoModeState {
 }
 
 interface DemoModeContextType extends DemoModeState {
+  isDemoMode: true;
   nextStep: () => void;
   prevStep: () => void;
   setStep: (step: number) => void;
@@ -54,6 +55,9 @@ interface DemoModeContextType extends DemoModeState {
   createTransaction: () => void;
   confirmTransaction: () => void;
   resetDemo: () => void;
+  // Data getters for hooks
+  getWalletData: (address: `0x${string}`) => DemoWallet | undefined;
+  getTransactionData: (walletAddress: `0x${string}`, txId: bigint) => DemoTransaction | undefined;
 }
 
 const DemoModeContext = createContext<DemoModeContextType | null>(null);
@@ -102,7 +106,7 @@ export function DemoModeProvider({ children }: { children: ReactNode }) {
     setState(prev => {
       const newWallet: DemoWallet = {
         ...DEMO_NEW_WALLET,
-        transactions: DEMO_TRANSACTIONS,
+        transactions: [],
       };
       return {
         ...prev,
@@ -188,8 +192,20 @@ export function DemoModeProvider({ children }: { children: ReactNode }) {
     setState(initialState);
   }, []);
 
+  // Data getters for hooks
+  const getWalletData = useCallback((address: `0x${string}`) => {
+    return state.wallets.find(w => w.address.toLowerCase() === address.toLowerCase());
+  }, [state.wallets]);
+
+  const getTransactionData = useCallback((walletAddress: `0x${string}`, txId: bigint) => {
+    const wallet = state.wallets.find(w => w.address.toLowerCase() === walletAddress.toLowerCase());
+    if (!wallet?.transactions) return undefined;
+    return wallet.transactions.find(tx => tx.id === Number(txId));
+  }, [state.wallets]);
+
   const value: DemoModeContextType = {
     ...state,
+    isDemoMode: true,
     nextStep,
     prevStep,
     setStep,
@@ -200,6 +216,8 @@ export function DemoModeProvider({ children }: { children: ReactNode }) {
     createTransaction,
     confirmTransaction,
     resetDemo,
+    getWalletData,
+    getTransactionData,
   };
 
   return (
@@ -209,10 +227,16 @@ export function DemoModeProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Hook that returns demo context or null if not in demo mode
 export function useDemoMode() {
   const context = useContext(DemoModeContext);
   if (!context) {
     throw new Error("useDemoMode must be used within a DemoModeProvider");
   }
   return context;
+}
+
+// Hook that returns demo data if in demo mode, null otherwise (safe to use outside provider)
+export function useDemoModeOptional() {
+  return useContext(DemoModeContext);
 }
