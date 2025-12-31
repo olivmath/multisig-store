@@ -54,7 +54,7 @@ export const DEMO_STEPS: DemoStep[] = [
     id: 6,
     name: "wallet-page",
     actions: [
-      { type: "selectWallet", address: "0xMultiSig111111111111111111111111111111111" },
+      { type: "selectWallet", address: "0xNewMultiSig22222222222222222222222222222" },
     ],
   },
   {

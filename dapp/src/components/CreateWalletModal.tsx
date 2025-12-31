@@ -172,28 +172,26 @@ const CreateWalletModal = ({ isOpen, onClose, connectedAddress, onCreate, isCrea
           </div>
 
           {/* Required Signatures */}
-          <div className="space-y-2">
-            <Label htmlFor="required">Required Signatures</Label>
+          <div className="space-y-3">
+            <Label>Required Signatures</Label>
             <div className="flex items-center gap-4">
-              <Input
-                id="required"
-                type="number"
+              <input
+                type="range"
                 min={1}
                 max={owners.length}
                 value={required}
-                onChange={(e) => setRequired(Math.min(Math.max(1, parseInt(e.target.value) || 1), owners.length))}
-                className="bg-background w-24"
+                onChange={(e) => setRequired(parseInt(e.target.value))}
+                className="flex-1 h-2 bg-muted rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
               />
-              <span className="text-muted-foreground">out of {owners.length} owners</span>
-            </div>
-            {required > 0 && required < owners.length && (
-              <div className="progress-gold mt-2">
-                <div
-                  className="progress-gold-fill"
-                  style={{ width: `${(required / owners.length) * 100}%` }}
-                />
+              <div className="flex items-center gap-2 text-2xl font-bold min-w-[80px] justify-center">
+                <span>{required}</span>
+                <span className="text-muted-foreground">/</span>
+                <span className="text-muted-foreground">{owners.length}</span>
               </div>
-            )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Number of approvals needed to execute transactions
+            </p>
           </div>
 
           {/* Fee Warning */}

@@ -342,7 +342,7 @@ export function TransactionCard({ multiSigAddress, txId }: TransactionCardProps)
           </Button>
         ) : (
           <Button
-            variant="default"
+            variant="gold"
             size="sm"
             onClick={handleConfirm}
             disabled={isConfirmPending || hasInsufficientBalance}
